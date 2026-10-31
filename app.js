@@ -37,9 +37,9 @@
       const mh = ty + 905 * s;
       layer.style.setProperty('--mh', Math.round(mh) + 'px');
     }
-    scene.style.setProperty('--s', s);
-    scene.style.setProperty('--tx', tx + 'px');
-    scene.style.setProperty('--ty', ty + 'px');
+    body.style.setProperty('--s', s);
+    body.style.setProperty('--tx', tx + 'px');
+    body.style.setProperty('--ty', ty + 'px');
 
     canvas.width = Math.round(vw * dpr);
     canvas.height = Math.round(vh * dpr);
@@ -126,7 +126,7 @@
   }
 
   function initSnow() {
-    const n = mobile ? 45 : 90;
+    const n = mobile ? 25 : 40;
     flakes.length = 0;
     for (let i = 0; i < n; i++) flakes.push(newFlake(true));
   }
