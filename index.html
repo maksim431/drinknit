@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Drinknit — новогодние наборы с вязаными игрушками</title>
+  <meta name="description" content="Новогодние наборы с вязаными игрушками ручной работы. Свяжу, упакую и подпишу открытку вашим текстом. Три набора: 600, 1 400 и 1 900 ₽.">
+  <meta name="theme-color" content="#0b3a20">
+  <meta property="og:title" content="Drinknit — новогодние наборы с вязаными игрушками">
+  <meta property="og:description" content="Свяжу, упакую и подпишу открытку вашим текстом. До Нового года успею сделать только 10.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="preload" as="image" href="assets/box-closed.webp">
+  <link rel="preload" as="image" href="assets/box-open.webp">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="is-loading">
+  <main class="viewport" aria-label="Новогодние наборы Drinknit">
+    <div class="stage scene" id="scene">
+      <!-- shadow under the box -->
+      <img class="shadow" src="assets/shadow.svg" alt="" aria-hidden="true">
+
+      <!-- magic glow & light rays behind the box -->
+      <div class="glow" aria-hidden="true"></div>
+      <div class="rays" aria-hidden="true"></div>
+
+      <!-- frame 1: closed gift -->
+      <div class="closed" aria-hidden="true">
+        <img class="closed__img" src="assets/box-closed.webp" alt="">
+      </div>
+
+      <!-- frame 2: open gift (back layer, under the frame) -->
+      <img class="open open--back" src="assets/box-open.webp"
+           alt="Открытая коробка: вязаные козлик, барашек, варежка, зелёный человечек в костюме Деда Мороза, открытка и крем">
+
+      <!-- cream frame -->
+      <img class="frame" src="assets/frame.svg" alt="" aria-hidden="true">
+
+      <!-- frame 2: open gift (front layer, the lid goes over the frame) -->
+      <div class="open-crop" aria-hidden="true">
+        <img class="open open--front" src="assets/box-open.webp" alt="">
+      </div>
+
+      <img class="snow-static" src="assets/snow.png" alt="" aria-hidden="true">
+    </div>
+
+    <div class="stage layer" id="layer">
+      <a class="logo ui" href="./" aria-label="Drinknit — вещи ручной работы">
+        <img src="assets/logo.svg" alt="" width="108" height="61">
+        <span>Вещи ручной работы</span>
+      </a>
+
+      <p class="stock ui"><span>Свободно</span><span>10 из 10 наборов</span></p>
+
+      <h1 class="title ui">
+        <span class="title__line ui">Новогодние наборы</span>
+        <span class="title__line ui">с вязаными игрушками</span>
+        <span class="title__line ui">ручной работы</span>
+      </h1>
+
+      <div class="offer">
+        <p class="offer__text ui">Свяжу, упакую и подпишу открытку вашим текстом.<br>
+          Три набора: 600, 1&nbsp;400 и 1&nbsp;900&nbsp;₽.<br>
+          До Нового года успею сделать только 10.</p>
+        <div class="offer__actions">
+          <a class="btn btn--primary ui" href="#sets">Выбрать набор</a>
+          <a class="btn btn--ghost ui" href="#contact">Написать мне</a>
+        </div>
+      </div>
+
+      <button class="sound ui" type="button" aria-pressed="false" aria-label="Включить музыку">
+        <img src="assets/sound.svg" alt="" width="32" height="32">
+        <i class="sound__waves" aria-hidden="true"><b></b><b></b></i>
+      </button>
+    </div>
+  </main>
+
+  <canvas class="fx" id="fx" aria-hidden="true"></canvas>
+  <button class="skip" type="button">Пропустить</button>
+
+  <script src="app.js"></script>
+</body>
+</html>
