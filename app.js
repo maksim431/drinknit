@@ -426,6 +426,8 @@
 
   // ---------------------------------------------------------------- items
   const BOX_RECT = { x: -229, y: -516, w: 2352, h: 1757 };
+  const BOX_SHIFT = { x: 13, y: 116 };   // the set moves down a bit on screen 2
+  const off = { x: 0, y: 0 };
   const itemsHost = document.getElementById('items');
   const itemsHostM = document.getElementById('items-m');
   const focusHost = document.getElementById('focus');
@@ -472,7 +474,8 @@
     }).catch(() => {});
   });
 
-  function hitItem(sx, sy) {
+  function hitItem(sx, sy, noOffset) {
+    if (!noOffset) { sx -= off.x; sy -= off.y; }
     for (const it of ITEMS) {
       if (!it.alpha || sx < it.x || sy < it.y || sx > it.x + it.w || sy > it.y + it.h) continue;
       const px = Math.floor((sx - it.x) / it.w * it.alpha.w);
@@ -486,7 +489,7 @@
     if (!it.edge || !it.edge.length) return;
     for (let i = 0; i < n; i++) {
       const [x, y] = pick(it.edge);
-      mote(x + rand(-3, 3), y + rand(-3, 3), opts);
+      mote(x + off.x + rand(-3, 3), y + off.y + rand(-3, 3), opts);
     }
   }
 
@@ -548,7 +551,7 @@
       if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
       const x = BOX_RECT.x + (e.clientX - r.left) / r.width * BOX_RECT.w;
       const y = BOX_RECT.y + (e.clientY - r.top) / r.height * BOX_RECT.h;
-      const it = hitItem(x, y);
+      const it = hitItem(x, y, true);
       if (it) openModal(it);
       return;
     }
@@ -606,8 +609,9 @@
       // the item stays lit above the dimmer, the window opens next to it
       focusHost.innerHTML = '<div class="items"></div>';
       focusHost.firstChild.appendChild(itemEl(it));
-      const cx = it.x + it.w / 2;
-      let left = cx >= 960 ? it.x - 24 - 700 : it.x + it.w + 24;
+      const ix = it.x + off.x;
+      const cx = ix + it.w / 2;
+      let left = cx >= 960 ? ix - 24 - 700 : ix + it.w + 24;
       left = Math.max(60, Math.min(left, W - 60 - 700));
       const top = 291; // as in the design
       modal.style.left = left + 'px';
@@ -688,12 +692,12 @@
     [q('.logo'), q('.hint')],
     [q('.stock'), q('.chip')],
     [q('.title'), q('.title2')],
-    [q('.offer__text'), q('.tabs')],
+    [q('.offer__text'), q('.tabsbar')],
     [q('.offer__text'), q('.desc')],
     [q('.offer__actions'), q('.buy')],
   ];
   const S1_ELS = [...new Set(PAIRS.map(p => p[0]))];
-  const S2_ELS = [q('.hint'), q('.title2'), q('.panel')];
+  const S2_ELS = [q('.hint'), q('.title2'), q('.panel'), q('.tabsbar'), q('.fade-bottom')];
   let geo = null, p = 0, lastP = 0, morphReady = false;
 
   const centre = el => {
@@ -715,6 +719,9 @@
     const a = smooth(0, .55, p);      // screen 1 leaving
     const b = smooth(.45, 1, p);      // screen 2 arriving
     body.style.setProperty('--p', p.toFixed(4));
+    const bo = smooth(0, 1, p);
+    body.style.setProperty('--bo', bo.toFixed(4));
+    off.x = BOX_SHIFT.x * bo; off.y = BOX_SHIFT.y * bo;
     layer.style.setProperty('--sp', smooth(.15, .85, p).toFixed(4));
     if (body.classList.contains('is-done') || force) {
       const seen = new Set();
@@ -738,7 +745,7 @@
       cropEl.style.opacity = 1 - a;
     }
     const was = onSets;
-    onSets = p > .5;
+    onSets = p > .5 && storyQ < .3;
     body.classList.toggle('on-sets', onSets);
     if (!onSets && was) { setHover(null); }
   }
@@ -768,8 +775,11 @@
     requestAnimationFrame(() => {
       ticking = false;
       if (mobile) return;
+      updateStory();
       p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight || 1)));
       const dp = Math.abs(p - lastP);
+      const nowSets = p > .5 && storyQ < .3;
+      if (nowSets !== onSets) applyMorph(true);
       if (dp > 0) {
         applyMorph();
         morphParticles(dp);
@@ -780,6 +790,97 @@
   }
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', () => { if (morphReady) measure(); onScroll(); });
+
+  // ---------------------------------------------------------------- block 3: slides
+  const story = document.getElementById('story');
+  const storyPin = document.getElementById('story-pin');
+  const viewportEl = document.querySelector('.viewport');
+  const storyTitle = story.querySelector('.story__title');
+  const storySub = story.querySelector('.story__sub');
+  const slides = [...story.querySelectorAll('.slide')];
+  let storyQ = 0, lastQ = 0, slideR = 0, lastR = 0, lastSlideIdx = 0;
+  const SLIDE_C = { x: 960, y: 470 };
+
+  function updateStory() {
+    if (mobile) { // the block is desktop-only for now
+      viewportEl.style.opacity = viewportEl.style.filter = viewportEl.style.scale = viewportEl.style.visibility = '';
+      storyQ = 0;
+      body.classList.remove('in-story');
+      return;
+    }
+    const vhh = window.innerHeight || 1;
+    // 0 → 1 while the block rises over the set
+    const top = story.getBoundingClientRect().top;
+    storyQ = Math.min(1, Math.max(0, 1 - top / vhh));
+    const dq = Math.abs(storyQ - lastQ);
+    story.style.setProperty('--sq', storyQ.toFixed(4));
+    body.classList.toggle('in-story', storyQ > .5);
+
+    // the set dissolves into magic as the block arrives
+    const k = smooth(0, .85, storyQ);
+    viewportEl.style.opacity = 1 - k;
+    viewportEl.style.filter = k > .001 ? `blur(${(k * 10).toFixed(1)}px)` : '';
+    viewportEl.style.scale = 1 - k * .05;
+    viewportEl.style.visibility = storyQ >= 1 ? 'hidden' : '';
+    const hk = smooth(.35, 1, storyQ);
+    storyTitle.style.opacity = storySub.style.opacity = '';
+    storyTitle.style.filter = hk < .999 ? `blur(${((1 - hk) * 12).toFixed(1)}px)` : '';
+    storyTitle.style.letterSpacing = `${((1 - hk) * .12).toFixed(3)}em`;
+    storyTitle.style.opacity = hk;
+    storySub.style.opacity = hk * .7;
+    storySub.style.filter = hk < .999 ? `blur(${((1 - hk) * 8).toFixed(1)}px)` : '';
+    if (dq > 0 && !reduced) {
+      const n = Math.min(40, Math.round(dq * 320));
+      for (let i = 0; i < n; i++) {
+        if (Math.random() < .6) sparkleEdge(pick(ITEMS), 1, { vy: rand(-260, -80), max: rand(.8, 1.6) });
+        else mote(rand(0, W), (top - ty) / s + rand(-40, 40), { vy: rand(-140, -40) });
+      }
+    }
+    lastQ = storyQ;
+
+    // slides: 0 … 2 while the pinned area scrolls
+    const pt = storyPin.getBoundingClientRect().top;
+    slideR = Math.min(slides.length - 1, Math.max(0, -pt / vhh));
+    const dr = Math.abs(slideR - lastR);
+    slides.forEach((sl, i) => {
+      const img = sl.firstElementChild, cap = sl.lastElementChild;
+      const fIn = Math.min(1, Math.max(0, slideR - (i - 1)));   // reveal of this slide
+      const fOut = Math.min(1, Math.max(0, slideR - i));        // the next one covering it
+      if (i > 0) {
+        const R = smooth(0, 1, fIn) * 1700;
+        const m = fIn >= 1 ? 'none' : `radial-gradient(circle at ${SLIDE_C.x}px ${SLIDE_C.y}px, #000 ${(R - 180).toFixed(0)}px, transparent ${R.toFixed(0)}px)`;
+        sl.style.visibility = fIn <= 0 ? 'hidden' : '';
+        sl.style.webkitMaskImage = sl.style.maskImage = m;
+        img.style.scale = 1.08 - .08 * smooth(0, 1, fIn);
+      }
+      img.style.filter = fOut > .001 ? `blur(${(fOut * 6).toFixed(1)}px) brightness(${(1 - fOut * .35).toFixed(2)})` : '';
+      if (i < slides.length - 1) img.style.scale = 1 + fOut * .06;
+      const ci = i === 0 ? 1 : smooth(.55, 1, fIn);
+      const co = 1 - smooth(0, .4, fOut);
+      cap.style.opacity = Math.min(ci, co);
+      cap.style.filter = Math.min(ci, co) < .999 ? `blur(${((1 - Math.min(ci, co)) * 8).toFixed(1)}px)` : '';
+      cap.style.translate = `0 ${((1 - ci) * 20 - (1 - co) * 20).toFixed(1)}px`;
+    });
+    if (dr > 0 && !reduced) {
+      const f = slideR % 1;
+      if (f > .001 && f < .999) {
+        const R = smooth(0, 1, f) * 1700 - 90;
+        const n = Math.min(60, Math.round(dr * 500));
+        for (let i = 0; i < n; i++) {
+          const a = rand(0, Math.PI * 2);
+          const x = SLIDE_C.x + Math.cos(a) * R, y = SLIDE_C.y + Math.sin(a) * R;
+          if (x > -20 && x < W + 20 && y > -20 && y < H + 20) mote(x, y, { vx: Math.cos(a) * rand(40, 140), vy: Math.sin(a) * rand(40, 140) - 40, size: rand(2, 5) });
+        }
+      }
+      const idx = Math.round(slideR);
+      if (idx !== lastSlideIdx && musicOn && ensureAudio()) {
+        const t = audio.currentTime;
+        [NOTE.G5, NOTE.C6, NOTE.E5 * 2].forEach((fq, i) => bell(fq, t + i * .07, 1.4, .18));
+      }
+      lastSlideIdx = idx;
+    }
+    lastR = slideR;
+  }
 
   function arrive() {
     // a short wave over all items when screen 2 settles
@@ -806,6 +907,7 @@
     document.documentElement.classList.remove('is-locked');
     twinkleOn = true;
     measure();
+    updateStory();
     onScroll();
   }
 

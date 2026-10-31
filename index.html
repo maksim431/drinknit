@@ -10,7 +10,7 @@
   <meta property="og:description" content="Свяжу, упакую и подпишу открытку вашим текстом. До Нового года успею сделать только 10.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="assets/box-closed.webp">
   <link rel="preload" as="image" href="assets/box-open.webp">
   <link rel="stylesheet" href="style.css">
@@ -18,6 +18,33 @@
 <body class="is-loading">
   <!-- scroll track: two screens, the artboard itself is fixed -->
   <div class="track" aria-hidden="true"><div class="track__screen" id="hero"></div><div class="track__screen" id="sets"></div></div>
+
+  <!-- ============ block 3: how I knit (slides) ============ -->
+  <section class="story" id="story" aria-label="Как я вяжу">
+    <div class="story__head">
+      <h2 class="story__title">Маленькую игрушку я вяжу <br>2 часа, среднюю 7 часов</h2>
+      <p class="story__sub">Поэтому к Новому году получится только 10 наборов, и все они будут немного разными.</p>
+    </div>
+    <div class="story__pin" id="story-pin">
+      <i class="story__mark" style="top:0"></i><i class="story__mark" style="top:100vh"></i><i class="story__mark" style="top:200vh"></i>
+      <div class="story__sticky">
+        <div class="stage story__stage" id="story-stage">
+          <figure class="slide">
+            <img src="assets/story/1.webp" alt="Детали вязаного пряничного человечка: голова, туловище, ручки, ножки, клубок и крючок">
+            <figcaption class="slide__cap" style="top:901px">Каждую деталь вяжу крючком сама, потом сшиваю и набиваю игрушку вручную.</figcaption>
+          </figure>
+          <figure class="slide">
+            <img src="assets/story/2.webp" alt="Малыш обнимает вязаного пряничного человечка у ёлки">
+            <figcaption class="slide__cap" style="top:934px">Пряжа: хлопок и акрил. Игрушки мягкие и после стирки держат форму.</figcaption>
+          </figure>
+          <figure class="slide">
+            <img src="assets/story/3.webp" alt="Весы: магазинный мишка в упаковке легче, чем коробка с вязаными игрушками">
+            <figcaption class="slide__cap" style="top:901px">Одна вязаная игрушка в&nbsp;сетевом магазине стоит около 1&nbsp;600&nbsp;₽. <br>В&nbsp;наборе M их три.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <main class="viewport" aria-label="Новогодние наборы Drinknit">
     <div class="stage scene" id="scene">
@@ -75,6 +102,7 @@
 
       <!-- ============ screen 2: sets ============ -->
       <section class="s2" id="s2" aria-label="Наборы">
+        <div class="fade-bottom" aria-hidden="true"></div>
         <p class="hint" data-from="logo">Кликните на предмет,<br>чтобы узнать подробнее</p>
 
         <div class="mbox" id="mbox">
@@ -84,13 +112,16 @@
 
         <h2 class="title2" data-from="title">Три набора: <br>выберите по тому, кому дарите</h2>
 
-        <div class="panel">
-          <p class="chip" data-from="stock"><span id="set-hours">4 часа вязания</span></p>
-          <div class="tabs" role="tablist" aria-label="Наборы" data-from="offer__text">
+        <div class="tabsbar">
+          <div class="tabs" role="tablist" aria-label="Наборы">
             <button class="tab is-active" role="tab" aria-selected="true" data-set="S">Набор S</button>
             <button class="tab" role="tab" aria-selected="false" data-set="M">Набор M</button>
             <button class="tab" role="tab" aria-selected="false" data-set="L">Набор L</button>
           </div>
+        </div>
+
+        <div class="panel">
+          <p class="chip" data-from="stock"><span id="set-hours">4 часа вязания</span></p>
           <p class="desc" id="set-desc" data-from="offer__text">Небольшой подарок учителю, воспитателю или коллеге</p>
           <div class="buy" data-from="offer__actions">
             <p class="price" id="set-price">1600 ₽</p>
