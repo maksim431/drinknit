@@ -213,21 +213,13 @@ body.is-frame .frame {
   right: -40px;
   top: calc(-1 * var(--tile-h));
   bottom: 0;
-  background: url("assets/snow.png") repeat;
+  background: url("assets/snow-combined.png") repeat;
   background-size: var(--tile-w) var(--tile-h);
   background-position: var(--tx) var(--ty);
   animation: snow-fall 34s linear infinite;
   will-change: transform;
 }
-.snow__l--near { opacity: .95; }
-.snow__l--far {
-  --tile-w: calc(1920px * var(--s) * .62);
-  --tile-h: calc(1064px * var(--s) * .62);
-  background-position: calc(var(--tx) + 37%) calc(var(--ty) + 21%);
-  opacity: .5;
-  filter: blur(.6px);
-  animation-duration: 26s;
-}
+.snow__l--far { display: none; } /* baked into snow-combined.png */
 
 /* ---------- UI ---------- */
 
@@ -357,6 +349,7 @@ body.is-done .btn { transition: transform .3s var(--ease-out), box-shadow .3s ea
   z-index: -1;
   background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, .45) 50%, transparent 70%);
   transform: translateX(-120%);
+  will-change: transform;
 }
 body.is-done .btn--primary::after { animation: shine 4.5s ease-in-out 1s infinite; }
 .btn--ghost {
@@ -428,6 +421,9 @@ body.is-done .btn--primary::after { animation: shine 4.5s ease-in-out 1s infinit
 body.is-ui .skip { opacity: 0; pointer-events: none; }
 
 body.is-loading .scene { opacity: 0; }
+body.is-done .closed,
+body.is-done .rays,
+body.is-done .glow { display: none; }
 .scene { transition: opacity .6s ease; }
 
 /* ---------- keyframes ---------- */
@@ -486,7 +482,6 @@ body.is-loading .scene { opacity: 0; }
 /* ---------- screen 1 ↔ screen 2 morph ---------- */
 .s1, .s2 { position: absolute; inset: 0; }
 .s2 { pointer-events: none; }
-.s2 > *, .s1 > * , .offer > * { will-change: opacity, translate, filter; }
 .s2 .hint, .s2 .title2, .s2 .panel, .s2 .tabsbar, .s2 .fade-bottom { opacity: 0; }
 body.on-sets .s1, body.on-sets .s1 * { pointer-events: none; }
 body.on-sets .s2 { pointer-events: auto; }
@@ -568,8 +563,6 @@ body.is-done .btn { transition: transform .3s var(--ease-out), box-shadow .3s ea
   padding: 10px 23px;
   border-radius: 100px;
   background: rgba(255, 255, 255, .14);
-  -webkit-backdrop-filter: blur(17px);
-          backdrop-filter: blur(17px);
   color: var(--cream);
   font-size: 20px;
   font-weight: 400;
@@ -624,35 +617,24 @@ body.is-done .btn { transition: transform .3s var(--ease-out), box-shadow .3s ea
   opacity: 0;
   transition: opacity .5s ease, translate .4s var(--ease-out), scale .4s var(--ease-out);
 }
-.item img { width: 100%; height: 100%; display: block; }
+.item .cut { position: relative; width: 100%; height: 100%; display: block; }
+.item .halo {
+  position: absolute;
+  max-width: none;
+  opacity: 0;
+  pointer-events: none;
+}
 body.on-sets .item.is-lit,
 body.on-sets .item.is-hover { opacity: 1; }
-.item.is-lit img,
-.item.is-hover img,
-.focus .item img {
-  filter:
-    drop-shadow(0 0 1.5px #fff8de)
-    drop-shadow(0 0 5px rgba(255, 220, 120, .95))
-    drop-shadow(0 0 16px rgba(255, 186, 72, .75));
-  animation: contour 1.8s ease-in-out infinite;
-}
+.item.is-lit .halo,
+.item.is-hover .halo,
+.focus .item .halo { animation: halo 1.8s ease-in-out infinite; }
 .item.is-hover { translate: 0 -6px; scale: 1.015; }
 body.is-pointing { cursor: pointer; }
 
-@keyframes contour {
-  0%, 100% {
-    filter:
-      drop-shadow(0 0 1.5px #fff8de)
-      drop-shadow(0 0 4px rgba(255, 220, 120, .9))
-      drop-shadow(0 0 12px rgba(255, 186, 72, .55));
-  }
-  50% {
-    filter:
-      brightness(1.06)
-      drop-shadow(0 0 2.5px #fffaf0)
-      drop-shadow(0 0 9px rgba(255, 224, 130, 1))
-      drop-shadow(0 0 26px rgba(255, 186, 72, .9));
-  }
+@keyframes halo {
+  0%, 100% { opacity: .75; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.025); }
 }
 
 /* ---------- details modal ---------- */
@@ -858,10 +840,11 @@ body:not(.on-sets) .s2 * { pointer-events: none; }
   color: var(--cream);
 }
 body.in-story .fx { z-index: 10; }
+body.in-story .snow, body.in-story .snow__l { animation-play-state: paused; }
+body.in-story .snow { visibility: hidden; }
 
 /* parallax for the snow while scrolling between screens */
-.snow__l--near { translate: 0 calc(var(--p, 0) * -260px); }
-.snow__l--far  { translate: 0 calc(var(--p, 0) * -110px); }
+.snow__l--near { translate: 0 calc(var(--p, 0) * -200px); }
 
 /* ---------- phones & portrait tablets ---------- */
 

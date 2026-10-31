@@ -12,7 +12,8 @@
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---------------------------------------------------------------- layout
-  let s = 1, tx = 0, ty = 0, vw = 0, vh = 0, dpr = 1, mobile = false;
+  let s = 1, tx = 0, ty = 0, vw = 0, vh = 0, dpr = 1, cdpr = 1, mobile = false;
+  let dirty = true;
 
   function layout() {
     vw = window.innerWidth;
@@ -41,8 +42,11 @@
     body.style.setProperty('--tx', tx + 'px');
     body.style.setProperty('--ty', ty + 'px');
 
-    canvas.width = Math.round(vw * dpr);
-    canvas.height = Math.round(vh * dpr);
+    // particles are soft glows: a lower canvas resolution looks the same and is much cheaper
+    cdpr = Math.min(dpr, 1.25);
+    canvas.width = Math.round(vw * cdpr);
+    canvas.height = Math.round(vh * cdpr);
+    dirty = true;
   }
   window.addEventListener('resize', layout);
   layout();
@@ -65,7 +69,6 @@
   const MOUTH = { x: 960, y: 380 };     // where the magic bursts out
 
   const parts = [];   // artboard-space particles
-  const flakes = [];  // screen-space snow
   let flash = 0;
   let ring = null;
 
@@ -125,49 +128,57 @@
     });
   }
 
-  function initSnow() {
-    const n = mobile ? 25 : 40;
-    flakes.length = 0;
-    for (let i = 0; i < n; i++) flakes.push(newFlake(true));
+  // pre-rendered sprites: drawing an image is far cheaper than building a gradient per particle
+  const spriteCache = new Map();
+  function sprite(kind, color) {
+    const key = kind + color;
+    let c = spriteCache.get(key);
+    if (c) return c;
+    c = document.createElement('canvas');
+    const S = c.width = c.height = 128;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, `rgba(${color},${kind === 'dot' ? 1 : .9})`);
+    grad.addColorStop(kind === 'dot' ? .35 : .25, `rgba(${color},${kind === 'dot' ? .45 : .25})`);
+    grad.addColorStop(1, `rgba(${color},0)`);
+    g.fillStyle = grad;
+    g.fillRect(0, 0, S, S);
+    if (kind === 'star') { // four-point sparkle, 40px "size" ↔ 64px glow radius
+      const sz = 40, k = sz * .16;
+      g.translate(64, 64);
+      g.fillStyle = '#fffaf0';
+      g.beginPath();
+      g.moveTo(0, -sz);
+      g.quadraticCurveTo(k, -k, sz, 0);
+      g.quadraticCurveTo(k, k, 0, sz);
+      g.quadraticCurveTo(-k, k, -sz, 0);
+      g.quadraticCurveTo(-k, -k, 0, -sz);
+      g.fill();
+    }
+    spriteCache.set(key, c);
+    return c;
   }
-  function newFlake(anywhere) {
-    return {
-      x: rand(0, vw), y: anywhere ? rand(0, vh) : rand(-40, -5),
-      r: rand(.8, 2.6), vy: rand(18, 55), sway: rand(10, 30), ph: rand(0, Math.PI * 2),
-      a: rand(.25, .7),
-    };
-  }
-
   function drawStar(x, y, size, rot, alpha, color) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rot);
-    ctx.globalAlpha = alpha;
-    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 1.6);
-    g.addColorStop(0, `rgba(${color},.9)`);
-    g.addColorStop(1, `rgba(${color},0)`);
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(0, 0, size * 1.6, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fffaf0';
-    ctx.beginPath();
-    const k = size * .16;
-    ctx.moveTo(0, -size);
-    ctx.quadraticCurveTo(k, -k, size, 0);
-    ctx.quadraticCurveTo(k, k, 0, size);
-    ctx.quadraticCurveTo(-k, k, -size, 0);
-    ctx.quadraticCurveTo(-k, -k, 0, -size);
-    ctx.fill();
-    ctx.restore();
+    if (alpha <= .01 || size <= .2) return;
+    const d = size * 3.2;
+    ctx.globalAlpha = Math.min(1, alpha);
+    ctx.drawImage(sprite('star', color), x - d / 2, y - d / 2, d, d);
+  }
+  function drawDot(x, y, r, alpha, color) {
+    if (alpha <= .01) return;
+    const d = r * 2;
+    ctx.globalAlpha = Math.min(1, alpha);
+    ctx.drawImage(sprite('dot', color), x - r, y - r, d, d);
   }
 
   let last = performance.now();
   let dustUntil = 0, twinkleOn = false, twinkleAcc = 0;
   const frameHooks = [];
   let onSets = false;
+  const MAX_PARTS = 320;
 
   function mote(x, y, opts = {}) {
+    if (parts.length >= MAX_PARTS) return;
     parts.push(Object.assign({
       type: 'mote', x, y,
       vx: rand(-40, 40), vy: rand(-90, -20),
@@ -178,36 +189,28 @@
   }
 
   function frame(now) {
+    requestAnimationFrame(frame);
     const dt = Math.min((now - last) / 1000, .05);
     last = now;
-    const sy = mobile ? window.scrollY : 0;
-
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // snow (screen space)
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = '#fff';
-    for (const f of flakes) {
-      f.y += f.vy * dt;
-      f.ph += dt;
-      if (f.y > vh + 10) Object.assign(f, newFlake(false));
-      ctx.globalAlpha = f.a;
-      ctx.beginPath();
-      ctx.arc(f.x + Math.sin(f.ph) * f.sway, f.y, f.r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-    ctx.globalAlpha = 1;
-
-    // artboard space
-    ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * tx, dpr * (ty - sy));
+    if (document.hidden) return;
 
     if (now < dustUntil) for (let i = 0; i < 4; i++) spawnDust();
     if (frameHooks.length) frameHooks.forEach(fn => fn(dt, now));
-    if (twinkleOn && !onSets) {
+    if (twinkleOn && !onSets && !body.classList.contains('in-story')) {
       twinkleAcc += dt;
-      while (twinkleAcc > .32) { twinkleAcc -= .32; spawnTwinkle(); }
+      while (twinkleAcc > .45) { twinkleAcc -= .45; spawnTwinkle(); }
     }
+
+    // nothing to draw → leave the canvas alone
+    if (!parts.length && flash <= 0 && !ring) {
+      if (dirty) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); dirty = false; }
+      return;
+    }
+    dirty = true;
+    const sy = mobile ? window.scrollY : 0;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(cdpr * s, 0, 0, cdpr * s, cdpr * tx, cdpr * (ty - sy));
 
     if (flash > 0) {
       const g = ctx.createRadialGradient(MOUTH.x, MOUTH.y, 0, MOUTH.x, MOUTH.y, 1300);
@@ -232,31 +235,25 @@
     }
 
     ctx.globalCompositeOperation = 'lighter';
-    for (let i = parts.length - 1; i >= 0; i--) {
+    let w = 0;
+    for (let i = 0; i < parts.length; i++) {
       const p = parts[i];
       p.life += dt;
       const t = p.life / p.max;
-      if (t >= 1) { parts.splice(i, 1); continue; }
+      if (t >= 1) continue;
+      parts[w++] = p;
 
       if (p.type === 'dust') {
         p.a += p.w * dt * (1 + 2 * (1 - p.r / p.r0));
         p.r = p.r0 * (1 - t) * (1 - t);
-        const x = BOX.x + Math.cos(p.a) * p.r;
-        const y = BOX.y + Math.sin(p.a) * p.r * .7;
-        const alpha = Math.sin(t * Math.PI);
-        const g = ctx.createRadialGradient(x, y, 0, x, y, p.size * 4);
-        g.addColorStop(0, `rgba(${p.hue},${alpha})`);
-        g.addColorStop(1, `rgba(${p.hue},0)`);
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(x, y, p.size * 4, 0, Math.PI * 2);
-        ctx.fill();
+        drawDot(BOX.x + Math.cos(p.a) * p.r, BOX.y + Math.sin(p.a) * p.r * .7, p.size * 4, Math.sin(t * Math.PI), p.hue);
       } else if (p.type === 'spark') {
         p.vx *= 1 - 2.6 * dt;
         p.vy *= 1 - 2.6 * dt;
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        ctx.strokeStyle = `rgba(255,232,170,${1 - t})`;
+        ctx.globalAlpha = 1 - t;
+        ctx.strokeStyle = 'rgb(255,232,170)';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
@@ -267,30 +264,22 @@
         p.vy = p.vy * (1 - 1.8 * dt) + 140 * dt;
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        p.rot += p.vr * dt;
         const tw = .6 + .4 * Math.sin(p.life * p.tw);
-        drawStar(p.x, p.y, p.size * (1 - t * .5), p.rot, (1 - t) * tw, '255,214,120');
+        drawStar(p.x, p.y, p.size * (1 - t * .5), 0, (1 - t) * tw, '255,214,120');
       } else if (p.type === 'mote') {
         p.vx *= 1 - 1.2 * dt;
         p.vy = p.vy * (1 - 1.2 * dt) - 30 * dt;
         p.x += p.vx * dt;
         p.y += p.vy * dt;
         const a = Math.sin(t * Math.PI);
-        if (p.star) drawStar(p.x, p.y, p.size * 2.6 * (.5 + .5 * a), p.rot, a * .9, p.hue);
-        else {
-          const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
-          g.addColorStop(0, `rgba(${p.hue},${a})`);
-          g.addColorStop(1, `rgba(${p.hue},0)`);
-          ctx.fillStyle = g;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        if (p.star) drawStar(p.x, p.y, p.size * 2.6 * (.5 + .5 * a), 0, a * .9, p.hue);
+        else drawDot(p.x, p.y, p.size * 3, a, p.hue);
       } else if (p.type === 'twinkle') {
         const a = Math.sin(t * Math.PI);
-        drawStar(p.x, p.y, p.size * (.4 + .6 * a), p.rot, a * .85, '255,225,160');
+        drawStar(p.x, p.y, p.size * (.4 + .6 * a), 0, a * .85, '255,225,160');
       }
     }
+    parts.length = w;
     ctx.globalCompositeOperation = 'source-over';
 
     // confetti drawn normally (not additive) so colours stay true
@@ -303,18 +292,13 @@
       p.y += p.vy * dt;
       p.rot += p.vr * dt;
       p.flip += p.vf * dt;
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rot);
-      ctx.scale(1, Math.cos(p.flip));
+      const c = Math.cos(p.rot), sn = Math.sin(p.rot), f = Math.cos(p.flip);
+      ctx.setTransform(cdpr * s * c, cdpr * s * sn, -cdpr * s * sn * f, cdpr * s * c * f, cdpr * (tx + p.x * s), cdpr * (ty - sy + p.y * s));
       ctx.globalAlpha = t > .75 ? (1 - t) / .25 : 1;
       ctx.fillStyle = p.color;
       ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-      ctx.restore();
     }
     ctx.globalAlpha = 1;
-
-    requestAnimationFrame(frame);
   }
 
   // ---------------------------------------------------------------- sound
@@ -390,28 +374,28 @@
   // the others are drafts — edit them here.
   const ITEMS = [
     // front-to-back order matters for hit testing
-    { id: 'lamb', x: 864.7, y: 454.7, w: 161.7, h: 223.5,
+    { id: 'lamb', nw: 165, nh: 228, x: 864.7, y: 454.7, w: 161.7, h: 223.5,
       title: 'Игрушка\n«Барашек»',
       body: 'Связан мной вручную.\nМягкий, с красным шарфиком.',
       note: 'Каждая игрушка может немного отличаться от фото, потому что связана вручную.' },
-    { id: 'mitten', x: 651, y: 440.9, w: 198, h: 272.6,
+    { id: 'mitten', nw: 202, nh: 278, x: 651, y: 440.9, w: 198, h: 272.6,
       title: 'Варежка-подвеска\nна ёлку',
       body: 'Связана мной вручную.\nМожно повесить на ёлку или положить в неё сладость.',
       note: 'Каждая игрушка может немного отличаться от фото, потому что связана вручную.' },
-    { id: 'cream', x: 1015.6, y: 483.1, w: 272.4, h: 231.4,
+    { id: 'cream', nw: 278, nh: 236, x: 1015.6, y: 483.1, w: 272.4, h: 231.4,
       title: 'Крем для рук',
       body: 'Приятный зимний уход в дополнение к игрушкам.',
       note: '' },
-    { id: 'goat', x: 577.5, y: 198.8, w: 428.3, h: 339.2,
+    { id: 'goat', nw: 437, nh: 346, x: 577.5, y: 198.8, w: 428.3, h: 339.2,
       title: 'Игрушка\n«Белый козлик»',
       body: 'Мягкий козлик с красным шарфом — символ уюта и праздника.',
       note: 'Каждая игрушка может немного отличаться от фото, потому что сделана вручную.' },
-    { id: 'grinch', x: 1008.7, y: 121.3, w: 326.3, h: 420.6,
+    { id: 'grinch', nw: 333, nh: 429, x: 1008.7, y: 121.3, w: 326.3, h: 420.6,
       title: 'Игрушка\n«Зелёный воришка»',
       body: 'Связано мной за 7 часов.\nРазмер: 14 см.\nСостав: Хлопок и акрил, мелкие детали на безопасном креплении.',
       note: 'Каждая игрушка может немного отличатся от фото, потому что связана вручную.',
       photos: ['assets/items/grinch-photo.webp'] },
-    { id: 'card', x: 818.6, y: 23.3, w: 290.1, h: 345.1,
+    { id: 'card', nw: 296, nh: 352, x: 818.6, y: 23.3, w: 290.1, h: 345.1,
       title: 'Открытка\nс вашим текстом',
       body: 'Подпишу открытку от руки — пришлите текст, когда будете заказывать набор.',
       note: '' },
@@ -440,7 +424,9 @@
     el.style.top = ((it.y - BOX_RECT.y) / BOX_RECT.h * 100) + '%';
     el.style.width = (it.w / BOX_RECT.w * 100) + '%';
     el.style.height = (it.h / BOX_RECT.h * 100) + '%';
-    el.innerHTML = `<img src="assets/items/${it.id}.webp" alt="" draggable="false">`;
+    // pre-rendered glow (assets/items/*-halo.webp, 48px padding around the cut-out)
+    const P = 48, nw = it.nw, nh = it.nh;
+    el.innerHTML = `<img class="halo" src="assets/items/${it.id}-halo.webp" alt="" draggable="false" style="left:${-P / nw * 100}%;top:${-P / nh * 100}%;width:${(nw + 2 * P) / nw * 100}%;height:${(nh + 2 * P) / nh * 100}%"><img class="cut" src="assets/items/${it.id}.webp" alt="" draggable="false">`;
     return el;
   }
   ITEMS.forEach(it => {
@@ -528,8 +514,8 @@
     }
     if (mobile) return; // sparkles are drawn on the artboard only
     sparkAcc += dt;
-    while (sparkAcc > .05) {
-      sparkAcc -= .05;
+    while (sparkAcc > .09) {
+      sparkAcc -= .09;
       const target = openItem || hoverItem || (litIdx >= 0 ? ITEMS[litIdx] : null);
       if (target) sparkleEdge(target, openItem || hoverItem ? 2 : 1);
     }
@@ -686,6 +672,9 @@
   const s2 = document.getElementById('s2');
   const q = sel => layer.querySelector(sel);
   const frameEl = scene.querySelector('.frame');
+  const snowEl = document.querySelector('.snow');
+  // blur is re-rasterised on every change, so only whole pixels
+  const blur = (v) => (v >= .5 ? `blur(${Math.round(v)}px)` : '');
   const cropEl = scene.querySelector('.open-crop');
   // screen-1 element → the screen-2 element it turns into
   const PAIRS = [
@@ -718,9 +707,10 @@
     if (!geo || mobile) return;
     const a = smooth(0, .55, p);      // screen 1 leaving
     const b = smooth(.45, 1, p);      // screen 2 arriving
-    body.style.setProperty('--p', p.toFixed(4));
+    snowEl.style.setProperty('--p', p.toFixed(3));
     const bo = smooth(0, 1, p);
-    body.style.setProperty('--bo', bo.toFixed(4));
+    scene.style.setProperty('--bo', bo.toFixed(4));
+    focusHost.style.setProperty('--bo', bo.toFixed(4));
     off.x = BOX_SHIFT.x * bo; off.y = BOX_SHIFT.y * bo;
     layer.style.setProperty('--sp', smooth(.15, .85, p).toFixed(4));
     if (body.classList.contains('is-done') || force) {
@@ -729,7 +719,7 @@
         if (!seen.has(g.a)) {
           seen.add(g.a);
           g.a.style.opacity = (1 - a) * g.a.dataset.o;
-          g.a.style.filter = a > .001 ? `blur(${(a * 14).toFixed(1)}px)` : '';
+          g.a.style.filter = blur(a * 12);
           g.a.style.translate = `${(g.dx * a * .55).toFixed(1)}px ${(g.dy * a * .55).toFixed(1)}px`;
         }
         const k = 1 - b;
@@ -737,11 +727,11 @@
       });
       S2_ELS.forEach(el => {
         el.style.opacity = b;
-        el.style.filter = b < .999 ? `blur(${((1 - b) * 14).toFixed(1)}px)` : '';
+        el.style.filter = blur((1 - b) * 12);
       });
       frameEl.style.opacity = 1 - a;
       frameEl.style.scale = 1 + a * .03;
-      frameEl.style.filter = a > .001 ? `blur(${(a * 8).toFixed(1)}px) brightness(${1 + a})` : '';
+
       cropEl.style.opacity = 1 - a;
     }
     const was = onSets;
@@ -819,16 +809,16 @@
     // the set dissolves into magic as the block arrives
     const k = smooth(0, .85, storyQ);
     viewportEl.style.opacity = 1 - k;
-    viewportEl.style.filter = k > .001 ? `blur(${(k * 10).toFixed(1)}px)` : '';
+
     viewportEl.style.scale = 1 - k * .05;
     viewportEl.style.visibility = storyQ >= 1 ? 'hidden' : '';
     const hk = smooth(.35, 1, storyQ);
     storyTitle.style.opacity = storySub.style.opacity = '';
-    storyTitle.style.filter = hk < .999 ? `blur(${((1 - hk) * 12).toFixed(1)}px)` : '';
+    storyTitle.style.filter = blur((1 - hk) * 12);
     storyTitle.style.letterSpacing = `${((1 - hk) * .12).toFixed(3)}em`;
     storyTitle.style.opacity = hk;
     storySub.style.opacity = hk * .7;
-    storySub.style.filter = hk < .999 ? `blur(${((1 - hk) * 8).toFixed(1)}px)` : '';
+    storySub.style.filter = blur((1 - hk) * 8);
     if (dq > 0 && !reduced) {
       const n = Math.min(40, Math.round(dq * 320));
       for (let i = 0; i < n; i++) {
@@ -853,12 +843,12 @@
         sl.style.webkitMaskImage = sl.style.maskImage = m;
         img.style.scale = 1.08 - .08 * smooth(0, 1, fIn);
       }
-      img.style.filter = fOut > .001 ? `blur(${(fOut * 6).toFixed(1)}px) brightness(${(1 - fOut * .35).toFixed(2)})` : '';
+      img.style.opacity = fOut > .001 ? (1 - fOut * .45).toFixed(3) : '';
       if (i < slides.length - 1) img.style.scale = 1 + fOut * .06;
       const ci = i === 0 ? 1 : smooth(.55, 1, fIn);
       const co = 1 - smooth(0, .4, fOut);
       cap.style.opacity = Math.min(ci, co);
-      cap.style.filter = Math.min(ci, co) < .999 ? `blur(${((1 - Math.min(ci, co)) * 8).toFixed(1)}px)` : '';
+      cap.style.filter = blur((1 - Math.min(ci, co)) * 8);
       cap.style.translate = `0 ${((1 - ci) * 20 - (1 - co) * 20).toFixed(1)}px`;
     });
     if (dr > 0 && !reduced) {
@@ -913,8 +903,7 @@
 
   function start() {
     body.classList.remove('is-loading');
-    initSnow();
-    requestAnimationFrame(t => { last = t; requestAnimationFrame(frame); });
+    requestAnimationFrame(t => { last = t; frame(t); });
 
     if (reduced) { finish(); return; }
 
