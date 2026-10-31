@@ -10,18 +10,18 @@
   <meta property="og:description" content="Свяжу, упакую и подпишу открытку вашим текстом. До Нового года успею сделать только 10.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="assets/box-closed.webp">
   <link rel="preload" as="image" href="assets/box-open.webp">
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="is-loading">
+  <!-- scroll track: two screens, the artboard itself is fixed -->
+  <div class="track" aria-hidden="true"><div class="track__screen" id="hero"></div><div class="track__screen" id="sets"></div></div>
+
   <main class="viewport" aria-label="Новогодние наборы Drinknit">
     <div class="stage scene" id="scene">
-      <!-- shadow under the box -->
       <img class="shadow" src="assets/shadow.svg" alt="" aria-hidden="true">
-
-      <!-- magic glow & light rays behind the box -->
       <div class="glow" aria-hidden="true"></div>
       <div class="rays" aria-hidden="true"></div>
 
@@ -30,43 +30,74 @@
         <img class="closed__img" src="assets/box-closed.webp" alt="">
       </div>
 
-      <!-- frame 2: open gift (back layer, under the frame) -->
+      <!-- frame 2: open gift (back layer) -->
       <img class="open open--back" src="assets/box-open.webp"
-           alt="Открытая коробка: вязаные козлик, барашек, варежка, зелёный человечек в костюме Деда Мороза, открытка и крем">
+           alt="Открытая коробка: козлик, барашек, варежка, зелёный воришка, открытка и крем">
 
-      <!-- cream frame -->
+      <!-- the six items, cut out along their contours (glow layer) -->
+      <div class="items" id="items" aria-hidden="true"></div>
+
+      <!-- cream frame of the first screen -->
       <img class="frame" src="assets/frame.svg" alt="" aria-hidden="true">
 
-      <!-- frame 2: open gift (front layer, the lid goes over the frame) -->
+      <!-- open gift front layer: the lid goes over the frame -->
       <div class="open-crop" aria-hidden="true">
         <img class="open open--front" src="assets/box-open.webp" alt="">
       </div>
-
     </div>
 
     <div class="stage layer" id="layer">
-      <a class="logo ui" href="./" aria-label="Drinknit — вещи ручной работы">
-        <img src="assets/logo.svg" alt="" width="108" height="61">
-        <span>Вещи ручной работы</span>
-      </a>
+      <!-- ============ screen 1 ============ -->
+      <div class="s1" id="s1">
+        <a class="logo ui" href="./" aria-label="Drinknit — вещи ручной работы" data-morph="hint">
+          <img src="assets/logo.svg" alt="" width="108" height="61">
+          <span>Вещи ручной работы</span>
+        </a>
 
-      <p class="stock ui"><span>Свободно</span><span>10 из 10 наборов</span></p>
+        <p class="stock ui" data-morph="chip"><span>Свободно</span><span>10 из 10 наборов</span></p>
 
-      <h1 class="title ui">
-        <span class="title__line ui">Новогодние наборы</span>
-        <span class="title__line ui">с вязаными игрушками</span>
-        <span class="title__line ui">ручной работы</span>
-      </h1>
+        <h1 class="title ui" data-morph="title2">
+          <span class="title__line ui">Новогодние наборы</span>
+          <span class="title__line ui">с вязаными игрушками</span>
+          <span class="title__line ui">ручной работы</span>
+        </h1>
 
-      <div class="offer">
-        <p class="offer__text ui">Свяжу, упакую и подпишу открытку вашим текстом.<br>
-          Три набора: 600, 1&nbsp;400 и 1&nbsp;900&nbsp;₽.<br>
-          До Нового года успею сделать только 10.</p>
-        <div class="offer__actions">
-          <a class="btn btn--primary ui" href="#sets">Выбрать набор</a>
-          <a class="btn btn--ghost ui" href="#contact">Написать мне</a>
+        <div class="offer">
+          <p class="offer__text ui" data-morph="desc">Свяжу, упакую и подпишу открытку вашим текстом.<br>
+            Три набора: 600, 1&nbsp;400 и 1&nbsp;900&nbsp;₽.<br>
+            До Нового года успею сделать только 10.</p>
+          <div class="offer__actions" data-morph="buy">
+            <a class="btn btn--primary ui" href="#sets" data-goto="sets">Выбрать набор</a>
+            <a class="btn btn--ghost ui" href="#contact">Написать мне</a>
+          </div>
         </div>
       </div>
+
+      <!-- ============ screen 2: sets ============ -->
+      <section class="s2" id="s2" aria-label="Наборы">
+        <p class="hint" data-from="logo">Кликните на предмет,<br>чтобы узнать подробнее</p>
+
+        <div class="mbox" id="mbox">
+          <img class="mbox__img" src="assets/box-open.webp" alt="">
+          <div class="items items--m" id="items-m"></div>
+        </div>
+
+        <h2 class="title2" data-from="title">Три набора: <br>выберите по тому, кому дарите</h2>
+
+        <div class="panel">
+          <p class="chip" data-from="stock"><span id="set-hours">4 часа вязания</span></p>
+          <div class="tabs" role="tablist" aria-label="Наборы" data-from="offer__text">
+            <button class="tab is-active" role="tab" aria-selected="true" data-set="S">Набор S</button>
+            <button class="tab" role="tab" aria-selected="false" data-set="M">Набор M</button>
+            <button class="tab" role="tab" aria-selected="false" data-set="L">Набор L</button>
+          </div>
+          <p class="desc" id="set-desc" data-from="offer__text">Небольшой подарок учителю, воспитателю или коллеге</p>
+          <div class="buy" data-from="offer__actions">
+            <p class="price" id="set-price">1600 ₽</p>
+            <a class="btn btn--primary btn--want" href="#contact" id="set-cta">Хочу набор S</a>
+          </div>
+        </div>
+      </section>
 
       <button class="sound ui" type="button" aria-pressed="false" aria-label="Включить музыку">
         <img src="assets/sound.svg" alt="" width="32" height="32">
@@ -77,6 +108,30 @@
 
   <div class="snow" aria-hidden="true"><i class="snow__l snow__l--far"></i><i class="snow__l snow__l--near"></i></div>
   <canvas class="fx" id="fx" aria-hidden="true"></canvas>
+
+  <!-- item details -->
+  <div class="dim" id="dim" aria-hidden="true"></div>
+  <div class="stage focus" id="focus" aria-hidden="true"></div>
+  <div class="stage modal-stage" id="modal-stage">
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+      <div class="modal__text">
+        <h3 class="modal__title" id="modal-title"></h3>
+        <div class="modal__info">
+          <p class="modal__body" id="modal-body"></p>
+          <p class="modal__note" id="modal-note"></p>
+        </div>
+      </div>
+      <div class="modal__photo">
+        <div class="modal__slides" id="modal-slides"></div>
+        <div class="modal__nav">
+          <button class="modal__arrow modal__arrow--prev" type="button" aria-label="Предыдущее фото"><img src="assets/cane.webp" alt=""></button>
+          <button class="modal__arrow modal__arrow--next" type="button" aria-label="Следующее фото"><img src="assets/cane.webp" alt=""></button>
+        </div>
+      </div>
+      <button class="modal__close" type="button" aria-label="Закрыть"><img src="assets/close.svg" alt="" width="44" height="44"></button>
+    </div>
+  </div>
+
   <button class="skip" type="button">Пропустить</button>
 
   <script src="app.js"></script>

@@ -164,6 +164,18 @@
 
   let last = performance.now();
   let dustUntil = 0, twinkleOn = false, twinkleAcc = 0;
+  const frameHooks = [];
+  let onSets = false;
+
+  function mote(x, y, opts = {}) {
+    parts.push(Object.assign({
+      type: 'mote', x, y,
+      vx: rand(-40, 40), vy: rand(-90, -20),
+      size: rand(2, 4.5), life: 0, max: rand(.7, 1.5),
+      star: Math.random() < .3, rot: rand(0, 1),
+      hue: pick(['255,226,150', '255,244,214', '255,200,120']),
+    }, opts));
+  }
 
   function frame(now) {
     const dt = Math.min((now - last) / 1000, .05);
@@ -191,7 +203,8 @@
     ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * tx, dpr * (ty - sy));
 
     if (now < dustUntil) for (let i = 0; i < 4; i++) spawnDust();
-    if (twinkleOn) {
+    if (frameHooks.length) frameHooks.forEach(fn => fn(dt, now));
+    if (twinkleOn && !onSets) {
       twinkleAcc += dt;
       while (twinkleAcc > .32) { twinkleAcc -= .32; spawnTwinkle(); }
     }
@@ -257,6 +270,22 @@
         p.rot += p.vr * dt;
         const tw = .6 + .4 * Math.sin(p.life * p.tw);
         drawStar(p.x, p.y, p.size * (1 - t * .5), p.rot, (1 - t) * tw, '255,214,120');
+      } else if (p.type === 'mote') {
+        p.vx *= 1 - 1.2 * dt;
+        p.vy = p.vy * (1 - 1.2 * dt) - 30 * dt;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        const a = Math.sin(t * Math.PI);
+        if (p.star) drawStar(p.x, p.y, p.size * 2.6 * (.5 + .5 * a), p.rot, a * .9, p.hue);
+        else {
+          const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size * 3);
+          g.addColorStop(0, `rgba(${p.hue},${a})`);
+          g.addColorStop(1, `rgba(${p.hue},0)`);
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
       } else if (p.type === 'twinkle') {
         const a = Math.sin(t * Math.PI);
         drawStar(p.x, p.y, p.size * (.4 + .6 * a), p.rot, a * .85, '255,225,160');
@@ -356,6 +385,415 @@
     if (musicOn) { magicChime(); playTune(); }
   });
 
+  // ---------------------------------------------------------------- content
+  // Item texts: only the «Зелёный воришка» copy comes from the design,
+  // the others are drafts — edit them here.
+  const ITEMS = [
+    // front-to-back order matters for hit testing
+    { id: 'lamb', x: 864.7, y: 454.7, w: 161.7, h: 223.5,
+      title: 'Игрушка\n«Барашек»',
+      body: 'Связан мной вручную.\nМягкий, с красным шарфиком.',
+      note: 'Каждая игрушка может немного отличаться от фото, потому что связана вручную.' },
+    { id: 'mitten', x: 651, y: 440.9, w: 198, h: 272.6,
+      title: 'Варежка-подвеска\nна ёлку',
+      body: 'Связана мной вручную.\nМожно повесить на ёлку или положить в неё сладость.',
+      note: 'Каждая игрушка может немного отличаться от фото, потому что связана вручную.' },
+    { id: 'cream', x: 1015.6, y: 483.1, w: 272.4, h: 231.4,
+      title: 'Крем для рук',
+      body: 'Приятный зимний уход в дополнение к игрушкам.',
+      note: '' },
+    { id: 'goat', x: 577.5, y: 198.8, w: 428.3, h: 339.2,
+      title: 'Игрушка\n«Белый козлик»',
+      body: 'Мягкий козлик с красным шарфом — символ уюта и праздника.',
+      note: 'Каждая игрушка может немного отличаться от фото, потому что сделана вручную.' },
+    { id: 'grinch', x: 1008.7, y: 121.3, w: 326.3, h: 420.6,
+      title: 'Игрушка\n«Зелёный воришка»',
+      body: 'Связано мной за 7 часов.\nРазмер: 14 см.\nСостав: Хлопок и акрил, мелкие детали на безопасном креплении.',
+      note: 'Каждая игрушка может немного отличатся от фото, потому что связана вручную.',
+      photos: ['assets/items/grinch-photo.webp'] },
+    { id: 'card', x: 818.6, y: 23.3, w: 290.1, h: 345.1,
+      title: 'Открытка\nс вашим текстом',
+      body: 'Подпишу открытку от руки — пришлите текст, когда будете заказывать набор.',
+      note: '' },
+  ];
+
+  // Sets: S comes from the design; M and L are drafts — edit them here.
+  const SETS = {
+    S: { hours: '4 часа вязания', desc: 'Небольшой подарок учителю, воспитателю или коллеге', price: '1600 ₽' },
+    M: { hours: '7 часов вязания', desc: 'Подарок другу или родным: больше игрушек и открытка вашим текстом', price: '1 400 ₽' },
+    L: { hours: '12 часов вязания', desc: 'Большой набор для самых близких — все игрушки из коробки', price: '1 900 ₽' },
+  };
+
+  // ---------------------------------------------------------------- items
+  const BOX_RECT = { x: -229, y: -516, w: 2352, h: 1757 };
+  const itemsHost = document.getElementById('items');
+  const itemsHostM = document.getElementById('items-m');
+  const focusHost = document.getElementById('focus');
+
+  function itemEl(it) {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.dataset.id = it.id;
+    el.style.left = ((it.x - BOX_RECT.x) / BOX_RECT.w * 100) + '%';
+    el.style.top = ((it.y - BOX_RECT.y) / BOX_RECT.h * 100) + '%';
+    el.style.width = (it.w / BOX_RECT.w * 100) + '%';
+    el.style.height = (it.h / BOX_RECT.h * 100) + '%';
+    el.innerHTML = `<img src="assets/items/${it.id}.webp" alt="" draggable="false">`;
+    return el;
+  }
+  ITEMS.forEach(it => {
+    it.el = itemEl(it);
+    it.elM = itemEl(it);
+    itemsHost.appendChild(it.el);
+    itemsHostM.appendChild(it.elM);
+  });
+
+  // alpha maps for pixel-exact hover and the contour points for sparkles
+  ITEMS.forEach(it => {
+    const img = new Image();
+    img.src = `assets/items/${it.id}.webp`;
+    img.decode().then(() => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const g = c.getContext('2d', { willReadFrequently: true });
+      g.drawImage(img, 0, 0);
+      const d = g.getImageData(0, 0, c.width, c.height).data;
+      it.alpha = { w: c.width, h: c.height, d };
+      const kx = it.w / c.width, ky = it.h / c.height, edge = [];
+      const A = (x, y) => d[(y * c.width + x) * 4 + 3];
+      for (let y = 2; y < c.height - 2; y += 3) {
+        for (let x = 2; x < c.width - 2; x += 3) {
+          if (A(x, y) > 128 && (A(x - 3, y) < 64 || A(x + 3, y) < 64 || A(x, y - 3) < 64 || A(x, y + 3) < 64)) {
+            edge.push([it.x + x * kx, it.y + y * ky]);
+          }
+        }
+      }
+      it.edge = edge;
+    }).catch(() => {});
+  });
+
+  function hitItem(sx, sy) {
+    for (const it of ITEMS) {
+      if (!it.alpha || sx < it.x || sy < it.y || sx > it.x + it.w || sy > it.y + it.h) continue;
+      const px = Math.floor((sx - it.x) / it.w * it.alpha.w);
+      const py = Math.floor((sy - it.y) / it.h * it.alpha.h);
+      if (it.alpha.d[(py * it.alpha.w + px) * 4 + 3] > 90) return it;
+    }
+    return null;
+  }
+
+  function sparkleEdge(it, n, opts) {
+    if (!it.edge || !it.edge.length) return;
+    for (let i = 0; i < n; i++) {
+      const [x, y] = pick(it.edge);
+      mote(x + rand(-3, 3), y + rand(-3, 3), opts);
+    }
+  }
+
+  // idle: the items light up one after another; hover: the item under the cursor
+  let hoverItem = null, litIdx = -1, litTimer = 0, openItem = null;
+  function setHover(it) {
+    if (hoverItem === it) return;
+    if (hoverItem) { hoverItem.el.classList.remove('is-hover'); hoverItem.elM.classList.remove('is-hover'); }
+    hoverItem = it;
+    body.classList.toggle('is-pointing', !!it);
+    if (it) {
+      it.el.classList.add('is-hover'); it.elM.classList.add('is-hover');
+      sparkleEdge(it, 26, { vy: rand(-140, -60) });
+      softChime(it);
+    }
+  }
+  function setLit(i) {
+    ITEMS.forEach((it, k) => { it.el.classList.toggle('is-lit', k === i); it.elM.classList.toggle('is-lit', k === i); });
+    litIdx = i;
+  }
+
+  let sparkAcc = 0;
+  frameHooks.push((dt) => {
+    const active = (onSets || mobile) && !reduced;
+    if (!active) { if (litIdx !== -1) setLit(-1); return; }
+    if (hoverItem && litIdx !== -1) setLit(-1);
+    if (!openItem && !hoverItem) {
+      litTimer -= dt;
+      if (litTimer <= 0) {
+        // order the idle wave left → right
+        const order = ['goat', 'mitten', 'lamb', 'card', 'cream', 'grinch'];
+        const next = (order.indexOf(ITEMS[litIdx] ? ITEMS[litIdx].id : '') + 1) % order.length;
+        setLit(ITEMS.findIndex(it => it.id === order[next]));
+        litTimer = 1.9;
+      }
+    }
+    if (mobile) return; // sparkles are drawn on the artboard only
+    sparkAcc += dt;
+    while (sparkAcc > .05) {
+      sparkAcc -= .05;
+      const target = openItem || hoverItem || (litIdx >= 0 ? ITEMS[litIdx] : null);
+      if (target) sparkleEdge(target, openItem || hoverItem ? 2 : 1);
+    }
+  });
+
+  function toStage(cx, cy) { return [(cx - tx) / s, (cy - ty) / s]; }
+
+  window.addEventListener('pointermove', e => {
+    if (mobile || !onSets || openItem || e.target.closest('a, button, .panel')) { if (!openItem) setHover(null); return; }
+    const [x, y] = toStage(e.clientX, e.clientY);
+    setHover(hitItem(x, y));
+  }, { passive: true });
+
+  window.addEventListener('click', e => {
+    if (e.target.closest('a, button, .modal')) return;
+    if (openItem) return;
+    if (mobile) {
+      const r = itemsHostM.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+      const x = BOX_RECT.x + (e.clientX - r.left) / r.width * BOX_RECT.w;
+      const y = BOX_RECT.y + (e.clientY - r.top) / r.height * BOX_RECT.h;
+      const it = hitItem(x, y);
+      if (it) openModal(it);
+      return;
+    }
+    if (!onSets) return;
+    const [x, y] = toStage(e.clientX, e.clientY);
+    const it = hitItem(x, y);
+    if (it) openModal(it);
+  });
+
+  // keyboard access to the items
+  const srList = document.createElement('div');
+  srList.className = 'sr-only';
+  ITEMS.forEach(it => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = it.title.replace('\n', ' ');
+    b.addEventListener('focus', () => { if (!mobile) setHover(it); });
+    b.addEventListener('blur', () => setHover(null));
+    b.addEventListener('click', () => openModal(it, b));
+    srList.appendChild(b);
+  });
+  document.getElementById('s2').appendChild(srList);
+
+  // ---------------------------------------------------------------- modal
+  const dim = document.getElementById('dim');
+  const modal = document.getElementById('modal');
+  const mTitle = document.getElementById('modal-title');
+  const mBody = document.getElementById('modal-body');
+  const mNote = document.getElementById('modal-note');
+  const mSlides = document.getElementById('modal-slides');
+  const mNav = modal.querySelector('.modal__nav');
+  let slideIdx = 0, returnFocus = null;
+
+  function showSlide(i) {
+    const slides = [...mSlides.children];
+    slideIdx = (i + slides.length) % slides.length;
+    slides.forEach((sl, k) => sl.classList.toggle('is-active', k === slideIdx));
+  }
+
+  function openModal(it, from) {
+    openItem = it;
+    returnFocus = from || document.activeElement;
+    setHover(null);
+    setLit(-1);
+    mTitle.textContent = it.title;
+    mBody.textContent = it.body;
+    mNote.textContent = it.note || '';
+    const photos = (it.photos || []).map(src => `<img class="modal__slide" src="${src}" alt="${it.title.replace('\n', ' ')}">`);
+    photos.push(`<img class="modal__slide modal__slide--cut" src="assets/items/${it.id}.webp" alt="${it.title.replace('\n', ' ')} в наборе">`);
+    mSlides.innerHTML = photos.join('');
+    mNav.hidden = photos.length < 2;
+    showSlide(0);
+
+    if (!mobile) {
+      // the item stays lit above the dimmer, the window opens next to it
+      focusHost.innerHTML = '<div class="items"></div>';
+      focusHost.firstChild.appendChild(itemEl(it));
+      const cx = it.x + it.w / 2;
+      let left = cx >= 960 ? it.x - 24 - 700 : it.x + it.w + 24;
+      left = Math.max(60, Math.min(left, W - 60 - 700));
+      const top = 291; // as in the design
+      modal.style.left = left + 'px';
+      modal.style.top = top + 'px';
+      sparkleEdge(it, 60, { vy: rand(-200, -80) });
+    }
+    modal.hidden = false;
+    requestAnimationFrame(() => body.classList.add('is-modal'));
+    modal.querySelector('.modal__close').focus({ preventScroll: true });
+    softChime(it, true);
+  }
+
+  function closeModal() {
+    if (!openItem) return;
+    body.classList.remove('is-modal');
+    openItem = null;
+    setTimeout(() => { if (!openItem) { modal.hidden = true; focusHost.innerHTML = ''; } }, 450);
+    if (returnFocus && returnFocus.focus) returnFocus.focus({ preventScroll: true });
+    litTimer = .6;
+  }
+
+  modal.querySelector('.modal__close').addEventListener('click', closeModal);
+  modal.querySelector('.modal__arrow--prev').addEventListener('click', () => showSlide(slideIdx - 1));
+  modal.querySelector('.modal__arrow--next').addEventListener('click', () => showSlide(slideIdx + 1));
+  dim.addEventListener('click', closeModal);
+  window.addEventListener('keydown', e => {
+    if (!openItem) return;
+    if (e.key === 'Escape') { e.stopImmediatePropagation(); closeModal(); }
+    if (e.key === 'ArrowLeft') showSlide(slideIdx - 1);
+    if (e.key === 'ArrowRight') showSlide(slideIdx + 1);
+    if (e.key === 'Tab') { // keep focus inside the window
+      const f = [...modal.querySelectorAll('button:not([hidden] *)')].filter(b => b.offsetParent);
+      const i = f.indexOf(document.activeElement);
+      if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+    }
+  }, true);
+
+  function softChime(it, strong) {
+    if (!musicOn || !ensureAudio()) return;
+    const t = audio.currentTime;
+    const base = [NOTE.C6, NOTE.E5 * 2, NOTE.G5 * 2, NOTE.A5 * 2, NOTE.C6 * 1.5, NOTE.D5 * 2][ITEMS.indexOf(it) % 6];
+    bell(base, t, 1.2, strong ? .32 : .16);
+    if (strong) bell(base * 1.5, t + .08, 1.4, .2);
+  }
+
+  // ---------------------------------------------------------------- sets
+  const tabs = [...document.querySelectorAll('.tab')];
+  const setHours = document.getElementById('set-hours');
+  const setDesc = document.getElementById('set-desc');
+  const setPrice = document.getElementById('set-price');
+  const setCta = document.getElementById('set-cta');
+  function swap(el, text) {
+    el.textContent = text;
+    el.classList.remove('swap'); void el.offsetWidth; el.classList.add('swap');
+  }
+  function selectSet(key) {
+    const d = SETS[key];
+    tabs.forEach(t => { const on = t.dataset.set === key; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', on); });
+    swap(setHours, d.hours);
+    swap(setDesc, d.desc);
+    swap(setPrice, d.price);
+    swap(setCta, 'Хочу набор ' + key);
+    if (!mobile) {
+      for (let i = 0; i < 26; i++) mote(rand(1469, 1700), rand(960, 1030), { vy: rand(-160, -40), vx: rand(-60, 60) });
+    }
+  }
+  tabs.forEach(t => t.addEventListener('click', () => selectSet(t.dataset.set)));
+
+  // ---------------------------------------------------------------- scroll morph
+  const s1 = document.getElementById('s1');
+  const s2 = document.getElementById('s2');
+  const q = sel => layer.querySelector(sel);
+  const frameEl = scene.querySelector('.frame');
+  const cropEl = scene.querySelector('.open-crop');
+  // screen-1 element → the screen-2 element it turns into
+  const PAIRS = [
+    [q('.logo'), q('.hint')],
+    [q('.stock'), q('.chip')],
+    [q('.title'), q('.title2')],
+    [q('.offer__text'), q('.tabs')],
+    [q('.offer__text'), q('.desc')],
+    [q('.offer__actions'), q('.buy')],
+  ];
+  const S1_ELS = [...new Set(PAIRS.map(p => p[0]))];
+  const S2_ELS = [q('.hint'), q('.title2'), q('.panel')];
+  let geo = null, p = 0, lastP = 0, morphReady = false;
+
+  const centre = el => {
+    const r = el.getBoundingClientRect();
+    return [(r.left + r.width / 2 - tx) / s, (r.top + r.height / 2 - ty) / s, r.width / s, r.height / s];
+  };
+  function measure() {
+    if (mobile) { geo = null; return; }
+    [...S1_ELS, ...PAIRS.map(p => p[1]), ...S2_ELS].forEach(el => { el.style.translate = ''; });
+    S1_ELS.forEach(el => { el.style.opacity = ''; el.dataset.o = parseFloat(getComputedStyle(el).opacity) || 1; });
+    geo = PAIRS.map(([a, b]) => { const A = centre(a), B = centre(b); return { a, b, dx: B[0] - A[0], dy: B[1] - A[1], A, B }; });
+    morphReady = true;
+    applyMorph(true);
+  }
+  const smooth = (e0, e1, x) => { const t = Math.min(1, Math.max(0, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
+
+  function applyMorph(force) {
+    if (!geo || mobile) return;
+    const a = smooth(0, .55, p);      // screen 1 leaving
+    const b = smooth(.45, 1, p);      // screen 2 arriving
+    body.style.setProperty('--p', p.toFixed(4));
+    layer.style.setProperty('--sp', smooth(.15, .85, p).toFixed(4));
+    if (body.classList.contains('is-done') || force) {
+      const seen = new Set();
+      geo.forEach(g => {
+        if (!seen.has(g.a)) {
+          seen.add(g.a);
+          g.a.style.opacity = (1 - a) * g.a.dataset.o;
+          g.a.style.filter = a > .001 ? `blur(${(a * 14).toFixed(1)}px)` : '';
+          g.a.style.translate = `${(g.dx * a * .55).toFixed(1)}px ${(g.dy * a * .55).toFixed(1)}px`;
+        }
+        const k = 1 - b;
+        g.b.style.translate = `${(-g.dx * k * .55).toFixed(1)}px ${(-g.dy * k * .55).toFixed(1)}px`;
+      });
+      S2_ELS.forEach(el => {
+        el.style.opacity = b;
+        el.style.filter = b < .999 ? `blur(${((1 - b) * 14).toFixed(1)}px)` : '';
+      });
+      frameEl.style.opacity = 1 - a;
+      frameEl.style.scale = 1 + a * .03;
+      frameEl.style.filter = a > .001 ? `blur(${(a * 8).toFixed(1)}px) brightness(${1 + a})` : '';
+      cropEl.style.opacity = 1 - a;
+    }
+    const was = onSets;
+    onSets = p > .5;
+    body.classList.toggle('on-sets', onSets);
+    if (!onSets && was) { setHover(null); }
+  }
+
+  function morphParticles(dp) {
+    if (reduced || mobile || !geo) return;
+    const n = Math.min(60, Math.round(dp * 520));
+    for (let i = 0; i < n; i++) {
+      if (p < .6 && Math.random() < .55) {
+        // the frame dissolves into sparkles
+        const side = Math.random() * 4 | 0;
+        const x = side < 2 ? rand(59, 1861) : (side === 2 ? 59 : 1861);
+        const y = side < 2 ? (side === 0 ? 71 : 1009) : rand(71, 1009);
+        mote(x, y, { vy: rand(-160, -40) });
+      } else {
+        const g = pick(geo);
+        const [cx, cy, w, h] = p < .5 ? g.A : g.B;
+        mote(cx + rand(-w / 2, w / 2), cy + rand(-h / 2, h / 2), { vy: rand(-120, -30), size: rand(2, 5) });
+      }
+    }
+  }
+
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      if (mobile) return;
+      p = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight || 1)));
+      const dp = Math.abs(p - lastP);
+      if (dp > 0) {
+        applyMorph();
+        morphParticles(dp);
+        if (p > .97 && lastP <= .97) arrive();
+        lastP = p;
+      }
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', () => { if (morphReady) measure(); onScroll(); });
+
+  function arrive() {
+    // a short wave over all items when screen 2 settles
+    if (reduced) return;
+    ITEMS.forEach((it, i) => setTimeout(() => sparkleEdge(it, 18, { vy: rand(-120, -40) }), i * 90));
+    litTimer = 0;
+  }
+
+  document.querySelectorAll('[data-goto="sets"]').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    if (mobile) s2.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
+    else window.scrollTo({ top: window.innerHeight, behavior: reduced ? 'auto' : 'smooth' });
+  }));
+
   // ---------------------------------------------------------------- timeline
   const timers = [];
   const at = (ms, fn) => timers.push(setTimeout(fn, ms));
@@ -365,7 +803,10 @@
     dustUntil = 0;
     body.classList.add('is-charging', 'is-open', 'is-frame', 'is-ui', 'is-done');
     body.classList.remove('is-intro-lock');
+    document.documentElement.classList.remove('is-locked');
     twinkleOn = true;
+    measure();
+    onScroll();
   }
 
   function start() {
@@ -376,6 +817,8 @@
     if (reduced) { finish(); return; }
 
     body.classList.add('is-intro-lock');
+    document.documentElement.classList.add('is-locked');
+    window.scrollTo(0, 0);
     at(700, () => {
       body.classList.add('is-charging');
       dustUntil = performance.now() + 1500;
@@ -390,11 +833,12 @@
       body.classList.add('is-ui');
       body.classList.remove('is-intro-lock');
     });
-    at(5200, () => { body.classList.add('is-done'); twinkleOn = true; });
+    at(5200, finish);
   }
 
   skipBtn.addEventListener('click', finish);
-  window.addEventListener('keydown', e => { if (e.key === 'Escape') finish(); });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape' && !body.classList.contains('is-done')) finish(); });
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   const imgs = [...document.querySelectorAll('.closed__img, .open--back')];
   Promise.all(imgs.map(img => (img.decode ? img.decode() : Promise.resolve()).catch(() => {})))
