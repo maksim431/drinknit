@@ -151,70 +151,223 @@
   /* ===== Стикеры ===== */
   for (const [set, list] of Object.entries(STICKERS)) {
     const host = $(`.stickers[data-set="${set}"]`);
-    list.forEach(([src, l, t, w, h, iw, ih, rot, il, it, iwp, ihp, d, shadow = true]) => {
+    list.forEach(([src, l, t, w, h, iw, ih, rot, il, it, iwp, ihp, d, shadow = true], i) => {
       const el = document.createElement('div');
-      el.className = 'stk';
-      el.style.cssText = `left:${l}px;top:${t}px;width:${w}px;height:${h}px`;
+      el.className = 'stk pop';
+      el.style.cssText = `left:${l}px;top:${t}px;width:${w}px;height:${h}px;--d:${(set === 'hero' ? .5 : .55) + i * .09}s`;
       if (d) el.dataset.d = d;
       el.innerHTML = `<div class="stk-r${shadow ? '' : ' ns'}" style="width:${iw}px;height:${ih}px;transform:rotate(${rot}deg)"><i><img src="assets/d/${src}.webp" alt="" style="left:${il}%;top:${it}%;width:${iwp}%;height:${ihp}%"></i></div>`;
       host.appendChild(el);
     });
   }
 
-  /* ===== Масштаб сцены ===== */
-  const page = $('#page');
+  /* ===== Экран стоит на месте: сцена вписана в окно ===== */
+  const html = document.documentElement;
+  const body = document.body;
+  const vp = $('#vp');
   const header = $('#header');
-  let s = 1;
-  const resize = () => {
-    s = document.documentElement.clientWidth / 1920;
-    document.documentElement.style.setProperty('--s', s);
-    page.style.height = `${8640 * s}px`;
-    fx.width = innerWidth * devicePixelRatio;
-    fx.height = innerHeight * devicePixelRatio;
-    update();
-  };
-
-  /* ===== Частицы «новогоднего волшебства» ===== */
   const fx = $('#fx');
   const ctx = fx.getContext('2d');
+  let s = 1, tx = 0, ty = 0, cdpr = 1;
+  const resize = () => {
+    const vw = innerWidth, vh = innerHeight;
+    s = Math.min(vw / 1920, vh / 1080);
+    tx = (vw - 1920 * s) / 2;
+    ty = (vh - 1080 * s) / 2;
+    vp.style.setProperty('--s', s);
+    vp.style.setProperty('--tx', `${tx}px`);
+    vp.style.setProperty('--ty', `${ty}px`);
+    cdpr = Math.min(devicePixelRatio || 1, 1.25);
+    fx.width = Math.round(vw * cdpr);
+    fx.height = Math.round(vh * cdpr);
+  };
+
+  /* ===== Частицы «новогоднего волшебства» (движок с прошлой версии сайта), координаты сцены 1920 × 1080 ===== */
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const pick = arr => arr[(Math.random() * arr.length) | 0];
+  const MOUTH = { x: 960, y: 380 };     // откуда вырывается волшебство при открытии
+  const BOXC = { x: 960, y: 470 };
   const parts = [];
-  const COLORS = ['#ffedc8', '#ffd98a', '#fff6e0', '#fb8895'];
-  // x, y — координаты сцены 1920
+  const MAX_PARTS = 420;
+  let flash = 0, ring = null, dustUntil = 0, twinkleOn = false, twinkleAcc = 0;
+  const GOLD = ['255,226,150', '255,244,214', '255,200,120'];
+  const CONFETTI = ['#c3222f', '#e8394a', '#f6d58e', '#ffe9b0', '#e1d2b2', '#ffffff', '#4fae72'];
+
+  const mote = (x, y, o = {}) => {
+    if (reduce || parts.length >= MAX_PARTS) return;
+    parts.push(Object.assign({ type: 'mote', x, y, vx: rand(-40, 40), vy: rand(-90, -20), size: rand(2, 4.5),
+      life: 0, max: rand(.7, 1.5), star: Math.random() < .3, hue: pick(GOLD) }, o));
+  };
+  // искры из точки
   const burst = (x, y, n = 60, spread = 1) => {
-    if (reduce) return;
-    const cx = x * s, cy = y * s - scrollY;
     for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const v = (1 + Math.random() * 5) * spread;
-      parts.push({ x: cx, y: cy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 1.5, life: 1, r: 1 + Math.random() * 2.6,
-        c: COLORS[(Math.random() * COLORS.length) | 0], star: Math.random() < .3 });
+      const a = rand(0, Math.PI * 2), v = rand(60, 320) * spread;
+      mote(x, y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v - 60, size: rand(2, 5), max: rand(.8, 1.8) });
     }
   };
+  // искры по площади
   const area = (x, y, w, h, n) => {
-    for (let i = 0; i < n; i++) burst(x + Math.random() * w, y + Math.random() * h, 1, .6);
+    for (let i = 0; i < n; i++) mote(x + rand(0, w), y + rand(0, h), { vy: rand(-140, -30), size: rand(2, 5) });
   };
-  const drawFx = () => {
-    const dpr = devicePixelRatio;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, innerWidth, innerHeight);
-    for (let i = parts.length - 1; i >= 0; i--) {
-      const p = parts[i];
-      p.x += p.vx; p.y += p.vy; p.vy += .04; p.vx *= .985; p.life -= .012;
-      if (p.life <= 0) { parts.splice(i, 1); continue; }
-      ctx.globalAlpha = p.life;
-      ctx.fillStyle = p.c;
-      ctx.shadowColor = p.c; ctx.shadowBlur = 8;
-      if (p.star) {
-        const r = p.r * 2.4;
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y - r); ctx.lineTo(p.x + r * .25, p.y - r * .25); ctx.lineTo(p.x + r, p.y);
-        ctx.lineTo(p.x + r * .25, p.y + r * .25); ctx.lineTo(p.x, p.y + r); ctx.lineTo(p.x - r * .25, p.y + r * .25);
-        ctx.lineTo(p.x - r, p.y); ctx.lineTo(p.x - r * .25, p.y - r * .25); ctx.closePath(); ctx.fill();
-      } else {
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+  const spawnDust = () => {
+    const a = rand(0, Math.PI * 2), r = rand(520, 900);
+    parts.push({ type: 'dust', a, r, r0: r, w: rand(1.6, 2.6) * (Math.random() < .5 ? -1 : 1),
+      size: rand(2.5, 6), life: 0, max: rand(1, 1.6), hue: pick(GOLD) });
+  };
+  const openBurst = () => {
+    flash = 1;
+    ring = { r: 40, life: 0 };
+    for (let i = 0; i < 110; i++) {
+      const a = rand(-Math.PI * .95, -Math.PI * .05) + rand(-.25, .25), v = rand(500, 1500);
+      parts.push({ type: 'confetti', x: MOUTH.x + rand(-160, 160), y: MOUTH.y + rand(-30, 60), vx: Math.cos(a) * v, vy: Math.sin(a) * v,
+        rot: rand(0, 6.3), vr: rand(-12, 12), flip: rand(0, 6.3), vf: rand(6, 14), w: rand(10, 18), h: rand(6, 11),
+        color: pick(CONFETTI), life: 0, max: rand(2.4, 3.6) });
+    }
+    for (let i = 0; i < 70; i++) {
+      const a = rand(0, Math.PI * 2), v = rand(250, 1100);
+      parts.push({ type: 'star', x: MOUTH.x, y: MOUTH.y + 40, vx: Math.cos(a) * v, vy: Math.sin(a) * v * .8 - 200,
+        size: rand(8, 26), life: 0, max: rand(1.2, 2.4), tw: rand(8, 16) });
+    }
+    for (let i = 0; i < 90; i++) {
+      const a = rand(0, Math.PI * 2), v = rand(900, 2200);
+      parts.push({ type: 'spark', x: MOUTH.x, y: MOUTH.y + 40, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: rand(.45, .9) });
+    }
+  };
+
+  // заранее нарисованные спрайты: картинка дешевле градиента на каждую частицу
+  const sprites = new Map();
+  const sprite = (kind, color) => {
+    const key = kind + color;
+    let c = sprites.get(key);
+    if (c) return c;
+    c = document.createElement('canvas');
+    c.width = c.height = 128;
+    const g = c.getContext('2d');
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, `rgba(${color},${kind === 'dot' ? 1 : .9})`);
+    grad.addColorStop(kind === 'dot' ? .35 : .25, `rgba(${color},${kind === 'dot' ? .45 : .25})`);
+    grad.addColorStop(1, `rgba(${color},0)`);
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    if (kind === 'star') {
+      const sz = 40, k = sz * .16;
+      g.translate(64, 64);
+      g.fillStyle = '#fffaf0';
+      g.beginPath();
+      g.moveTo(0, -sz);
+      g.quadraticCurveTo(k, -k, sz, 0); g.quadraticCurveTo(k, k, 0, sz);
+      g.quadraticCurveTo(-k, k, -sz, 0); g.quadraticCurveTo(-k, -k, 0, -sz);
+      g.fill();
+    }
+    sprites.set(key, c);
+    return c;
+  };
+  const drawStar = (x, y, size, alpha, color) => {
+    if (alpha <= .01 || size <= .2) return;
+    const d = size * 3.2;
+    ctx.globalAlpha = Math.min(1, alpha);
+    ctx.drawImage(sprite('star', color), x - d / 2, y - d / 2, d, d);
+  };
+  const drawDot = (x, y, r, alpha, color) => {
+    if (alpha <= .01) return;
+    ctx.globalAlpha = Math.min(1, alpha);
+    ctx.drawImage(sprite('dot', color), x - r, y - r, r * 2, r * 2);
+  };
+
+  let last = performance.now(), dirty = true;
+  const drawFx = now => {
+    const dt = Math.min((now - last) / 1000, .05);
+    last = now;
+    if (now < dustUntil) for (let i = 0; i < 4; i++) spawnDust();
+    if (twinkleOn && scene === 0) {
+      twinkleAcc += dt;
+      while (twinkleAcc > .45) {
+        twinkleAcc -= .45;
+        parts.push({ type: 'twinkle', x: rand(470, 1480), y: rand(60, 860), size: rand(7, 16), life: 0, max: rand(1, 1.8) });
       }
     }
-    ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+    if (!parts.length && flash <= 0 && !ring) {
+      if (dirty) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, fx.width, fx.height); dirty = false; }
+      return;
+    }
+    dirty = true;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, fx.width, fx.height);
+    ctx.setTransform(cdpr * s, 0, 0, cdpr * s, cdpr * tx, cdpr * ty);
+
+    if (flash > 0) {
+      const g = ctx.createRadialGradient(MOUTH.x, MOUTH.y, 0, MOUTH.x, MOUTH.y, 1300);
+      g.addColorStop(0, `rgba(255,250,230,${flash})`);
+      g.addColorStop(.35, `rgba(255,230,170,${flash * .55})`);
+      g.addColorStop(1, 'rgba(255,230,170,0)');
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = g;
+      ctx.fillRect(-500, -500, 2920, 2080);
+      flash = Math.max(0, flash - dt * 1.6);
+    }
+    if (ring) {
+      ring.life += dt;
+      ring.r += dt * 1700;
+      const a = Math.max(0, 1 - ring.life / .8);
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = `rgba(255,236,190,${a * a * .35})`;
+      ctx.lineWidth = 3 + 14 * a;
+      ctx.beginPath();
+      ctx.ellipse(MOUTH.x, MOUTH.y + 60, ring.r, ring.r * .55, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      if (a <= 0) ring = null;
+    }
+
+    ctx.globalCompositeOperation = 'lighter';
+    let w = 0;
+    for (let i = 0; i < parts.length; i++) {
+      const p = parts[i];
+      p.life += dt;
+      const t = p.life / p.max;
+      if (t >= 1) continue;
+      parts[w++] = p;
+      if (p.type === 'dust') {
+        p.a += p.w * dt * (1 + 2 * (1 - p.r / p.r0));
+        p.r = p.r0 * (1 - t) * (1 - t);
+        drawDot(BOXC.x + Math.cos(p.a) * p.r, BOXC.y + Math.sin(p.a) * p.r * .7, p.size * 4, Math.sin(t * Math.PI), p.hue);
+      } else if (p.type === 'spark') {
+        p.vx *= 1 - 2.6 * dt; p.vy *= 1 - 2.6 * dt;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        ctx.globalAlpha = 1 - t;
+        ctx.strokeStyle = 'rgb(255,232,170)';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * .05, p.y - p.vy * .05); ctx.stroke();
+      } else if (p.type === 'star') {
+        p.vx *= 1 - 1.8 * dt; p.vy = p.vy * (1 - 1.8 * dt) + 140 * dt;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        drawStar(p.x, p.y, p.size * (1 - t * .5), (1 - t) * (.6 + .4 * Math.sin(p.life * p.tw)), '255,214,120');
+      } else if (p.type === 'mote') {
+        p.vx *= 1 - 1.2 * dt; p.vy = p.vy * (1 - 1.2 * dt) - 30 * dt;
+        p.x += p.vx * dt; p.y += p.vy * dt;
+        const a = Math.sin(t * Math.PI);
+        if (p.star) drawStar(p.x, p.y, p.size * 2.6 * (.5 + .5 * a), a * .9, p.hue);
+        else drawDot(p.x, p.y, p.size * 3, a, p.hue);
+      } else if (p.type === 'twinkle') {
+        const a = Math.sin(t * Math.PI);
+        drawStar(p.x, p.y, p.size * (.4 + .6 * a), a * .85, '255,225,160');
+      }
+    }
+    parts.length = w;
+    ctx.globalCompositeOperation = 'source-over';
+    // конфетти без сложения цветов, чтобы цвета оставались честными
+    for (const p of parts) {
+      if (p.type !== 'confetti') continue;
+      const t = p.life / p.max;
+      p.vx *= 1 - 1.4 * dt; p.vy = p.vy * (1 - 1.4 * dt) + 520 * dt;
+      p.x += p.vx * dt + Math.sin(p.life * 3 + p.flip) * 40 * dt; p.y += p.vy * dt;
+      p.rot += p.vr * dt; p.flip += p.vf * dt;
+      const c = Math.cos(p.rot), sn = Math.sin(p.rot), f = Math.cos(p.flip);
+      ctx.setTransform(cdpr * s * c, cdpr * s * sn, -cdpr * s * sn * f, cdpr * s * c * f, cdpr * (tx + p.x * s), cdpr * (ty + p.y * s));
+      ctx.globalAlpha = t > .75 ? (1 - t) / .25 : 1;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+    }
+    ctx.globalAlpha = 1;
   };
 
   /* ===== Наборы ===== */
@@ -302,8 +455,8 @@
     prodInner.appendChild(wave);
     prodInner.classList.toggle('small', !!SETS[key].small);
     hots.style.opacity = '0';
-    burst(1016, 1080 + 560, 90, 1.3);
-    area(600, 1080 + 250, 830, 700, 70);
+    burst(1016, 560, 90, 1.3);
+    area(600, 250, 830, 700, 70);
     setTimeout(() => {
       prodImg.src = SETS[key].img;
       prodImg.alt = `Новогодний набор ${key}`;
@@ -518,14 +671,50 @@
     if (musicOn) { magicChime(); playTune(); }
   });
 
-  /* ===== Навигация ===== */
-  const TOPS = { hero: 0, sets: 1080, time: 2160, kids: 3240, left: 4320, terms: 5400, about: 6480, book: 7560 };
+  /* ===== Скролл: 10 остановок, экран стоит, сцены сменяются ===== */
+  // остановка → сцена: 0 первый экран, 1 наборы, 2–4 «сколько вяжу» (три карточки), 5 для детей, 6 таймер, 7 сроки, 8 обо мне, 9 финал
+  const STOP_SCENE = ['hero', 'sets', 'time', 'time', 'time', 'kids', 'left', 'terms', 'about', 'book'];
+  const STOPS = { hero: 0, sets: 1, time: 2, kids: 5, left: 6, terms: 7, about: 8, book: 9 };
+  const scenes = $$('.scene');
+  const sceneEl = id => $(`#${id}`);
+  let scene = 0;            // текущая остановка
+  let sceneId = 'hero';
+
   const goTo = hash => {
     const id = hash.slice(1);
-    if (!(id in TOPS)) return;
-    scrollTo({ top: TOPS[id] * s, behavior: reduce ? 'auto' : 'smooth' });
+    if (!(id in STOPS) || html.classList.contains('is-locked')) return;
+    scrollTo({ top: STOPS[id] * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
   };
   $$('[data-nav]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); goTo(a.getAttribute('href')); }));
+
+  // один жест колесом или тачпадом = одна остановка, инерция тачпада не перелистывает дальше
+  let wheelUntil = 0;
+  const step = dir => {
+    const target = clamp(Math.round(scrollY / innerHeight) + dir, 0, STOP_SCENE.length - 1);
+    scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
+  };
+  addEventListener('wheel', e => {
+    if (e.ctrlKey) return;                         // масштаб страницы
+    e.preventDefault();
+    if (html.classList.contains('is-locked') || !modal.hidden) return;
+    const now = performance.now();
+    if (now < wheelUntil) { wheelUntil = Math.max(wheelUntil, now + 120); return; }
+    if (Math.abs(e.deltaY) < 3) return;
+    wheelUntil = now + 900;
+    step(Math.sign(e.deltaY));
+  }, { passive: false });
+  addEventListener('keydown', e => {
+    if (html.classList.contains('is-locked') || !modal.hidden || e.target.closest('input, textarea')) return;
+    const k = e.key;
+    let dir = 0;
+    if (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) dir = 1;
+    else if (k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) dir = -1;
+    else if (k === 'Home') dir = -99;
+    else if (k === 'End') dir = 99;
+    if (!dir) return;
+    e.preventDefault();
+    step(dir);
+  });
 
   /* ===== Параллакс от мыши ===== */
   const depthEls = $$('[data-d]');
@@ -534,44 +723,83 @@
     mx = e.clientX / innerWidth * 2 - 1;
     my = e.clientY / innerHeight * 2 - 1;
   });
-  // продукт и стикеры первого экрана двигаются рассинхронно
-  const heroProdDepth = 12;
+  const heroProdDepth = 12;   // коробка и стикеры первого экрана двигаются рассинхронно
 
-  /* ===== Скролл-анимации ===== */
-  const hero = $('#hero');
-  const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]', hero)];
-  const pin = $('#pin');
-  const about = $('#about-card');
-  const b8cards = $$('.b8-card');
-  const B8_CX = [534.5, 960.5, 1386.5];
-  let b2on = false;
-  let heroBurst = false;
+  /* ===== Смена сцен ===== */
+  const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]')];
+  const left = $('#left');
+  const aboutSec = $('#about');
+  // карточки финала вылетают из карточки Кати (центр 960, 683)
+  [534.5, 960.5, 1386.5].forEach((x, i) => {
+    const c = $$('.b8-card')[i];
+    c.style.setProperty('--ox', `${960 - x}px`);
+    c.style.setProperty('--oy', '324.5px');
+    c.style.setProperty('--or', `${(i - 1) * 8}deg`);
+    c.style.zIndex = i === 1 ? 2 : 1;
+  });
+  let b2on = false, heroBurst = false;
+
+  // волшебство при входе сцены
+  const SPARK = {
+    time: () => { area(500, 120, 920, 260, 60); burst(960, 672, 70, 1.2); },
+    kids: () => { area(60, 160, 820, 240, 60); burst(1100, 520, 60); },
+    left: () => area(560, 300, 800, 500, 80),
+    terms: () => { area(60, 60, 600, 200, 50); burst(1290, 470, 70); },
+    about: () => burst(960, 683, 90, 1.3),
+    book: () => { burst(960, 683, 120, 1.6); area(363, 119, 1195, 479, 80); },
+  };
+
+  const setScene = stop => {
+    if (stop === scene) return;
+    const prevId = sceneId;
+    scene = stop;
+    sceneId = STOP_SCENE[stop];
+    header.classList.toggle('scrolled', stop > 0);
+    if (sceneId === 'time') flipTo(stop - 2);
+    if (sceneId === prevId) return;
+    aboutSec.classList.toggle('leave-book', prevId === 'about' && sceneId === 'book');
+    // к первому экрану возвращаемся через растворение: он лежит ниже остальных сцен
+    const prevSc = sceneEl(prevId);
+    if (prevSc && prevSc.classList.contains('scene') && (sceneId === 'hero' || sceneId === 'sets')) {
+      prevSc.classList.add('leave-fade');
+      setTimeout(() => prevSc.classList.remove('leave-fade'), 800);
+    }
+    scenes.forEach(sc => {
+      if (sc === left) return;   // таймер управляется скроллом напрямую
+      sc.classList.toggle('is-on', sc.id === sceneId);
+    });
+    // карточка Кати остаётся на месте, пока из неё вылетают карточки наборов
+    if (prevId === 'about' && sceneId === 'book') {
+      aboutSec.classList.add('is-on');
+      setTimeout(() => { if (sceneId === 'book') aboutSec.classList.remove('is-on'); }, 700);
+    }
+    if (sceneId !== 'sets' && sceneId !== 'hero') closeItem();
+    SPARK[sceneId]?.();
+    ding(stop);
+  };
 
   const update = () => {
-    const Y = scrollY / s;               // верх окна в координатах сцены
-    const vh = innerHeight / s;
+    const P = scrollY / (innerHeight || 1);          // 0…9: позиция в остановках
+    setScene(Math.round(P));
 
-    header.classList.toggle('scrolled', Y > 40);
-
-    // 1 → 2: продукт едет из первого экрана во второй
-    const p = clamp(Y / 1080);
-    const e = p;                         // линейно: на экране продукт почти не прыгает
-    const k = 1.1834 + (1 - 1.1834) * e;
-    const dx = -59.47 * (1 - e) + cx * heroProdDepth * (1 - p);
-    const dy = -1331.5 * (1 - e) + cy * heroProdDepth * (1 - p);
+    // 1 → 2: продукт едет из первого экрана во второй, элементы растворяются и появляются
+    const grpA = P < 1.5;
+    body.classList.toggle('grp-a', grpA);
+    const p = clamp(P);
+    const k = 1.1834 + (1 - 1.1834) * p;
+    const dx = -59.47 * (1 - p) + cx * heroProdDepth * (1 - p);
+    const dy = -251.5 * (1 - p) + cy * heroProdDepth * (1 - p);
     product.style.transform = `translate(${dx}px, ${dy}px) scale(${k})`;
     if (focusClone) focusClone.style.transform = product.style.transform;
-
     const fade = clamp(1 - p * 2.6);
     heroFadeEls.forEach(el => { el.style.opacity = fade; });
     if (p > .12 && !heroBurst) { heroBurst = true; area(300, 200, 1320, 800, 120); }
     if (p < .05) heroBurst = false;
-
     if (p >= .9 && !b2on) {
       b2on = true;
       b2.classList.add('b2-on');
       product.classList.add('b2-on');
-      area(60, 1080 + 120, 1800, 900, 160);
+      area(60, 120, 1800, 900, 160);
     } else if (p < .75 && b2on) {
       b2on = false;
       b2.classList.remove('b2-on');
@@ -579,30 +807,20 @@
       closeItem();
     }
 
-    // 3: карточка меняется при скролле
-    const q3 = (Y + vh * .6 - 2160) / 1080;
-    flipTo(q3 < .62 ? 0 : q3 < .95 ? 1 : 2);
-
-    // 5: жёсткий параллакс — объекты стоят на месте, экран скроллится
-    const off = clamp(Y - 4320 + (vh - 1080) / 2, -vh, 1080 + vh);
-    pin.style.transform = `translateY(${off}px)`;
-
-    // 7 → 8: карточка раскладывается на три
-    const q = clamp((Y - 6480) / 1080);
-    const eq = easeIO(q);
-    about.style.opacity = clamp(1 - (q - .08) * 4);
-    b8cards.forEach((c, i) => {
-      const ox = (960 - B8_CX[i]) * (1 - eq);
-      const oy = (7163 - 7918.5) * (1 - eq);
-      const sc = 1.353 + (1 - 1.353) * eq;
-      const rot = (i - 1) * 8 * (1 - eq);
-      c.style.transform = `translate(${ox}px, ${oy}px) scale(${sc}) rotate(${rot}deg)`;
-      c.style.opacity = clamp(q * 8);
-      c.style.zIndex = i === 1 ? 2 : 1;
-    });
+    // 5 ↔ 6 ↔ 7: жёсткий параллакс — объекты таймера стоят, рамка наезжает снизу и уезжает вверх
+    const ct = clamp(6 - P) * 100;     // верхний край рамки при въезде
+    const cb = clamp(P - 6) * 100;     // нижний край при выезде
+    left.style.setProperty('--ct', `${ct}%`);
+    left.style.setProperty('--cb', `${cb}%`);
+    const leftVisible = P > 5 && P < 7;
+    left.style.visibility = leftVisible ? 'visible' : 'hidden';
+    left.classList.toggle('is-on', leftVisible);
+    // соседние сцены не исчезают, пока рамка таймера их закрывает
+    $('#kids').classList.toggle('is-on', sceneId === 'kids' || (P > 5 && P < 6));
+    $('#terms').classList.toggle('is-on', sceneId === 'terms' || (P > 6 && P < 7));
   };
 
-  const loop = () => {
+  const loop = now => {
     cx += (mx - cx) * .06;
     cy += (my - cy) * .06;
     if (!reduce) {
@@ -612,13 +830,43 @@
       });
     }
     update();
-    drawFx();
+    if (!document.hidden) drawFx(now);
     requestAnimationFrame(loop);
   };
 
-  renderPanel(current);
-  renderHots(current);
-  addEventListener('resize', resize);
-  resize();
-  requestAnimationFrame(loop);
+  /* ===== Интро первого экрана: коробка качается, собирает пыль, открывается со вспышкой ===== */
+  const timers = [];
+  const at = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const finish = () => {
+    timers.forEach(clearTimeout);
+    dustUntil = 0;
+    body.classList.add('is-charging', 'is-open', 'is-frame', 'is-ui', 'is-done');
+    html.classList.remove('is-locked');
+    twinkleOn = true;
+    setTimeout(() => body.classList.remove('intro'), 50);
+  };
+  const start = () => {
+    body.classList.add('intro');
+    renderPanel(current);
+    renderHots(current);
+    addEventListener('resize', resize);
+    resize();
+    requestAnimationFrame(t => { last = t; loop(t); });
+    if (reduce) { finish(); return; }
+    html.classList.add('is-locked');
+    scrollTo(0, 0);
+    at(700, () => { body.classList.add('is-charging'); dustUntil = performance.now() + 1500; });
+    at(2400, () => { body.classList.add('is-open'); openBurst(); magicChime(); });
+    at(3000, () => body.classList.add('is-frame'));
+    at(3500, () => body.classList.add('is-ui'));
+    at(5200, finish);
+  };
+  $('.skip').addEventListener('click', finish);
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !body.classList.contains('is-done')) finish(); });
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+  const introImgs = [$('.closed img'), prodImg];
+  Promise.all(introImgs.map(img => (img.decode ? img.decode() : Promise.resolve()).catch(() => {})))
+    .then(() => (document.fonts ? document.fonts.ready : null))
+    .then(start, start);
 })();
