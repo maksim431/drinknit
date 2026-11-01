@@ -731,9 +731,11 @@
   // P — положение в «экранах»: 0 первый экран, 1 наборы, 2–4 «сколько вяжу» (три карточки), 5 для детей, 6 таймер, 7 сроки, 8 обо мне, 9 финал
   const LAST = 9;
   const STOPS = { hero: 0, sets: 1, time: 2, kids: 5, left: 6, terms: 7, about: 8, book: 9 };
+  let auto = false;          // прокрутку ведёт сам сайт (меню, доезжание)
   const goTo = hash => {
     const id = hash.slice(1);
     if (!(id in STOPS) || html.classList.contains('is-locked')) return;
+    auto = true;                 // переход по меню проезжает блоки без стопора
     scrollTo({ top: STOPS[id] * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
   };
   $$('[data-nav]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); goTo(a.getAttribute('href')); }));
@@ -744,13 +746,48 @@
   }));
 
   // прилипание только рядом с экраном: остановились ближе 16 % от него — страница доезжает
-  let settleT = 0;
+  // стопор на каждом блоке: если скролл проскакивает экран, страница останавливается на нём.
+  // Пока колесо или тачпад продолжают слать прокрутку (инерция), стопор держит — но не дольше 1,2 с,
+  // после паузы в 0,18 с или по истечении этого времени прокрутка снова свободная
+  const HOLD_MIN = 450, HOLD_MAX = 1200, HOLD_GAP = 180;
+  let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY;
+  let lastWheel = 0;
+  addEventListener('wheel', e => {
+    const now = performance.now();
+    lastWheel = now;
+    auto = false;                // посетитель крутит колесо — доезжание и переход по меню отменяются
+    if (now < holdUntil && !e.ctrlKey) {
+      e.preventDefault();
+      holdUntil = Math.min(holdStart + HOLD_MAX, Math.max(holdUntil, now + HOLD_GAP));
+    }
+  }, { passive: false });
   addEventListener('scroll', () => {
+    const vh = innerHeight, P = scrollY / vh, P0 = lastY / vh, now = performance.now();
+    lastY = scrollY;
+    if (!auto && !html.classList.contains('is-locked') && modal.hidden) {
+      if (now < holdUntil) {
+        // во время стопора держим экран на месте (клавиши, полоса прокрутки)
+        if (Math.abs(P - holdStop) > .001) { scrollTo({ top: holdStop * vh, behavior: 'instant' }); lastY = holdStop * vh; }
+      } else {
+        // первый экран, который скролл проскочил за это событие
+        const k = P > P0 ? Math.floor(P0 + 1e-4) + 1 : Math.ceil(P0 - 1e-4) - 1;
+        const crossed = P > P0 ? P >= k - 1e-4 : P <= k + 1e-4;   // дошёл до экрана или проскочил его
+        if (crossed && k >= 0 && k <= LAST) {
+          holdStop = k;
+          holdStart = now;
+          holdUntil = now + HOLD_MIN;
+          scrollTo({ top: k * vh, behavior: 'instant' });
+          lastY = k * vh;
+        }
+      }
+    }
     clearTimeout(settleT);
     settleT = setTimeout(() => {
+      auto = false;
       if (html.classList.contains('is-locked') || !modal.hidden) return;
+      if (performance.now() - lastWheel < 260) return;   // колесо ещё крутят — не доезжаем
       const P = scrollY / innerHeight, target = Math.round(P), d = Math.abs(P - target);
-      if (d > .003 && d < .16) scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
+      if (d > .003 && d < .16) { auto = true; scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' }); }
     }, 160);
   }, { passive: true });
 
