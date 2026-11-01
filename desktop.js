@@ -119,6 +119,15 @@
     });
   }
 
+  // копия карточки Кати на финальном экране: карточки наборов вылетают из-за неё
+  const katyaCopy = $('#about .b7-card-wrap').cloneNode(true);
+  katyaCopy.className = 'b7-card-wrap b8-katya';
+  katyaCopy.removeAttribute('data-split');
+  katyaCopy.removeAttribute('style');
+  katyaCopy.setAttribute('aria-hidden', 'true');
+  katyaCopy.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+  $('#book .fr').appendChild(katyaCopy);
+
   /* ===== Экран стоит на месте: кадр 1920 × 1080 вписан в окно, фоны доходят до краёв ===== */
   const html = document.documentElement;
   const body = document.body;
@@ -741,7 +750,7 @@
   const left = $('#left');
   const b8cards = $$('.b8-card');
   const b8fill = $('.b8-fill');
-  const B8 = [534.5, 960.5, 1386.5].map((x, i) => ({ ox: 960 - x, oy: 324.5, or: (i - 1) * 8 }));
+  const B8 = [534.5, 960.5, 1386.5].map(x => ({ ox: 960 - x, oy: 324.5 }));
 
   const fmt = v => Math.round(v * 1000) / 1000;
   const styleEl = (n, op, ty, blur, extra = '') => {
@@ -803,7 +812,7 @@
       sc.rv.forEach(({ n, d, keep }) => {
         const pe = still ? 1 : clamp((e - .25 - Math.min(d, 1) * .3) / .4);
         let pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .12) / .4) : 0;
-        if (keep) { pl = 0; n.style.opacity = fmt(pe * (1 - clamp((l - .08) * 4))); n.style.transform = `translateY(${fmt((1 - pe) * 30)}px)`; n.style.filter = ''; return; }
+        if (keep) { n.style.opacity = P > 8 ? 0 : fmt(pe); n.style.transform = `translateY(${fmt((1 - pe) * 30)}px)`; n.style.filter = ''; return; }
         styleEl(n, pe * (1 - pl), (1 - pe) * 40 - pl * 40, (1 - pe + pl) * 8);
       });
       sc.st.forEach(({ n, d }) => {
@@ -827,15 +836,20 @@
     left.style.setProperty('--ct', `${fmt(clamp(6 - P) * 100)}%`);
     left.style.setProperty('--cb', `${fmt(clamp(P - 6) * 100)}%`);
 
-    // 8 → 9: карточка Кати раскладывается на три карточки наборов
-    const eb = clamp(P - 8), eq = easeIO(eb);
+    // 8 → 9: из-за карточки Кати вылетают три карточки наборов — соосно, без поворота, потом карточка Кати исчезает
+    const eb = clamp(P - 8), eq = easeIO(clamp((eb - .08) / .72));
     b8fill.style.opacity = fmt(clamp(eb / .6));
     b8cards.forEach((c, j) => {
       const o = B8[j];
-      c.style.transform = `translate(${fmt(o.ox * (1 - eq))}px, ${fmt(o.oy * (1 - eq))}px) scale(${fmt(1 + .353 * (1 - eq))}) rotate(${fmt(o.or * (1 - eq))}deg)`;
-      c.style.opacity = fmt(clamp(eb * 8));
+      c.style.transform = `translate(${fmt(o.ox * (1 - eq))}px, ${fmt(o.oy * (1 - eq))}px) scale(${fmt(1 + .353 * (1 - eq))})`;
+      c.style.opacity = eb > 0 ? 1 : 0;
       c.style.zIndex = j === 1 ? 2 : 1;
     });
+    // карточка Кати уходит вниз, пока карточки наборов поднимаются, — без наложения полупрозрачных слоёв
+    const kf = easeIO(clamp((eb - .22) / .5));
+    katyaCopy.style.opacity = fmt(1 - clamp((kf - .35) / .65));
+    katyaCopy.style.transform = `translateY(${fmt(kf * 420)}px) scale(${fmt(1 - .12 * kf)})`;
+    katyaCopy.style.visibility = kf >= 1 ? 'hidden' : '';
 
     // искры во время смены сцен, сколько — зависит от скорости скролла
     const f = P - Math.floor(P);

@@ -57,6 +57,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   font-family: Comfortaa, sans-serif; font-weight: 700; font-size: 36px;
   text-transform: uppercase; color: var(--cream);
 }
+/* заголовки в макете с обводкой 1 px снаружи — буквы толще */
+.h1, .h2, .b5-left { -webkit-text-stroke: 2px var(--cream); paint-order: stroke fill; }
 .h1 { line-height: 1.4; letter-spacing: 1.08px; text-align: center; }
 .h2 { line-height: 1.3; letter-spacing: 1.44px; }
 
@@ -350,6 +352,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* 8. Финальный призыв */
 .b8-cards { position: absolute; left: 363px; top: 119px; display: flex; gap: 83px; z-index: 14; }
+/* копия карточки Кати: из-за неё вылетают карточки наборов */
+.b8-katya { z-index: 15; pointer-events: none; }
 .b8-card { width: 342.99px; height: 479px; flex: none; }
 .b8-fill { position: absolute; inset: 0; }
 .b8-card-in {
