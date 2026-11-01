@@ -135,6 +135,7 @@
     ty = (vh - 1080 * s) / 2;
     const px = tx / s, py = ty / s;
     vp.style.setProperty('--s', s);
+    html.style.setProperty('--s', s);
     vp.style.setProperty('--tx', `${tx}px`);
     vp.style.setProperty('--ty', `${ty}px`);
     vp.style.setProperty('--px', `${px}px`);
@@ -694,26 +695,6 @@
     setTimeout(() => selectSet(k), 900);
   }));
 
-  // когда скролл остановился между экранами, страница мягко доезжает до следующего экрана в сторону прокрутки;
-  // совсем короткий сдвиг возвращает на текущий экран
-  let settleT = 0, base = 0;
-  addEventListener('scroll', () => {
-    clearTimeout(settleT);
-    settleT = setTimeout(() => {
-      if (html.classList.contains('is-locked') || !modal.hidden) return;
-      const P = scrollY / innerHeight;
-      let target = Math.round(P);
-      if (Math.abs(P - target) > .004) {
-        const dir = Math.sign(P - base);
-        if (Math.abs(P - base) > .04) target = dir > 0 ? Math.ceil(P - .004) : Math.floor(P + .004);
-        else target = base;
-        scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
-      } else {
-        base = target;
-      }
-    }, 160);
-  }, { passive: true });
-
   /* ===== Параллакс от мыши ===== */
   const depthEls = $$('[data-d]');
   let mx = 0, my = 0, cx = 0, cy = 0;
@@ -782,7 +763,7 @@
     if (p < .05) heroBurst = false;
     if (!moved) return;                      // дальше всё зависит только от скролла
     b2els.forEach(({ n, d }) => {
-      const pe = clamp((p - .5 - d * .5) / .35), pl = clamp((lS - d * .15) / .35);
+      const pe = clamp((p - .5 - d * .3) / .3), pl = clamp((lS - d * .15) / .35);
       styleEl(n, pe * (1 - pl), (1 - pe) * 30 - pl * 30, (1 - pe + pl) * 8);
     });
     const onSets = p > .96 && lS < .04;
@@ -802,13 +783,13 @@
       sc.el.style.opacity = sc.enter === 'fade' ? fmt(clamp(e / .5)) : 1;
       const still = sc.enter === 'clip' || sc.enter === 'under';
       sc.rv.forEach(({ n, d, keep }) => {
-        const pe = still ? 1 : clamp((e - .3 - d * .35) / .45);
+        const pe = still ? 1 : clamp((e - .25 - Math.min(d, 1) * .3) / .4);
         let pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .12) / .4) : 0;
         if (keep) { pl = 0; n.style.opacity = fmt(pe * (1 - clamp((l - .08) * 4))); n.style.transform = `translateY(${fmt((1 - pe) * 30)}px)`; n.style.filter = ''; return; }
         styleEl(n, pe * (1 - pl), (1 - pe) * 40 - pl * 40, (1 - pe + pl) * 8);
       });
       sc.st.forEach(({ n, d }) => {
-        const pe = still ? 1 : clamp((e - .35 - d * .3) / .4);
+        const pe = still ? 1 : clamp((e - .3 - Math.min(d, .7) * .3) / .4);
         const pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .1) / .4) : 0;
         const sc1 = (.5 + .5 * easeBack(pe)) * (1 - .25 * pl);
         n.style.opacity = fmt(Math.min(1, pe * 1.4) * (1 - pl));

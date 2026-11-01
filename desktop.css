@@ -91,13 +91,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stk-r > i { position: absolute; inset: 0; overflow: hidden; }
 .stk-r > i > img { position: absolute; max-width: none; }
 
-/* Снег */
-.snow {
-  position: absolute; inset: 0; pointer-events: none; z-index: 11;
-  background: url(assets/d/snow.webp) 0 0 / 1920px 1064px repeat-y;
-  animation: snow 60s linear infinite;
+/* Снег: всегда на экране, поверх всех сцен */
+.snow-all {
+  position: fixed; left: 0; right: 0; bottom: 0; top: calc(-1064px * var(--s, 1)); z-index: 2; pointer-events: none;
+  background: url(assets/d/snow.webp) 0 0 / calc(1920px * var(--s, 1)) calc(1064px * var(--s, 1)) repeat;
+  animation: snowfall 60s linear infinite;
 }
-@keyframes snow { to { background-position: 0 1064px; } }
+@keyframes snowfall { to { transform: translateY(calc(1064px * var(--s, 1))); } }
 
 /* Шапка */
 #header { position: absolute; left: 0; top: 0; z-index: 100; width: 1920px; pointer-events: none; }
@@ -358,7 +358,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-ray, .snow { animation: none !important; }
+  .hero-ray, .snow-all { animation: none !important; }
   .prod-inner, .it img { transition: none !important; }
 }
 
