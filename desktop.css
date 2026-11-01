@@ -97,9 +97,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .snow-all { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
 .snow-all i {
   position: absolute; left: 0; right: 0; bottom: 0; top: calc(-1 * var(--th));
-  background: url(assets/d/snow.webp) 0 0 / calc(1920px * var(--sz)) var(--th) repeat;
+  background: url(assets/d/snow-glow.webp) 0 0 / calc(1920px * var(--sz)) var(--th) repeat;
   animation: snowfall var(--dur) linear infinite;
-  filter: brightness(1.6) drop-shadow(0 0 2px rgba(255, 255, 255, .9));
+  will-change: transform;
 }
 .snow-all .far { --sz: var(--s, 1); --th: calc(1064px * var(--s, 1)); --dur: 60s; opacity: .9; }
 .snow-all .near { --sz: calc(1.8 * var(--s, 1)); --th: calc(1915px * var(--s, 1)); --dur: 42s; background-position: 37% 0; }

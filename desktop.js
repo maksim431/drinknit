@@ -137,6 +137,8 @@
   const ctx = fx.getContext('2d');
   const bgls = $$('.bgl');
   let s = 1, tx = 0, ty = 0, cdpr = 1;
+  // фоны растягиваются от центра кадра; считаем один раз, координаты кадра от размера окна не зависят
+  bgls.forEach(el => { el.style.transformOrigin = `${960 - el.offsetLeft}px ${540 - el.offsetTop}px`; });
   const resize = () => {
     const vw = html.clientWidth, vh = innerHeight;
     s = Math.min(vw / 1920, vh / 1080);
@@ -151,7 +153,6 @@
     vp.style.setProperty('--py', `${py}px`);
     vp.style.setProperty('--k', Math.max((1920 + 2 * px) / 1920, (1080 + 2 * py) / 1080).toFixed(4));
     // фоны растягиваются от центра кадра
-    bgls.forEach(el => { el.style.transformOrigin = `${960 - el.offsetLeft}px ${540 - el.offsetTop}px`; });
     cdpr = Math.min(devicePixelRatio || 1, 1.25);
     fx.width = Math.round(vw * cdpr);
     fx.height = Math.round(vh * cdpr);
@@ -163,7 +164,7 @@
   const MOUTH = { x: 960, y: 380 };     // откуда вырывается волшебство при открытии
   const BOXC = { x: 960, y: 470 };
   const parts = [];
-  const MAX_PARTS = 420;
+  const MAX_PARTS = 280;
   let flash = 0, ring = null, dustUntil = 0, twinkleOn = false, twinkleAcc = 0;
   const GOLD = ['255,226,150', '255,244,214', '255,200,120'];
   const CONFETTI = ['#c3222f', '#e8394a', '#f6d58e', '#ffe9b0', '#e1d2b2', '#ffffff', '#4fae72'];
@@ -706,14 +707,14 @@
     setTimeout(() => selectSet(k), 900);
   }));
 
-  // прилипание только совсем рядом с экраном: остановились ближе 7 % от него — страница доезжает
+  // прилипание только рядом с экраном: остановились ближе 8,4 % от него — страница доезжает
   let settleT = 0;
   addEventListener('scroll', () => {
     clearTimeout(settleT);
     settleT = setTimeout(() => {
       if (html.classList.contains('is-locked') || !modal.hidden) return;
       const P = scrollY / innerHeight, target = Math.round(P), d = Math.abs(P - target);
-      if (d > .003 && d < .07) scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
+      if (d > .003 && d < .084) scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
     }, 160);
   }, { passive: true });
 
@@ -753,16 +754,28 @@
   const B8 = [534.5, 960.5, 1386.5].map(x => ({ ox: 960 - x, oy: 324.5 }));
 
   const fmt = v => Math.round(v * 1000) / 1000;
-  const styleEl = (n, op, ty, blur, extra = '') => {
-    n.style.opacity = fmt(op);
-    n.style.transform = `translateY(${fmt(ty)}px)${extra}`;
-    n.style.filter = blur > .05 ? `blur(${fmt(blur)}px)` : '';
+  // запись в стиль только если значение изменилось: без лишних пересчётов страницы
+  const put = (n, prop, v) => {
+    const c = n._st || (n._st = {});
+    if (c[prop] === v) return;
+    c[prop] = v;
+    n.style[prop] = v;
   };
+  const styleEl = (n, op, ty, blur) => {
+    put(n, 'opacity', String(fmt(op)));
+    put(n, 'transform', `translateY(${Math.round(ty * 10) / 10}px)`);
+    // размытие только для небольших элементов: на больших фонах оно дорого и почти не заметно
+    put(n, 'filter', blur > .3 && !n.classList.contains('bgl') ? `blur(${Math.round(blur * 2) / 2}px)` : '');
+  };
+  const show = (n, on) => put(n, 'display', on ? '' : 'none');
+  const heroContent = $('.hero-content');
+  const heroSec = $('#hero');
 
-  let lastP = -1, heroBurst = false;
+  let lastP = -1, heroBurst = false, mouseMoving = true;
   const render = P => {
     const dP = Math.abs(P - lastP);
     const moved = dP > 0;
+    if (!moved && !(mouseMoving && P < 1)) return;   // ничего не изменилось — кадр пропускаем
     lastP = P;
     scene = Math.round(P);
     const scrolled = P > .05;
@@ -775,17 +788,21 @@
     // 0 → 1: элементы первого экрана растворяются, коробка едет на место, появляются элементы наборов
     const p = clamp(P);
     const lS = clamp(P - 1);                 // наборы уходят
-    body.classList.toggle('grp-a', P < 1.6);
+    const grpA = P < 1.6;
+    if (grpA !== body.classList.contains('grp-a')) body.classList.toggle('grp-a', grpA);
+    // первый экран и наборы не рисуются, когда их полностью закрыла следующая сцена
+    show(heroSec, P < 1.6); show(b2, P < 1.6); show(product, P < 1.6);
     const k = 1.1834 + (1 - 1.1834) * p;
     const dx = -59.47 * (1 - p) + cx * heroProdDepth * (1 - p);
     const dy = -251.5 * (1 - p) + cy * heroProdDepth * (1 - p);
-    product.style.transform = `translate(${dx}px, ${dy}px) scale(${k})`;
-    product.style.opacity = fmt(1 - clamp((lS - .05) * 2.4));
+    put(product, 'transform', `translate(${fmt(dx)}px, ${fmt(dy)}px) scale(${fmt(k)})`);
+    put(product, 'opacity', String(fmt(1 - clamp((lS - .05) * 2.4))));
     if (focusClone) focusClone.style.transform = product.style.transform;
     const fade = clamp(1 - p * 2.4);
-    heroFadeEls.forEach(el => { el.style.opacity = fmt(fade); });
-    $('.hero-content').style.transform = `translateY(${fmt(-40 * (1 - fade))}px)`;
-    $('.hero-content').style.pointerEvents = fade > .5 ? '' : 'none';
+    heroFadeEls.forEach(el => put(el, 'opacity', String(fmt(fade))));
+    show(heroContent.parentNode.querySelector('.hero-ray'), fade > 0);
+    put(heroContent, 'transform', `translateY(${fmt(-40 * (1 - fade))}px)`);
+    put(heroContent, 'pointerEvents', fade > .5 ? '' : 'none');
     if (p > .1 && !heroBurst && body.classList.contains('is-done')) { heroBurst = true; area(300, 200, 1320, 800, 120); }
     if (p < .05) heroBurst = false;
     if (!moved) return;                      // дальше всё зависит только от скролла
@@ -805,9 +822,11 @@
     SCENES.forEach(sc => {
       const e = clamp(P - (sc.a - 1)), l = clamp(P - sc.b);
       const visible = e > 0 && (sc.leave === 'cover' || sc.leave === 'split' || sc.leave === 'clip' ? l < 1 : l < .6);
-      sc.el.style.visibility = visible ? 'visible' : 'hidden';
+      // невидимые сцены убираются из отрисовки целиком
+      put(sc.el, 'display', visible ? '' : 'none');
+      put(sc.el, 'visibility', visible ? 'visible' : 'hidden');
       if (!visible) return;
-      sc.el.style.opacity = sc.enter === 'fade' ? fmt(clamp(e / .5)) : 1;
+      put(sc.el, 'opacity', String(sc.enter === 'fade' ? fmt(clamp(e / .5)) : 1));
       const still = sc.enter === 'clip' || sc.enter === 'under';
       sc.rv.forEach(({ n, d, keep }) => {
         const pe = still ? 1 : clamp((e - .25 - Math.min(d, 1) * .3) / .4);
@@ -854,18 +873,21 @@
     // искры во время смены сцен, сколько — зависит от скорости скролла
     const f = P - Math.floor(P);
     if (dP > 0 && dP < 1 && f > .04 && f < .96 && !reduce) {
-      const n = Math.min(26, Math.round(dP * 260));
+      const n = Math.min(14, Math.round(dP * 180));
       for (let j = 0; j < n; j++) mote(rand(0, 1920), rand(80, 1000), { vy: rand(-150, -40), size: rand(2, 4.5) });
     }
   };
 
+  const depth = depthEls.map(el => ({ el, d: Number(el.dataset.d), sec: el.closest('section') })).filter(o => o.d);
   const loop = now => {
-    cx += (mx - cx) * .06;
-    cy += (my - cy) * .06;
-    if (!reduce) {
-      depthEls.forEach(el => {
-        const d = Number(el.dataset.d);
-        if (d) el.style.translate = `${cx * d}px ${cy * d}px`;
+    const ddx = mx - cx, ddy = my - cy;
+    mouseMoving = Math.abs(ddx) + Math.abs(ddy) > .0004;
+    if (mouseMoving && !reduce) {
+      cx += ddx * .06;
+      cy += ddy * .06;
+      depth.forEach(({ el, d, sec }) => {
+        if (sec && (sec.style.display === 'none' || sec.style.visibility === 'hidden')) return;
+        put(el, 'translate', `${fmt(cx * d)}px ${fmt(cy * d)}px`);
       });
     }
     render(clamp(scrollY / (innerHeight || 1), 0, LAST));

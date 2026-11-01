@@ -20,7 +20,7 @@
       document.documentElement.classList.add(m ? 'is-m' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
       if (m) { add('preload', 'assets/box-closed.webp', 'image'); add('preload', 'assets/box-open.webp', 'image'); add('stylesheet', 'style.css'); }
-      else { add('preload', 'assets/d/hero-product.webp', 'image'); add('stylesheet', 'desktop.css'); }
+      else { add('preload', 'assets/d/sets/L-base.webp', 'image'); add('stylesheet', 'desktop.css'); }
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -378,15 +378,15 @@
   <section id="book" class="scr scene b8"><div class="b8-fill bg-green" aria-hidden="true"></div><div class="fr">
     <div class="b8-cards">
       <div class="b8-card" data-card="0"><div class="b8-card-in" data-set-pick="S">
-        <div class="stamp-win"><img class="w-bg" src="assets/d/sets-bg.webp" alt=""><img class="w-prod" style="width:374px;height:279px;top:19px" src="assets/d/set-S.webp" alt="Набор S"></div>
+        <div class="stamp-win"><img class="w-bg" src="assets/d/card-bg.webp" alt=""><img class="w-prod" style="width:374px;height:279px;top:19px" src="assets/d/card-S.webp" alt="Набор S"></div>
         <p class="b8-name">Набор S</p><p class="b8-price"><span data-price="S"></span> ₽</p>
       </div></div>
       <div class="b8-card" data-card="1"><div class="b8-card-in" data-set-pick="M">
-        <div class="stamp-win"><img class="w-bg" src="assets/d/sets-bg.webp" alt=""><img class="w-prod" style="width:471.429px;height:352px;top:-13px" src="assets/d/set-M.webp" alt="Набор M"></div>
+        <div class="stamp-win"><img class="w-bg" src="assets/d/card-bg.webp" alt=""><img class="w-prod" style="width:471.429px;height:352px;top:-13px" src="assets/d/card-M.webp" alt="Набор M"></div>
         <p class="b8-name">Набор M</p><p class="b8-price"><span data-price="M"></span> ₽</p>
       </div></div>
       <div class="b8-card" data-card="2"><div class="b8-card-in" data-set-pick="L">
-        <div class="stamp-win"><img class="w-bg" src="assets/d/sets-bg.webp" alt=""><img class="w-prod" style="width:476.786px;height:356px;top:-15px" src="assets/d/hero-product.webp" alt="Набор L"></div>
+        <div class="stamp-win"><img class="w-bg" src="assets/d/card-bg.webp" alt=""><img class="w-prod" style="width:476.786px;height:356px;top:-15px" src="assets/d/card-L.webp" alt="Набор L"></div>
         <p class="b8-name">Набор L</p><p class="b8-price"><span data-price="L"></span> ₽</p>
       </div></div>
     </div>
