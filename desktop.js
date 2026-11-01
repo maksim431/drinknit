@@ -747,9 +747,9 @@
 
   // прилипание только рядом с экраном: остановились ближе 16 % от него — страница доезжает
   // стопор на каждом блоке: если скролл проскакивает экран, страница останавливается на нём.
-  // Пока колесо или тачпад продолжают слать прокрутку (инерция), стопор держит — но не дольше 1,2 с,
+  // Пока колесо или тачпад продолжают слать прокрутку (инерция), стопор держит — но не дольше 1,6 с,
   // после паузы в 0,18 с или по истечении этого времени прокрутка снова свободная
-  const HOLD_MIN = 450, HOLD_MAX = 1200, HOLD_GAP = 180;
+  const HOLD_MIN = 450, HOLD_MAX = 1600, HOLD_GAP = 180;
   let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY;
   let lastWheel = 0;
   addEventListener('wheel', e => {
@@ -772,7 +772,8 @@
         // первый экран, который скролл проскочил за это событие
         const k = P > P0 ? Math.floor(P0 + 1e-4) + 1 : Math.ceil(P0 - 1e-4) - 1;
         const crossed = P > P0 ? P >= k - 1e-4 : P <= k + 1e-4;   // дошёл до экрана или проскочил его
-        if (crossed && k >= 0 && k <= LAST) {
+        // большой скачок за одно событие — это полоса прокрутки или End/Home: стопор не мешает
+        if (crossed && k >= 0 && k <= LAST && Math.abs(P - P0) < .5) {
           holdStop = k;
           holdStart = now;
           holdUntil = now + HOLD_MIN;
@@ -782,13 +783,15 @@
       }
     }
     clearTimeout(settleT);
-    settleT = setTimeout(() => {
+    const settle = () => {
       auto = false;
       if (html.classList.contains('is-locked') || !modal.hidden) return;
-      if (performance.now() - lastWheel < 260) return;   // колесо ещё крутят — не доезжаем
+      // колесо ещё крутят — проверим чуть позже
+      if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
       const P = scrollY / innerHeight, target = Math.round(P), d = Math.abs(P - target);
       if (d > .003 && d < .16) { auto = true; scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' }); }
-    }, 160);
+    };
+    settleT = setTimeout(settle, 160);
   }, { passive: true });
 
   /* ===== Параллакс от мыши ===== */
