@@ -11,9 +11,21 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="assets/box-closed.webp">
-  <link rel="preload" as="image" href="assets/box-open.webp">
-  <link rel="stylesheet" href="style.css">
+  <!-- десктоп и мобильная версия: разные стили и скрипты, переключение по ширине и ориентации окна -->
+  <script>
+    (function () {
+      var isM = function () { return innerWidth < 821 || innerWidth / innerHeight < 1; };
+      var m = isM();
+      window.__drinknitMode = m ? 'm' : 'd';
+      document.documentElement.classList.add(m ? 'is-m' : 'is-d');
+      var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
+      if (m) { add('preload', 'assets/box-closed.webp', 'image'); add('preload', 'assets/box-open.webp', 'image'); add('stylesheet', 'style.css'); }
+      else { add('preload', 'assets/d/hero-product.webp', 'image'); add('stylesheet', 'desktop.css'); }
+      var t;
+      addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
+    })();
+  </script>
+  <style>html.is-d body:not(.d-ready) > :not(template):not(script) { display: none; } html.is-d { background: #002510; }</style>
 </head>
 <body class="is-loading">
   <!-- scroll track: two screens, the artboard itself is fixed -->
@@ -165,6 +177,235 @@
 
   <button class="skip" type="button">Пропустить</button>
 
-  <script src="app.js"></script>
+  <!-- ============ десктопная версия по новому макету ============ -->
+  <template id="tpl-desktop">
+<!-- Шапка: фиксированная, после начала скролла переходит в компактный вариант -->
+<header id="header">
+  <div class="hd">
+    <a class="hd-logo" href="#hero" data-nav>
+      <img src="assets/d/logo.svg" width="198" height="112" alt="Drinknit">
+      <span>Вещи ручной работы</span>
+    </a>
+    <nav class="hd-nav glass-dark">
+      <a href="#sets" data-nav>Наборы</a>
+      <a href="#kids" data-nav>Для детей</a>
+      <a href="#terms" data-nav>Сроки</a>
+      <a href="#book" data-nav>Забронировать набор</a>
+    </nav>
+    <div class="hd-right">
+      <button class="hd-sound glass-dark" id="sound" type="button" aria-label="Включить музыку" aria-pressed="false">
+        <img src="assets/d/ic-sound.svg" width="24" height="24" alt="">
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="page">
+<div id="stage">
+
+  <!-- 1. Первый экран -->
+  <section id="hero" class="scr bg-green">
+    <img class="hero-ray" src="assets/d/hero-ray.svg" alt="">
+    <img class="hero-ellipse" src="assets/d/hero-ellipse.svg" alt="">
+    <div class="hero-fade"></div>
+    <div class="hero-content">
+      <div class="chip"><img src="assets/d/ic-gift.svg" width="24" height="24" alt=""><span>Свободно <b data-free>10</b> из <b data-total>10</b> наборов</span></div>
+      <h1 class="h1">Новогодние наборы<br>с вязаными игрушками ручной работы</h1>
+      <div class="row-btns">
+        <a class="btn btn-red" href="#sets" data-nav>Выбрать набор</a>
+        <a class="btn btn-glass" href="#" data-msg="telegram">Написать мне</a>
+      </div>
+    </div>
+    <div class="snow"></div>
+    <div class="stickers" data-set="hero"></div>
+  </section>
+
+  <!-- 2. Наборы -->
+  <section id="sets" class="scr bg-green b2">
+    <img class="b2-bg b2-el" src="assets/d/sets-bg.webp" alt="">
+    <h2 class="h2 b2-title b2-el">Три набора:<br>выберите для того, кому дарите</h2>
+    <div class="set-panel glass-dark b2-el">
+      <p class="set-panel-title">Выберите набор</p>
+      <div class="set-tabs" role="tablist">
+        <button type="button" role="tab" data-set-tab="S">Набор S</button>
+        <button type="button" role="tab" data-set-tab="M">Набор M</button>
+        <button type="button" role="tab" data-set-tab="L">Набор L</button>
+      </div>
+      <div class="set-desc">
+        <p data-set-for></p>
+        <p data-set-hours></p>
+      </div>
+      <div class="set-buy">
+        <p class="set-price"><span data-set-price></span> ₽</p>
+        <a class="btn btn-red" href="#" data-msg="telegram" data-set-btn></a>
+      </div>
+    </div>
+    <div class="snow"></div>
+    <div class="hint b2-el">
+      <img class="hint-bubble" src="assets/d/bubble.svg" alt="">
+      <div class="hint-goat"><div class="stk-r" style="width:286.17px;height:332.861px;transform:rotate(-165.17deg) scaleY(-1)"><i><img src="assets/d/st-goatbox.webp" alt="" style="left:0;top:-11.43%;width:269.47%;height:231.67%"></i></div></div>
+      <p class="hint-text">Кликните на предмет,<br>чтобы узнать подробнее</p>
+    </div>
+    <div class="dim" id="dim"></div>
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+      <div class="modal-info">
+        <h3 class="modal-title" id="modal-title"></h3>
+        <div class="modal-bottom">
+          <p class="modal-text" id="modal-text"></p>
+          <p class="modal-note" id="modal-note"></p>
+        </div>
+      </div>
+      <div class="modal-photo">
+        <div class="modal-img" id="modal-img"></div>
+        <div class="modal-arrows">
+          <button type="button" class="arr arr-prev" data-photo="-1" aria-label="Предыдущее фото"><img src="assets/d/arrow.webp" alt=""></button>
+          <button type="button" class="arr" data-photo="1" aria-label="Следующее фото"><img src="assets/d/arrow.webp" alt=""></button>
+        </div>
+      </div>
+      <button type="button" class="modal-close" id="modal-close" aria-label="Закрыть"><img src="assets/d/ic-close.svg" alt=""></button>
+    </div>
+  </section>
+
+  <!-- Продукт: один слой на два экрана. Едет со скроллом из первого экрана во второй -->
+  <div id="product">
+    <div class="prod-inner">
+      <img class="prod-img" src="assets/d/hero-product.webp" alt="Новогодний набор L: вязаные игрушки, открытка и крем в подарочной коробке">
+      <div class="hots"></div>
+    </div>
+  </div>
+
+  <!-- 3. Сколько вяжу -->
+  <section id="time" class="scr b3">
+    <div class="b3-layers">
+      <img src="assets/d/b3-01.webp" alt="" data-d="6">
+      <img src="assets/d/b3-02.webp" alt="" data-d="14">
+      <img src="assets/d/b3-03.webp" alt="" data-d="26">
+    </div>
+    <div class="b3-text">
+      <h2 class="h2">Маленькую игрушку<br>я вяжу 2 часа, среднюю 7 часов</h2>
+      <p class="lead">Поэтому к Новому году<br>получится только 10 наборов, и все они будут немного разными</p>
+    </div>
+    <div class="b3-card-wrap" data-d="10">
+      <div class="stamp" id="flip">
+        <div class="stamp-win"><img id="flip-img" src="assets/d/card-gingerbread.webp" alt=""></div>
+        <p class="stamp-cap" id="flip-cap"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Для детей -->
+  <section id="kids" class="scr b4">
+    <img class="b4-bg" src="assets/d/b4-bg1.webp" alt="" data-d="8">
+    <img class="b4-bg" src="assets/d/b4-bg2.webp" alt="" data-d="16">
+    <h2 class="h2 b4-title">Можно дарить детям:<br>глазки и мелкие детали держатся на безопасном креплении</h2>
+    <div class="stickers" data-set="kids"></div>
+    <div class="b4-bubble" data-d="12">
+      <img src="assets/d/b4-bubble.svg" alt="">
+      <p>Пряжа гипоаллергенная: [какой хлопок и акрил, производитель].<br>Мелкие детали [пришиты или на безопасных замках], их не оторвать руками.<br>Подходит детям с [возраст].<br>Стирка: [ручная, 30°, как сушить].</p>
+    </div>
+  </section>
+
+  <!-- 5. Осталось наборов и таймер. Жёсткий параллакс: объекты стоят, экран скроллится -->
+  <section id="left" class="scr bg-green b5">
+    <div class="pin" id="pin">
+      <div class="stickers" data-set="left"></div>
+      <div class="b5-center">
+        <div class="b5-panel glass-dark">
+          <p class="b5-left">Осталось<br><span data-free>10</span> из <span data-total>10</span> наборов</p>
+          <div class="b5-and"><img src="assets/d/line.svg" alt=""><span>и</span><img src="assets/d/line.svg" alt=""></div>
+          <div class="b5-timer">
+            <p class="b5-days" id="t-days">— дней,</p>
+            <p class="b5-hm" id="t-hm">— часов, — минут</p>
+            <p class="b5-cap">до окончания приёма заказов</p>
+          </div>
+        </div>
+        <div class="b5-cta">
+          <a class="btn btn-red" href="#" data-msg="telegram">Забронировать набор</a>
+          <p>Напишите, какой набор хотите и что подписать<br>на открытке. Остальное подскажу в переписке</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Сроки и как заказать -->
+  <section id="terms" class="scr b6">
+    <img class="b6-bg b6-bg2" src="assets/d/b5-bg2.webp" alt="" data-d="8">
+    <div class="b6-bg b6-bg1" data-d="16"><img src="assets/d/b5-bg1.webp" alt=""></div>
+    <h2 class="h2 b6-title">Чтобы набор успел<br>к празднику,<br>напишите до 25.12</h2>
+    <img class="b6-bubble" src="assets/d/b5-bubble.svg" alt="" data-d="10">
+    <ol class="b6-steps" data-d="10">
+      <li>Напишите мне, какой набор хотите и какой текст написать на открытке.</li>
+      <li>Я ставлю ваш набор в очередь. Вы вносите 100% предоплату за набор переводом на карту.</li>
+      <li>Вяжу и собираю набор за 1–3 дня, в зависимости от размера набора.</li>
+      <li>Получаете набор: самовывоз Нижний Новгород (район ТЦ Фантастика), Яндекс Доставка по городу или отправка по России (СДЭК / Яндекс / Озон / Почта). Доставку оплачиваете отдельно по тарифу службы.</li>
+    </ol>
+    <div class="stickers" data-set="terms"></div>
+    <a class="btn btn-red b6-btn" href="#" data-msg="telegram" data-d="10">Забронировать набор</a>
+  </section>
+
+  <!-- 7. Обо мне -->
+  <section id="about" class="scr bg-green b7">
+    <h2 class="h2 b7-title">Привет, я Катя,<br>вяжу игрушки 30 лет</h2>
+    <div class="b7-card-wrap" data-d="10">
+      <div class="stamp stamp-about" id="about-card">
+        <div class="stamp-win"><img src="assets/d/katya.webp" alt="Катя, мастер"></div>
+        <p class="stamp-cap">Первые игрушки я вязала по схемам<br>из журнала «Валентина».<br>Сейчас придумываю свои: идеи беру<br>из природы и ищу на небольших сайтах мастеров, куда редко заходят производители массовых игрушек.</p>
+      </div>
+    </div>
+    <div class="stickers" data-set="about"></div>
+  </section>
+
+  <!-- 8. Финальный призыв -->
+  <section id="book" class="scr bg-green b8">
+    <div class="b8-cards">
+      <div class="b8-card" data-card="0"><div class="b8-card-in" data-set-pick="S">
+        <div class="stamp-win"><img class="w-bg" src="assets/d/sets-bg.webp" alt=""><img class="w-prod" style="width:374px;height:279px;top:19px" src="assets/d/set-S.webp" alt="Набор S"></div>
+        <p class="b8-name">Набор S</p><p class="b8-price"><span data-price="S"></span> ₽</p>
+      </div></div>
+      <div class="b8-card" data-card="1"><div class="b8-card-in" data-set-pick="M">
+        <div class="stamp-win"><img class="w-bg" src="assets/d/sets-bg.webp" alt=""><img class="w-prod" style="width:471.429px;height:352px;top:-13px" src="assets/d/set-M.webp" alt="Набор M"></div>
+        <p class="b8-name">Набор M</p><p class="b8-price"><span data-price="M"></span> ₽</p>
+      </div></div>
+      <div class="b8-card" data-card="2"><div class="b8-card-in" data-set-pick="L">
+        <div class="stamp-win"><img class="w-bg" src="assets/d/sets-bg.webp" alt=""><img class="w-prod" style="width:476.786px;height:356px;top:-15px" src="assets/d/hero-product.webp" alt="Набор L"></div>
+        <p class="b8-name">Набор L</p><p class="b8-price"><span data-price="L"></span> ₽</p>
+      </div></div>
+    </div>
+    <div class="b8-cta">
+      <h2 class="h2 b8-title">Займите один из 10 наборов до 25.12</h2>
+      <div class="b8-btns">
+        <a class="btn btn-red" href="#" data-msg="telegram">Написать в Telegram</a>
+        <a class="btn btn-red" href="#" data-msg="vk">Написать в ВК</a>
+        <a class="btn btn-red" href="#" data-msg="max">Написать в MAX</a>
+      </div>
+      <a class="round glass-dark" href="#" data-msg="vkGroup" aria-label="Группа ВКонтакте"><img src="assets/d/ic-vk.svg" width="24" height="24" alt=""></a>
+    </div>
+    <div class="stickers" data-set="book"></div>
+  </section>
+
+</div>
+</div>
+
+<canvas id="fx"></canvas>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </template>
+
+  <script>
+    (function () {
+      var s = document.createElement('script');
+      if (window.__drinknitMode === 'd') {
+        var tpl = document.getElementById('tpl-desktop');
+        Array.prototype.slice.call(document.body.children).forEach(function (n) {
+          if (n !== tpl && n.tagName !== 'SCRIPT') n.remove();
+        });
+        document.body.className = 'd-ready';
+        document.body.appendChild(tpl.content);
+        s.src = 'desktop.js';
+      } else {
+        s.src = 'app.js';
+      }
+      document.body.appendChild(s);
+    })();
+  </script>
 </body>
 </html>
