@@ -91,13 +91,17 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stk-r > i { position: absolute; inset: 0; overflow: hidden; }
 .stk-r > i > img { position: absolute; max-width: none; }
 
-/* Снег: всегда на экране, поверх всех сцен */
-.snow-all {
-  position: fixed; left: 0; right: 0; bottom: 0; top: calc(-1064px * var(--s, 1)); z-index: 2; pointer-events: none;
-  background: url(assets/d/snow.webp) 0 0 / calc(1920px * var(--s, 1)) calc(1064px * var(--s, 1)) repeat;
-  animation: snowfall 60s linear infinite;
+/* Снег: всегда на экране, поверх всех сцен, два слоя */
+.snow-all { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.snow-all i {
+  position: absolute; left: 0; right: 0; bottom: 0; top: calc(-1 * var(--th));
+  background: url(assets/d/snow.webp) 0 0 / calc(1920px * var(--sz)) var(--th) repeat;
+  animation: snowfall var(--dur) linear infinite;
+  filter: brightness(1.6) drop-shadow(0 0 2px rgba(255, 255, 255, .9));
 }
-@keyframes snowfall { to { transform: translateY(calc(1064px * var(--s, 1))); } }
+.snow-all .far { --sz: var(--s, 1); --th: calc(1064px * var(--s, 1)); --dur: 60s; opacity: .9; }
+.snow-all .near { --sz: calc(1.8 * var(--s, 1)); --th: calc(1915px * var(--s, 1)); --dur: 42s; background-position: 37% 0; }
+@keyframes snowfall { to { transform: translateY(var(--th)); } }
 
 /* Шапка */
 #header { position: absolute; left: 0; top: 0; z-index: 100; width: 1920px; pointer-events: none; }
@@ -118,16 +122,39 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hd-sound { display: flex; padding: 14px; border-radius: 100px; }
 .hd-sound[aria-pressed="true"] { background: rgba(255, 237, 200, .25); }
 /* Второй вариант шапки после начала скролла */
-#header.scrolled .hd { margin-top: 12px; }
-#header.scrolled .hd-logo { transform: scale(.45); }
-#header.scrolled .hd-logo span { opacity: 0; }
-#header.scrolled .hd-nav { background: rgba(1, 38, 17, .72); }
+/* второй вариант шапки после начала скролла: компактная строка по центру */
+.hd { transition: opacity .4s ease, transform .5s cubic-bezier(.16, 1, .3, 1); }
+.hd2 {
+  position: absolute; left: 50%; top: 20px; display: flex; align-items: center; gap: 48px;
+  opacity: 0; pointer-events: none; transform: translate(-50%, -24px);
+  transition: opacity .4s ease, transform .5s cubic-bezier(.16, 1, .3, 1);
+}
+#header.scrolled .hd { opacity: 0; transform: translateY(-24px); pointer-events: none; }
+#header.scrolled .hd > * { pointer-events: none; }
+#header.scrolled .hd2 { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.hd2-logo { display: flex; flex-direction: column; align-items: center; gap: 3.7px; width: 81.23px; }
+.hd2-logo img { width: 81.23px; height: 45.95px; }
+.hd2-logo span { font: 400 5.647px/normal Manrope, sans-serif; color: var(--cream); white-space: nowrap; }
+.hd2-mid { display: flex; gap: 10px; }
+.hd2-nav {
+  display: flex; align-items: center; gap: 46px; height: 52px; padding: 18px 45px; border-radius: 100px;
+  font: 500 16px/normal Manrope, sans-serif; white-space: nowrap;
+}
+.hd2-nav a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.hd2-book {
+  display: flex; align-items: center; height: 52px; padding: 0 45px; border-radius: 100px;
+  background: linear-gradient(180deg, #ffedc8 0%, #b8a274 100%); border: 2px solid #bca372;
+  font: 700 16px/normal Manrope, sans-serif; color: #022712; white-space: nowrap;
+  transition: filter .25s ease, transform .25s ease;
+}
+.hd2-book:hover { filter: brightness(1.06); transform: translateY(-2px); }
+.hd2 a:focus-visible, .hd2 button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 
 /* 1. Первый экран */
 .hero-ray {
   pointer-events: none;
   position: absolute; left: 960.5px; top: 313.5px; width: 1487.36px; height: 1487.36px;
-  margin: -743.68px 0 0 -743.68px; z-index: 1; animation: spin 120s linear infinite;
+  margin: -743.68px 0 0 -743.68px; z-index: 1; animation: spin 100s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hero-ellipse { position: absolute; left: 564px; top: 526px; width: 760px; height: 165px; z-index: 1; }
@@ -151,7 +178,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Продукт */
 #product, #focus {
   position: absolute; left: 122.97px; top: -125px; width: 1787px; height: 1334px; z-index: 5;
-  transform-origin: 50% 50%; will-change: transform;
+  transform-origin: 50% 50%;
 }
 .prod-inner { position: absolute; inset: 0; transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
 

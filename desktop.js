@@ -613,7 +613,7 @@
   }));
 
   /* ===== Музыкальная шкатулка (с прошлой версии сайта) ===== */
-  const sound = $('#sound');
+  const sounds = $$('.js-sound');
   let audio = null, musicOn = false, loopTimer = null;
   const NOTE = { C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880, C6: 1046.5 };
   // «Jingle Bells», общественное достояние
@@ -671,13 +671,15 @@
     if (!musicOn || !ensureAudio()) return;
     bell([NOTE.C6, NOTE.E5 * 2, NOTE.G5 * 2, NOTE.A5 * 2, NOTE.C6 * 1.5, NOTE.D5 * 2][i % 6], audio.currentTime, 1.4, .35);
   }
-  sound.addEventListener('click', () => {
+  sounds.forEach(btn => btn.addEventListener('click', () => {
     musicOn = !musicOn;
-    sound.setAttribute('aria-pressed', String(musicOn));
-    sound.setAttribute('aria-label', musicOn ? 'Выключить музыку' : 'Включить музыку');
+    sounds.forEach(b => {
+      b.setAttribute('aria-pressed', String(musicOn));
+      b.setAttribute('aria-label', musicOn ? 'Выключить музыку' : 'Включить музыку');
+    });
     clearTimeout(loopTimer);
     if (musicOn) { magicChime(); playTune(); }
-  });
+  }));
 
   /* ===== Скролл: каждая смена сцены — процесс, привязанный к положению скролла ===== */
   // P — положение в «экранах»: 0 первый экран, 1 наборы, 2–4 «сколько вяжу» (три карточки), 5 для детей, 6 таймер, 7 сроки, 8 обо мне, 9 финал
@@ -694,6 +696,17 @@
     goTo('#sets');
     setTimeout(() => selectSet(k), 900);
   }));
+
+  // прилипание только совсем рядом с экраном: остановились ближе 7 % от него — страница доезжает
+  let settleT = 0;
+  addEventListener('scroll', () => {
+    clearTimeout(settleT);
+    settleT = setTimeout(() => {
+      if (html.classList.contains('is-locked') || !modal.hidden) return;
+      const P = scrollY / innerHeight, target = Math.round(P), d = Math.abs(P - target);
+      if (d > .003 && d < .07) scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
+    }, 160);
+  }, { passive: true });
 
   /* ===== Параллакс от мыши ===== */
   const depthEls = $$('[data-d]');
@@ -743,7 +756,12 @@
     const moved = dP > 0;
     lastP = P;
     scene = Math.round(P);
-    header.classList.toggle('scrolled', P > .05);
+    const scrolled = P > .05;
+    if (scrolled !== header.classList.contains('scrolled')) {
+      header.classList.toggle('scrolled', scrolled);
+      $$('.hd a, .hd button').forEach(n => { n.tabIndex = scrolled ? -1 : 0; });
+      $$('.hd2 a, .hd2 button').forEach(n => { n.tabIndex = scrolled ? 0 : -1; });
+    }
 
     // 0 → 1: элементы первого экрана растворяются, коробка едет на место, появляются элементы наборов
     const p = clamp(P);

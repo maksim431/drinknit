@@ -198,10 +198,28 @@
       <a href="#book" data-nav>Забронировать набор</a>
     </nav>
     <div class="hd-right ui" style="--d:.08s">
-      <button class="hd-sound glass-dark" id="sound" type="button" aria-label="Включить музыку" aria-pressed="false">
+      <button class="hd-sound glass-dark js-sound" type="button" aria-label="Включить музыку" aria-pressed="false">
         <img src="assets/d/ic-sound.svg" width="24" height="24" alt="">
       </button>
     </div>
+  </div>
+  <!-- второй вариант шапки: после начала скролла -->
+  <div class="hd2">
+    <a class="hd2-logo" href="#hero" data-nav tabindex="-1">
+      <img src="assets/d/logo.svg" width="81" height="46" alt="Drinknit">
+      <span>Вещи ручной работы</span>
+    </a>
+    <div class="hd2-mid">
+      <nav class="hd2-nav glass-dark">
+        <a href="#sets" data-nav tabindex="-1">Наборы</a>
+        <a href="#kids" data-nav tabindex="-1">Для детей</a>
+        <a href="#terms" data-nav tabindex="-1">Сроки</a>
+      </nav>
+      <a class="hd2-book" href="#book" data-nav tabindex="-1">Забронировать набор</a>
+    </div>
+    <button class="hd-sound glass-dark js-sound" type="button" tabindex="-1" aria-label="Включить музыку" aria-pressed="false">
+      <img src="assets/d/ic-sound.svg" width="24" height="24" alt="">
+    </button>
   </div>
 </header>
 
@@ -388,7 +406,7 @@
 </div>
 
 <!-- снег поверх всех сцен -->
-<div class="snow-all" aria-hidden="true"></div>
+<div class="snow-all" aria-hidden="true"><i class="far"></i><i class="near"></i></div>
 
 <!-- скролл: 10 остановок, экран при этом стоит на месте -->
 <div class="track" aria-hidden="true"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
