@@ -6,7 +6,7 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { background: #002510; scroll-snap-type: y mandatory; }
+html { background: #002510; }
 html.is-locked { overflow: hidden; }
 body {
   background: #002510;
@@ -21,38 +21,30 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* Экран стоит на месте: сцена 1920 × 1080 вписана в окно, скролл только переключает сцены */
 .track { position: relative; z-index: 0; }
-.track > div { height: 100vh; scroll-snap-align: start; scroll-snap-stop: always; }
+.track > div { height: 100vh; }
 .vp {
   position: fixed; inset: 0; overflow: hidden; z-index: 1;
   background: linear-gradient(180deg, #346949 0%, #002510 100%);
 }
 #stage {
-  position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden;
+  position: absolute; left: 0; top: 0; width: 1920px; height: 1080px;
   transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--s)); transform-origin: 0 0;
 }
-.scr { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; }
+.scr {
+  position: absolute; overflow: hidden;
+  left: calc(-1 * var(--px, 0px)); top: calc(-1 * var(--py, 0px));
+  width: calc(1920px + 2 * var(--px, 0px)); height: calc(1080px + 2 * var(--py, 0px));
+}
+/* фоны секций доходят до краёв окна, содержимое остаётся в кадре 1920 × 1080 */
+.fr { position: absolute; left: var(--px, 0px); top: var(--py, 0px); width: 1920px; height: 1080px; }
+.bgl { scale: var(--k, 1); }
 /* первый экран и наборы — одна сцена с общим продуктом, остальные сцены сменяют друг друга поверх */
 #hero, #sets, #product { visibility: hidden; transition: visibility 0s linear .8s; }
 .grp-a #hero, .grp-a #sets, .grp-a #product { visibility: visible; transition: none; }
-/* уходящая сцена не гаснет, пока новая проявляется поверх неё */
-.scene {
-  z-index: 20; opacity: 0; visibility: hidden;
-  transition: opacity 0s linear .8s, visibility 0s linear .8s, transform 0s linear .8s;
-  transform: scale(1.03);
-}
-.scene.leave-fade { transition: opacity .7s ease, visibility 0s linear .7s, transform .9s ease; }
-.scene.is-on {
-  z-index: 30; opacity: 1; visibility: visible; transform: none;
-  transition: opacity .7s ease, transform 1.1s cubic-bezier(.16, 1, .3, 1);
-}
-/* элементы сцены появляются по очереди */
-.rv { opacity: 0; transform: translateY(30px); filter: blur(8px); transition: opacity .4s ease, transform .4s ease, filter .4s ease; }
-.is-on .rv {
-  opacity: 1; transform: none; filter: none;
-  transition: opacity .8s ease var(--d, 0s), transform 1s cubic-bezier(.16, 1, .3, 1) var(--d, 0s), filter .8s ease var(--d, 0s);
-}
-.stk.pop { opacity: 0; transform: scale(.5) rotate(-10deg); transition: opacity .3s ease, transform .3s ease; }
-.is-on .stk.pop, .is-ui #hero .stk.pop {
+.scene { z-index: 30; opacity: 0; visibility: hidden; }
+#left { z-index: 40; }
+#hero .stk.pop { opacity: 0; transform: scale(.5) rotate(-10deg); }
+.is-ui #hero .stk.pop {
   opacity: 1; transform: none;
   transition: opacity .5s ease var(--d, 0s), transform .9s cubic-bezier(.34, 1.45, .5, 1) var(--d, 0s);
 }
@@ -133,12 +125,14 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* 1. Первый экран */
 .hero-ray {
+  pointer-events: none;
   position: absolute; left: 960.5px; top: 313.5px; width: 1487.36px; height: 1487.36px;
   margin: -743.68px 0 0 -743.68px; z-index: 1; animation: spin 120s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .hero-ellipse { position: absolute; left: 564px; top: 526px; width: 760px; height: 165px; z-index: 1; }
 .hero-fade {
+  pointer-events: none;
   position: absolute; left: 0; top: 514px; width: 1920px; height: 566px; z-index: 6;
   background: linear-gradient(180deg, rgba(1, 38, 17, 0) 0%, #012611 55.288%);
 }
@@ -160,43 +154,24 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   transform-origin: 50% 50%; will-change: transform;
 }
 .prod-inner { position: absolute; inset: 0; transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
-.prod-inner.small { transform: scale(.7314); }
-.prod-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.prod-wave {
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
-  clip-path: circle(0% at 50% 55%); animation: wave .9s cubic-bezier(.3, .7, .2, 1) forwards;
-}
-@keyframes wave { to { clip-path: circle(80% at 50% 55%); } }
 
-/* Предметы в наборе: бегущая подсветка по очереди */
-.hots { position: absolute; inset: 0; opacity: 0; pointer-events: none; transition: opacity .6s; }
-.b2-on .hots { opacity: 1; pointer-events: auto; }
-.hot, .item { position: absolute; pointer-events: none; display: block; }
-.hot { border-radius: 50%; }
-.hot::before, .hot::after {
-  content: ""; position: absolute; inset: -4%; border-radius: 50%; pointer-events: none;
+
+/* Предметы набора: слои из макета, свечение по контуру, подсвечиваются по очереди */
+.setg { position: absolute; inset: 0; transform-origin: 50% 50%; }
+.setg[hidden] { display: none; }
+.setg[data-set="S"] { transform: scale(.7314); }
+.setg .base { position: absolute; inset: 0; width: 100%; height: 100%; }
+.it { position: absolute; display: block; padding: 0; pointer-events: none; }
+.it img {
+  position: absolute; inset: 0; width: 100%; height: 100%; max-width: none;
+  filter: drop-shadow(0 0 4px rgba(255, 244, 205, .95)) drop-shadow(0 0 14px rgba(255, 205, 105, .8)) brightness(1.08);
+  opacity: 0; transition: opacity .7s ease;
 }
-.hot::before {
-  border: 3px solid rgba(255, 228, 160, .95);
-  box-shadow: 0 0 24px 6px rgba(255, 214, 120, .65), inset 0 0 24px 4px rgba(255, 214, 120, .35);
-  opacity: 0; animation: run 6s ease-in-out infinite; animation-delay: calc(var(--i) * 1s);
-}
-.hot::after {
-  background: radial-gradient(closest-side, rgba(255, 230, 170, .22), transparent);
-  opacity: 0; transition: opacity .25s;
-}
-.hot.is-hover::after, .hot:focus-visible::after { opacity: 1; }
-.hot.is-hover::before, .hot:focus-visible::before, .hot.is-focus::before { animation: none; opacity: 1; }
-.hot:focus-visible, .item:focus-visible { outline: none; }
-/* вырезка по контуру: свечение заранее отрисовано в assets/items/*-halo.webp */
-.item .halo, .item .cut { position: absolute; max-width: none; pointer-events: none; }
-.item .cut { inset: 0; width: 100%; height: 100%; }
-.item .halo { opacity: 0; animation: run 6s ease-in-out infinite; animation-delay: calc(var(--i) * 1s); }
-.item.is-hover .halo, .item:focus-visible .halo, .item.is-focus .halo { animation: none; opacity: 1; transition: opacity .25s; }
-@keyframes run {
-  0%, 22%, 100% { opacity: 0; }
-  8% { opacity: 1; }
-}
+.it.lit img { opacity: .9; transition-duration: .35s; }
+.it.is-hover img, .it:focus-visible img, .it.is-focus img { opacity: 1; transition-duration: .2s; }
+.it:focus-visible { outline: none; }
+#product.b2-on { cursor: default; }
+#product.b2-on.is-pointer { cursor: pointer; }
 
 /* 2. Наборы */
 .b2-bg { position: absolute; left: -71px; top: -86px; width: 2174px; height: 1216px; object-fit: contain; z-index: 1; }
@@ -226,11 +201,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hint-goat .stk-r > i > img { position: absolute; max-width: none; }
 .hint-goat .stk-r { filter: drop-shadow(0 8px 4px rgba(0, 0, 0, .55)); }
 .hint-text { position: absolute; left: -24px; top: 5px; width: 205px; font: 700 14px/normal Comfortaa, sans-serif; color: var(--deep); }
-.b2-el { opacity: 0; filter: blur(8px); transform: translateY(24px); transition: opacity .7s ease, filter .7s ease, transform .7s ease; }
-.b2.b2-on .b2-el { opacity: 1; filter: none; transform: none; }
-.b2.b2-on .b2-el:nth-of-type(2) { transition-delay: .1s; }
-.b2.b2-on .set-panel { transition-delay: .2s; }
-.b2.b2-on .hint { transition-delay: .35s; }
+.b2-el { opacity: 0; }
 
 /* Модальное окно предмета */
 .dim { position: absolute; inset: 0; background: rgba(0, 0, 0, .66); z-index: 20; opacity: 0; pointer-events: none; transition: opacity .35s; }
@@ -269,6 +240,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* 3. Сколько вяжу */
 .b3 { background: #002d16; }
+.b3-layers { position: absolute; inset: 0; }
 .b3-layers img { position: absolute; left: -15px; bottom: 0; width: 1935px; height: 1080px; object-fit: cover; }
 .b3-text {
   position: absolute; left: 82px; top: 138px; width: 1756px; z-index: 3;
@@ -351,19 +323,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* 8. Финальный призыв */
 .b8-cards { position: absolute; left: 363px; top: 119px; display: flex; gap: 83px; z-index: 14; }
-.b8-card {
-  width: 342.99px; height: 479px; flex: none; opacity: 0;
-  transform: translate(var(--ox), var(--oy)) scale(1.353) rotate(var(--or));
-  transition: opacity .3s ease, transform .3s ease;
-}
-/* карточка Кати раскладывается на три */
-#book.is-on .b8-card {
-  opacity: 1; transform: none;
-  transition: opacity .35s ease .15s, transform 1.3s cubic-bezier(.65, 0, .25, 1) .15s;
-}
-#about .stamp-about { transition: opacity .5s ease, transform .6s ease; }
-#about.is-on .stamp-about { opacity: 1; }
-#about.leave-book .stamp-about { opacity: 0; transform: scale(.96); }
+.b8-card { width: 342.99px; height: 479px; flex: none; }
+.b8-fill { position: absolute; inset: 0; }
 .b8-card-in {
   position: relative; width: 100%; height: 100%; cursor: pointer;
   background: url(assets/d/stamp3.svg) 0 0 / 100% 100% no-repeat;
@@ -397,13 +358,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .toast.on { opacity: 1; transform: translate(-50%, 0); }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-ray, .snow, .hot::before, .item .halo { animation: none !important; }
-  .b2-el, .prod-inner, .scene, .rv, .stk.pop, .b8-card { transition: none !important; }
+  .hero-ray, .snow { animation: none !important; }
+  .prod-inner, .it img { transition: none !important; }
 }
 
 /* 5. Жёсткий параллакс: объекты стоят, а рамка экрана наезжает и уезжает */
-#left.scene, #left.scene.is-on { opacity: 1; transform: none; transition: none; }
 #left { clip-path: inset(var(--ct, 100%) 0 var(--cb, 0%) 0); }
+/* стикер поверх облака с текстом */
+#kids .stickers, #terms .stickers { z-index: 15; }
+.b6-btn { z-index: 16; }
 
 /* ===== Интро первого экрана: коробка качается, собирает пыль, открывается ===== */
 .glow {

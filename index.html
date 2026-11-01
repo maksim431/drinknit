@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Drinknit — новогодние наборы с вязаными игрушками</title>
-  <meta name="description" content="Новогодние наборы с вязаными игрушками ручной работы. Свяжу, упакую и подпишу открытку вашим текстом. Три набора: 600, 1 400 и 1 900 ₽.">
+  <meta name="description" content="Новогодние наборы с вязаными игрушками ручной работы. Свяжу, упакую и подпишу открытку вашим текстом. Три набора: 900, 1 700 и 2 400 ₽.">
   <meta name="theme-color" content="#0b3a20">
   <meta property="og:title" content="Drinknit — новогодние наборы с вязаными игрушками">
   <meta property="og:description" content="Свяжу, упакую и подпишу открытку вашим текстом. До Нового года успею сделать только 10.">
@@ -103,7 +103,7 @@
 
         <div class="offer">
           <p class="offer__text ui" data-morph="desc">Свяжу, упакую и подпишу открытку вашим текстом.<br>
-            Три набора: 600, 1&nbsp;400 и 1&nbsp;900&nbsp;₽.<br>
+            Три набора: 900, 1&nbsp;700 и 2&nbsp;400&nbsp;₽.<br>
             До Нового года успею сделать только 10.</p>
           <div class="offer__actions" data-morph="buy">
             <a class="btn btn--primary ui" href="#sets" data-goto="sets">Выбрать набор</a>
@@ -136,7 +136,7 @@
           <p class="chip" data-from="stock"><span id="set-hours">4 часа вязания</span></p>
           <p class="desc" id="set-desc" data-from="offer__text">Небольшой подарок учителю, воспитателю или коллеге</p>
           <div class="buy" data-from="offer__actions">
-            <p class="price" id="set-price">1600 ₽</p>
+            <p class="price" id="set-price">900 ₽</p>
             <a class="btn btn--primary btn--want" href="#contact" id="set-cta">Хочу набор S</a>
           </div>
         </div>
@@ -207,13 +207,13 @@
 
 
   <!-- 1. Первый экран -->
-  <section id="hero" class="scr bg-green">
+  <section id="hero" class="scr bg-green"><div class="fr">
     <div class="glow" aria-hidden="true"></div>
     <div class="rays" aria-hidden="true"></div>
     <div class="closed" aria-hidden="true"><img src="assets/box-closed.webp" alt=""></div>
     <img class="hero-ray" src="assets/d/hero-ray.svg" alt="">
     <img class="hero-ellipse" src="assets/d/hero-ellipse.svg" alt="">
-    <div class="hero-fade"></div>
+    <div class="hero-fade bgl"></div>
     <div class="hero-content">
       <div class="chip ui" style="--d:.2s"><img src="assets/d/ic-gift.svg" width="24" height="24" alt=""><span>Свободно <b data-free>10</b> из <b data-total>10</b> наборов</span></div>
       <h1 class="h1 ui" style="--d:.3s">Новогодние наборы<br>с вязаными игрушками ручной работы</h1>
@@ -222,15 +222,15 @@
         <a class="btn btn-glass" href="#" data-msg="telegram">Написать мне</a>
       </div>
     </div>
-    <div class="snow"></div>
+    <div class="snow bgl"></div>
     <div class="stickers" data-set="hero"></div>
-  </section>
+  </div></section>
 
   <!-- 2. Наборы -->
-  <section id="sets" class="scr bg-green b2">
-    <img class="b2-bg b2-el" src="assets/d/sets-bg.webp" alt="">
-    <h2 class="h2 b2-title b2-el">Три набора:<br>выберите для того, кому дарите</h2>
-    <div class="set-panel glass-dark b2-el">
+  <section id="sets" class="scr bg-green b2"><div class="fr">
+    <img class="b2-bg b2-el bgl" style="--d:0" src="assets/d/sets-bg.webp" alt="">
+    <h2 class="h2 b2-title b2-el" style="--d:.1">Три набора:<br>выберите для того, кому дарите</h2>
+    <div class="set-panel glass-dark b2-el" style="--d:.25">
       <p class="set-panel-title">Выберите набор</p>
       <div class="set-tabs" role="tablist">
         <button type="button" role="tab" data-set-tab="S">Набор S</button>
@@ -246,13 +246,13 @@
         <a class="btn btn-red" href="#" data-msg="telegram" data-set-btn></a>
       </div>
     </div>
-    <div class="snow"></div>
-    <div class="hint b2-el">
+    <div class="snow bgl"></div>
+    <div class="hint b2-el" style="--d:.45">
       <img class="hint-bubble" src="assets/d/bubble.svg" alt="">
       <div class="hint-goat"><div class="stk-r" style="width:286.17px;height:332.861px;transform:rotate(-165.17deg) scaleY(-1)"><i><img src="assets/d/st-goatbox.webp" alt="" style="left:0;top:-11.43%;width:269.47%;height:231.67%"></i></div></div>
       <p class="hint-text">Кликните на предмет,<br>чтобы узнать подробнее</p>
     </div>
-    <div class="dim" id="dim"></div>
+    <div class="dim bgl" id="dim"></div>
     <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
       <div class="modal-info">
         <h3 class="modal-title" id="modal-title"></h3>
@@ -270,19 +270,16 @@
       </div>
       <button type="button" class="modal-close" id="modal-close" aria-label="Закрыть"><img src="assets/d/ic-close.svg" alt=""></button>
     </div>
-  </section>
+  </div></section>
 
   <!-- Продукт: один слой на два экрана. Едет со скроллом из первого экрана во второй -->
-  <div id="product">
-    <div class="prod-inner">
-      <img class="prod-img" src="assets/d/hero-product.webp" alt="Новогодний набор L: вязаные игрушки, открытка и крем в подарочной коробке">
-      <div class="hots"></div>
-    </div>
+  <div id="product" aria-label="Набор: нажмите на предмет, чтобы узнать подробнее">
+    <div class="prod-inner"></div>
   </div>
 
   <!-- 3. Сколько вяжу -->
-  <section id="time" class="scr scene b3">
-    <div class="b3-layers">
+  <section id="time" class="scr scene b3"><div class="fr">
+    <div class="b3-layers bgl">
       <img src="assets/d/b3-01.webp" alt="" data-d="6">
       <img src="assets/d/b3-02.webp" alt="" data-d="14">
       <img src="assets/d/b3-03.webp" alt="" data-d="26">
@@ -297,22 +294,22 @@
         <p class="stamp-cap" id="flip-cap"></p>
       </div>
     </div>
-  </section>
+  </div></section>
 
   <!-- 4. Для детей -->
-  <section id="kids" class="scr scene b4">
-    <img class="b4-bg" src="assets/d/b4-bg1.webp" alt="" data-d="8">
-    <img class="b4-bg" src="assets/d/b4-bg2.webp" alt="" data-d="16">
+  <section id="kids" class="scr scene b4"><div class="fr">
+    <img class="b4-bg bgl" src="assets/d/b4-bg1.webp" alt="" data-d="8">
+    <img class="b4-bg bgl" src="assets/d/b4-bg2.webp" alt="" data-d="16">
     <h2 class="h2 b4-title rv" style="--d:.2s">Можно дарить детям:<br>глазки и мелкие детали держатся на безопасном креплении</h2>
     <div class="stickers" data-set="kids"></div>
     <div class="b4-bubble rv" style="--d:.45s" data-d="12">
       <img src="assets/d/b4-bubble.svg" alt="">
       <p>Пряжа гипоаллергенная: [какой хлопок и акрил, производитель].<br>Мелкие детали [пришиты или на безопасных замках], их не оторвать руками.<br>Подходит детям с [возраст].<br>Стирка: [ручная, 30°, как сушить].</p>
     </div>
-  </section>
+  </div></section>
 
   <!-- 5. Осталось наборов и таймер. Жёсткий параллакс: объекты стоят, экран скроллится -->
-  <section id="left" class="scr scene bg-green b5">
+  <section id="left" class="scr scene bg-green b5"><div class="fr">
     <div class="pin" id="pin">
       <div class="stickers" data-set="left"></div>
       <div class="b5-center">
@@ -331,12 +328,12 @@
         </div>
       </div>
     </div>
-  </section>
+  </div></section>
 
   <!-- 6. Сроки и как заказать -->
-  <section id="terms" class="scr scene b6">
-    <img class="b6-bg b6-bg2" src="assets/d/b5-bg2.webp" alt="" data-d="8">
-    <div class="b6-bg b6-bg1" data-d="16"><img src="assets/d/b5-bg1.webp" alt=""></div>
+  <section id="terms" class="scr scene b6"><div class="fr">
+    <img class="b6-bg b6-bg2 bgl" src="assets/d/b5-bg2.webp" alt="" data-d="8">
+    <div class="b6-bg b6-bg1 bgl" data-d="16"><img src="assets/d/b5-bg1.webp" alt=""></div>
     <h2 class="h2 b6-title rv" style="--d:.2s">Чтобы набор успел<br>к празднику,<br>напишите до 25.12</h2>
     <div class="rv" style="--d:.4s"><img class="b6-bubble" src="assets/d/b5-bubble.svg" alt="" data-d="10">
     <ol class="b6-steps" data-d="10">
@@ -347,22 +344,22 @@
     </ol></div>
     <div class="stickers" data-set="terms"></div>
     <a class="btn btn-red b6-btn rv" style="--d:.6s" href="#" data-msg="telegram" data-d="10">Забронировать набор</a>
-  </section>
+  </div></section>
 
   <!-- 7. Обо мне -->
-  <section id="about" class="scr scene bg-green b7">
+  <section id="about" class="scr scene bg-green b7"><div class="fr">
     <h2 class="h2 b7-title rv" style="--d:.2s">Привет, я Катя,<br>вяжу игрушки 30 лет</h2>
-    <div class="b7-card-wrap rv" style="--d:.4s" data-d="10">
+    <div class="b7-card-wrap rv" data-split style="--d:.4s" data-d="10">
       <div class="stamp stamp-about" id="about-card">
         <div class="stamp-win"><img src="assets/d/katya.webp" alt="Катя, мастер"></div>
         <p class="stamp-cap">Первые игрушки я вязала по схемам<br>из журнала «Валентина».<br>Сейчас придумываю свои: идеи беру<br>из природы и ищу на небольших сайтах мастеров, куда редко заходят производители массовых игрушек.</p>
       </div>
     </div>
     <div class="stickers" data-set="about"></div>
-  </section>
+  </div></section>
 
   <!-- 8. Финальный призыв -->
-  <section id="book" class="scr scene bg-green b8">
+  <section id="book" class="scr scene b8"><div class="b8-fill bg-green" aria-hidden="true"></div><div class="fr">
     <div class="b8-cards">
       <div class="b8-card" data-card="0"><div class="b8-card-in" data-set-pick="S">
         <div class="stamp-win"><img class="w-bg" src="assets/d/sets-bg.webp" alt=""><img class="w-prod" style="width:374px;height:279px;top:19px" src="assets/d/set-S.webp" alt="Набор S"></div>
@@ -387,7 +384,7 @@
       <a class="round glass-dark" href="#" data-msg="vkGroup" aria-label="Группа ВКонтакте"><img src="assets/d/ic-vk.svg" width="24" height="24" alt=""></a>
     </div>
     <div class="stickers" data-set="book"></div>
-  </section>
+  </div></section>
 
 </div>
 </div>

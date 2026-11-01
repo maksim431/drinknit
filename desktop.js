@@ -15,9 +15,9 @@
   };
 
   const SETS = {
-    S: { price: 900, img: 'assets/d/set-S.webp', forWhom: 'Небольшой подарок учителю, воспитателю или коллеге', hours: '4 часа вязания', small: true },
-    M: { price: 1700, img: 'assets/d/set-M.webp', forWhom: 'Подарок другу или родным: больше игрушек и открытка вашим текстом', hours: '11 часов вязания' },
-    L: { price: 2400, img: 'assets/d/hero-product.webp', forWhom: 'Большой набор для самых близких, с козликом', hours: '11 часов вязания' },
+    S: { price: 900, forWhom: 'Небольшой подарок учителю, воспитателю или коллеге', hours: '4 часа вязания' },
+    M: { price: 1700, forWhom: 'Подарок другу или родным: больше игрушек и открытка вашим текстом', hours: '11 часов вязания' },
+    L: { price: 2400, forWhom: 'Большой набор для самых близких, с козликом', hours: '11 часов вязания' },
   };
 
   // Тексты предметов: «Зелёный воришка» из макета, остальные черновики с прошлой версии сайта
@@ -31,61 +31,18 @@
     card: { title: 'Открытка<br>с вашим текстом', text: 'Подпишу открытку от руки: пришлите текст, когда будете заказывать набор.', note: '', photos: [] },
   };
 
-  // Набор L: предметы вырезаны по контуру (assets/items), координаты на картинке коробки 2352×1757 со сдвигом −229, −516
-  const BOX = { x: -229, y: -516, w: 2352, h: 1757 };
-  const cut = (id, nw, nh, x, y, w, h) => ({ id, cut: { nw, nh }, box: [(x - BOX.x) / BOX.w * 100, (y - BOX.y) / BOX.h * 100, w / BOX.w * 100, h / BOX.h * 100] });
-  // M и S: предметы отмечены овалами, позиции в процентах от картинки набора
-  const oval = (id, l, t, w, h) => ({ id, box: [l, t, w, h] });
-
-  // порядок спереди назад: так определяется, по какому предмету кликнули
-  const ITEMS = {
-    L: [
-      cut('lamb', 165, 228, 864.7, 454.7, 161.7, 223.5),
-      cut('mitten', 202, 278, 651, 440.9, 198, 272.6),
-      oval('cream', 54.2, 58.0, 10.4, 11.7), // в новом макете другой крем, вырезки для него нет
-      cut('goat', 437, 346, 577.5, 198.8, 428.3, 339.2),
-      cut('grinch', 333, 429, 1008.7, 121.3, 326.3, 420.6),
-      cut('card', 296, 352, 818.6, 23.3, 290.1, 345.1),
-    ],
-    M: [
-      oval('cream', 48.3, 53.0, 10.0, 16.7),
-      oval('mitten', 54.2, 55.8, 11.7, 14.5),
-      oval('lamb', 58.3, 45.8, 8.3, 12.3),
-      oval('grinch', 35.4, 41.9, 14.6, 27.9),
-      oval('card', 49.6, 30.7, 14.2, 22.3),
-    ],
-    S: [
-      oval('lamb', 37.1, 53.6, 11.7, 23.4),
-      oval('mitten', 45.8, 52.5, 14.6, 26.2),
-      oval('cream', 58.3, 43.0, 8.8, 33.5),
-      oval('card', 40.4, 25.1, 19.6, 29.6),
-    ],
+  // Слои наборов из макета (assets/d/sets): base — весь набор, поверх него вырезанные предметы.
+  // [предмет, left %, top %, width %, height %] от картинки набора; порядок как в макете — снизу вверх
+  const LAYERS = {
+    L: [['goat', 33.7158, 38.9997, 20.0928, 23.7006], ['mitten', 36.377, 54.7565, 9.4971, 15.201], ['lamb', 46.4844, 54.8218, 6.9824, 13.0435],
+      ['cream', 52.9785, 56.7506, 11.5967, 13.4031], ['grinch', 52.3438, 35.6326, 13.7695, 26.1196], ['card', 42.5537, 30.5982, 15.0146, 20.7257]],
+    M: [['card', 49.4629, 30.3793, 14.624, 24.7874], ['lamb', 57.7393, 45.7162, 8.4961, 12.5899], ['mitten', 54.1016, 54.5128, 13.7695, 15.8927],
+      ['cream', 47.8271, 51.9621, 10.4736, 18.378], ['grinch', 35.3271, 42.119, 15.0879, 27.2073]],
+    S: [['lamb', 37.4023, 52.0275, 11.5967, 26.6514], ['mitten', 45.3369, 48.1687, 15.5273, 29.6926], ['cream', 58.3252, 42.4133, 8.9111, 34.6959],
+      ['card', 40.1123, 24.7874, 20.1904, 31.0988]],
   };
-  Object.values(ITEMS).flat().forEach(it => Object.assign(it, DETAILS[it.id]));
-
-  // альфа-маски вырезанных предметов: клик и наведение точно по контуру
-  const ALPHA = {};
-  ITEMS.L.filter(it => it.cut).forEach(it => {
-    const img = new Image();
-    img.src = `assets/items/${it.id}.webp`;
-    img.decode().then(() => {
-      const c = document.createElement('canvas');
-      c.width = img.naturalWidth; c.height = img.naturalHeight;
-      const g = c.getContext('2d', { willReadFrequently: true });
-      g.drawImage(img, 0, 0);
-      ALPHA[it.id] = { w: c.width, h: c.height, d: g.getImageData(0, 0, c.width, c.height).data };
-    }).catch(() => {});
-  });
-  // x, y — доли от картинки набора (0…1)
-  const hitItem = (key, x, y) => ITEMS[key].find(it => {
-    const [l, t, w, h] = it.box;
-    const u = (x * 100 - l) / w, v = (y * 100 - t) / h;
-    if (u < 0 || u > 1 || v < 0 || v > 1) return false;
-    if (!it.cut) return (u - .5) ** 2 + (v - .5) ** 2 <= .25;
-    const a = ALPHA[it.id];
-    if (!a) return true;
-    return a.d[(Math.floor(v * (a.h - 1)) * a.w + Math.floor(u * (a.w - 1))) * 4 + 3] > 100;
-  });
+  const SET_K = { S: .7314, M: 1, L: 1 };      // набор S в макете меньше
+  const PROD = { x: 122.97, y: -125, w: 1787, h: 1334 };   // коробка на экране наборов
 
   const CARDS = [
     { src: 'assets/d/card-gingerbread.webp', w: 1393.988, h: 645.189, dx: -0.09, dy: -0.17,
@@ -144,9 +101,10 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-  const ease = t => 1 - Math.pow(1 - t, 3);
   const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const easeBack = t => 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 1, 2);
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let scene = 0;            // ближайшая остановка скролла
 
   /* ===== Стикеры ===== */
   for (const [set, list] of Object.entries(STICKERS)) {
@@ -161,22 +119,29 @@
     });
   }
 
-  /* ===== Экран стоит на месте: сцена вписана в окно ===== */
+  /* ===== Экран стоит на месте: кадр 1920 × 1080 вписан в окно, фоны доходят до краёв ===== */
   const html = document.documentElement;
   const body = document.body;
   const vp = $('#vp');
   const header = $('#header');
   const fx = $('#fx');
   const ctx = fx.getContext('2d');
+  const bgls = $$('.bgl');
   let s = 1, tx = 0, ty = 0, cdpr = 1;
   const resize = () => {
-    const vw = innerWidth, vh = innerHeight;
+    const vw = html.clientWidth, vh = innerHeight;
     s = Math.min(vw / 1920, vh / 1080);
     tx = (vw - 1920 * s) / 2;
     ty = (vh - 1080 * s) / 2;
+    const px = tx / s, py = ty / s;
     vp.style.setProperty('--s', s);
     vp.style.setProperty('--tx', `${tx}px`);
     vp.style.setProperty('--ty', `${ty}px`);
+    vp.style.setProperty('--px', `${px}px`);
+    vp.style.setProperty('--py', `${py}px`);
+    vp.style.setProperty('--k', Math.max((1920 + 2 * px) / 1920, (1080 + 2 * py) / 1080).toFixed(4));
+    // фоны растягиваются от центра кадра
+    bgls.forEach(el => { el.style.transformOrigin = `${960 - el.offsetLeft}px ${540 - el.offsetTop}px`; });
     cdpr = Math.min(devicePixelRatio || 1, 1.25);
     fx.width = Math.round(vw * cdpr);
     fx.height = Math.round(vh * cdpr);
@@ -370,66 +335,114 @@
     ctx.globalAlpha = 1;
   };
 
-  /* ===== Наборы ===== */
+  /* ===== Наборы: слои из макета ===== */
   const product = $('#product');
   const prodInner = $('.prod-inner', product);
-  const prodImg = $('.prod-img', product);
-  const hots = $('.hots', product);
   const b2 = $('#sets');
   let current = 'L';
+  let busy = false;          // идёт смена набора
+  const groups = {};
+  const ITEMS = {};
 
-  // предмет: вырезка по контуру со свечением (набор L) или овал (M, S)
-  const itemEl = (it, i, tag = 'button') => {
-    const [l, t, w, h] = it.box;
-    const el = document.createElement(tag);
-    el.style.cssText = `left:${l}%;top:${t}%;width:${w}%;height:${h}%;--i:${i}`;
-    if (it.cut) {
-      const P = 48, { nw, nh } = it.cut;
-      el.className = 'item';
-      el.innerHTML = `<img class="halo" src="assets/items/${it.id}-halo.webp" alt="" draggable="false" style="left:${-P / nw * 100}%;top:${-P / nh * 100}%;width:${(nw + 2 * P) / nw * 100}%;height:${(nh + 2 * P) / nh * 100}%"><img class="cut" src="assets/items/${it.id}.webp" alt="" draggable="false">`;
-    } else {
-      el.className = 'hot';
-    }
-    return el;
-  };
-
-  // наборы сзади вперёд для отрисовки, спереди назад для клика
-  const renderHots = key => {
-    hots.innerHTML = '';
-    const list = ITEMS[key];
-    [...list].reverse().forEach(it => {
-      const i = list.indexOf(it);
-      const b = itemEl(it, list.length - 1 - i);
+  Object.entries(LAYERS).forEach(([key, list]) => {
+    const g = document.createElement('div');
+    g.className = 'setg';
+    g.dataset.set = key;
+    g.hidden = key !== current;
+    g.innerHTML = `<img class="base" src="assets/d/sets/${key}-base.webp" alt="Новогодний набор ${key}" draggable="false">`;
+    ITEMS[key] = list.map(([id, l, t, w, h], i) => {
+      const b = document.createElement('button');
       b.type = 'button';
-      b.dataset.i = i;
-      b.setAttribute('aria-label', `Подробнее: ${it.title.replace(/<br>/g, ' ')}`);
+      b.className = 'it';
+      b.style.cssText = `left:${l}%;top:${t}%;width:${w}%;height:${h}%`;
+      b.innerHTML = `<img src="assets/d/sets/${key}-${id}.webp" alt="" draggable="false">`;
+      b.setAttribute('aria-label', `Подробнее: ${DETAILS[id].title.replace(/<br>/g, ' ')}`);
       b.addEventListener('click', e => { if (e.detail === 0) openItem(key, i); }); // клавиатура
-      hots.appendChild(b);
+      g.appendChild(b);
+      const it = { id, key, i, box: [l, t, w, h], el: b, ...DETAILS[id] };
+      // альфа-маска: клик и наведение точно по контуру, точки контура для искр
+      const img = b.firstChild;
+      const read = () => {
+        const c = document.createElement('canvas');
+        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        const cg = c.getContext('2d', { willReadFrequently: true });
+        cg.drawImage(img, 0, 0);
+        let d;
+        try { d = cg.getImageData(0, 0, c.width, c.height).data; } catch { return; }   // file:// — без маски, клик по рамке
+        it.alpha = { w: c.width, h: c.height, d };
+        const A = (x, y) => d[(y * c.width + x) * 4 + 3];
+        it.edge = [];
+        for (let y = 3; y < c.height - 3; y += 4) {
+          for (let x = 3; x < c.width - 3; x += 4) {
+            if (A(x, y) > 128 && (A(x - 3, y) < 64 || A(x + 3, y) < 64 || A(x, y - 3) < 64 || A(x, y + 3) < 64)) it.edge.push([x / c.width, y / c.height]);
+          }
+        }
+      };
+      if (img.complete && img.naturalWidth) read(); else img.addEventListener('load', read, { once: true });
+      return it;
     });
+    groups[key] = g;
+    prodInner.appendChild(g);
+  });
+
+  // точка на предмете (u, v — доли от его рамки) → координаты кадра
+  const toStage = (it, u, v) => {
+    const [l, t, w, h] = it.box, k = SET_K[it.key];
+    const x = PROD.x + (l + u * w) / 100 * PROD.w, y = PROD.y + (t + v * h) / 100 * PROD.h;
+    const cx = PROD.x + PROD.w / 2, cy = PROD.y + PROD.h / 2;
+    return [cx + (x - cx) * k, cy + (y - cy) * k];
+  };
+  const sparkleEdge = (it, n, o = {}) => {
+    if (!it.edge || !it.edge.length) return;
+    for (let i = 0; i < n; i++) {
+      const [u, v] = pick(it.edge);
+      const [x, y] = toStage(it, u, v);
+      mote(x, y, Object.assign({ vy: rand(-110, -30), size: rand(2, 4.5) }, o));
+    }
   };
 
-  // наведение и клик по контуру предмета
+  // какой предмет под курсором: спереди назад, по альфа-каналу
   const hitAt = e => {
-    const r = hots.getBoundingClientRect();
-    const it = hitItem(current, (e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
-    return it ? ITEMS[current].indexOf(it) : -1;
+    const r = groups[current].getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width * 100, y = (e.clientY - r.top) / r.height * 100;
+    const list = ITEMS[current];
+    for (let i = list.length - 1; i >= 0; i--) {
+      const it = list[i], [l, t, w, h] = it.box;
+      const u = (x - l) / w, v = (y - t) / h;
+      if (u < 0 || u > 1 || v < 0 || v > 1) continue;
+      const a = it.alpha;
+      if (!a || a.d[(Math.floor(v * (a.h - 1)) * a.w + Math.floor(u * (a.w - 1))) * 4 + 3] > 90) return it;
+    }
+    return null;
   };
-  let hoverIdx = -1;
-  hots.addEventListener('mousemove', e => {
-    const i = hitAt(e);
-    if (i === hoverIdx) return;
-    hoverIdx = i;
-    $$('[data-i]', hots).forEach(b => b.classList.toggle('is-hover', Number(b.dataset.i) === i));
-    hots.style.cursor = i >= 0 ? 'pointer' : '';
+  let hoverIt = null;
+  const setHover = it => {
+    if (it === hoverIt) return;
+    hoverIt?.el.classList.remove('is-hover');
+    hoverIt = it;
+    it?.el.classList.add('is-hover');
+    product.classList.toggle('is-pointer', !!it);
+    if (it) sparkleEdge(it, 10);
+  };
+  product.addEventListener('mousemove', e => { if (product.classList.contains('b2-on') && !busy) setHover(hitAt(e)); });
+  product.addEventListener('mouseleave', () => setHover(null));
+  product.addEventListener('click', e => {
+    if (!product.classList.contains('b2-on') || busy) return;
+    const it = hitAt(e);
+    if (it) openItem(it.key, it.i);
   });
-  hots.addEventListener('mouseleave', () => {
-    hoverIdx = -1;
-    $$('[data-i]', hots).forEach(b => b.classList.remove('is-hover'));
-  });
-  hots.addEventListener('click', e => {
-    const i = hitAt(e);
-    if (i >= 0) openItem(current, i);
-  });
+
+  // бегущая подсветка: предметы загораются по очереди, с искрами по контуру
+  let litIdx = -1;
+  setInterval(() => {
+    if (!product.classList.contains('b2-on') || busy || !modal.hidden || document.hidden) return;
+    const list = ITEMS[current];
+    list.forEach(it => it.el.classList.remove('lit'));
+    litIdx = (litIdx + 1) % list.length;
+    const it = list[litIdx];
+    it.el.classList.add('lit');
+    sparkleEdge(it, 16);
+  }, 1100);
 
   const renderPanel = key => {
     const d = SETS[key];
@@ -442,37 +455,49 @@
     btn.dataset.text = `Здравствуйте! Хочу набор ${key}`;
   };
 
+  // смена набора: новый набор расходится волной от центра коробки, по фронту волны — искры
   const selectSet = key => {
-    if (key === current) return;
+    if (key === current || busy) return;
+    const from = groups[current], to = groups[key];
+    busy = true;
+    setHover(null);
+    ITEMS[current].forEach(it => it.el.classList.remove('lit'));
     current = key;
     renderPanel(key);
     magicChime();
-    // смена картинки волной + частицы
-    const wave = document.createElement('img');
-    wave.className = 'prod-wave';
-    wave.src = SETS[key].img;
-    wave.alt = '';
-    prodInner.appendChild(wave);
-    prodInner.classList.toggle('small', !!SETS[key].small);
-    hots.style.opacity = '0';
-    burst(1016, 560, 90, 1.3);
-    area(600, 250, 830, 700, 70);
-    setTimeout(() => {
-      prodImg.src = SETS[key].img;
-      prodImg.alt = `Новогодний набор ${key}`;
-      wave.remove();
-      renderHots(key);
-      hots.style.opacity = '';
-    }, reduce ? 0 : 900);
+    to.hidden = false;
+    to.style.zIndex = 2;
+    from.style.zIndex = 1;
+    const k = SET_K[key];
+    const cx = PROD.x + PROD.w / 2, cy = PROD.y + PROD.h * .55;
+    const DUR = reduce ? 1 : 1100, MAXR = 1250, FEATHER = 160;
+    const t0 = performance.now();
+    const step = now => {
+      const t = clamp((now - t0) / DUR);
+      const R = easeIO(t) * (MAXR + FEATHER);
+      const m = `radial-gradient(circle at 50% 55%, #000 ${Math.max(0, R - FEATHER)}px, rgba(0,0,0,.5) ${Math.max(0, R - FEATHER / 2)}px, transparent ${R}px)`;
+      to.style.webkitMaskImage = to.style.maskImage = m;
+      from.style.opacity = 1 - t * .4;
+      from.style.filter = `blur(${t * 6}px)`;
+      // искры по фронту волны
+      for (let i = 0; i < 9; i++) {
+        const a = rand(0, Math.PI * 2), r = R * k * rand(.92, 1.02);
+        const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * .9;
+        if (x > 100 && x < 1900 && y > -100 && y < 1100) mote(x, y, { vx: Math.cos(a) * rand(40, 160), vy: Math.sin(a) * rand(40, 160) - 50, size: rand(2, 5) });
+      }
+      if (t < 1) { requestAnimationFrame(step); return; }
+      to.style.webkitMaskImage = to.style.maskImage = '';
+      from.hidden = true;
+      from.style.opacity = from.style.filter = from.style.zIndex = to.style.zIndex = '';
+      busy = false;
+      litIdx = -1;
+      ITEMS[key].forEach((it, i) => setTimeout(() => sparkleEdge(it, 14), i * 90));
+    };
+    requestAnimationFrame(step);
   };
 
   $$('[data-set-tab]').forEach(t => t.addEventListener('click', () => selectSet(t.dataset.setTab)));
   $$('[data-price]').forEach(el => { el.textContent = SETS[el.dataset.price].price; });
-  $$('[data-set-pick]').forEach(el => el.addEventListener('click', () => {
-    const k = el.dataset.setPick;
-    goTo('#sets');
-    setTimeout(() => selectSet(k), 500);
-  }));
 
   /* ===== Модальное окно предмета ===== */
   const modal = $('#modal');
@@ -500,23 +525,21 @@
     note.hidden = !openData.note;
     renderPhoto();
     ding(i);
+    setHover(null);
     // выбранный предмет остаётся подсвеченным поверх затемнения
     focusClone = product.cloneNode(true);
     focusClone.id = 'focus';
-    focusClone.querySelectorAll('.prod-wave').forEach(n => n.remove());
-    const [l, t, w, h] = openData.box;
-    const img = focusClone.querySelector('.prod-img');
-    if (openData.cut) img.style.opacity = '0';
-    else img.style.clipPath = `ellipse(${w / 2 + 1}% ${h / 2 + 1}% at ${l + w / 2}% ${t + h / 2}%)`;
-    const fh = focusClone.querySelector('.hots');
-    fh.innerHTML = '';
-    fh.style.opacity = '1';
-    const one = itemEl(openData, 0, 'span');
-    one.classList.add('is-focus');
-    fh.appendChild(one);
+    focusClone.removeAttribute('aria-label');
+    focusClone.querySelectorAll('.setg').forEach(g => { if (g.dataset.set !== key) g.remove(); });
+    focusClone.querySelector('.base').remove();
+    focusClone.querySelectorAll('.it').forEach((b, j) => {
+      b.tabIndex = -1;
+      if (j !== i) b.remove(); else { b.classList.remove('lit', 'is-hover'); b.classList.add('is-focus'); }
+    });
     $('#stage').appendChild(focusClone);
     dim.classList.add('on');
     modal.hidden = false;
+    sparkleEdge(openData, 30, { vy: rand(-160, -60) });
     $('#modal-close').focus();
   };
 
@@ -537,36 +560,19 @@
     renderPhoto();
   }));
 
-  /* ===== Карточка с переворотом (блок 3) ===== */
+  /* ===== Карточка с переворотом (блок 3): угол зависит от скролла ===== */
   const flip = $('#flip');
   const flipImg = $('#flip-img');
   const flipCap = $('#flip-cap');
   let cardIdx = -1;
-  let flipBusy = false;
-  let cardWanted = 0;
   const setCard = i => {
+    if (i === cardIdx) return;
     const c = CARDS[i];
     flipImg.src = c.src;
     flipImg.style.cssText = `width:${c.w}px;height:${c.h}px;transform:translate(calc(-50% + ${c.dx}px), calc(-50% + ${c.dy}px))`;
     flipCap.innerHTML = c.cap;
+    if (cardIdx >= 0) burst(960, 672, 50, 1.1);
     cardIdx = i;
-  };
-  const flipTo = i => {
-    cardWanted = i;
-    if (flipBusy || i === cardIdx) return;
-    if (reduce) { setCard(i); return; }
-    flipBusy = true;
-    flip.classList.add('flip-out');
-    setTimeout(() => {
-      setCard(i);
-      flip.classList.remove('flip-out');
-      flip.classList.add('flip-in');
-      setTimeout(() => {
-        flip.classList.remove('flip-in');
-        flipBusy = false;
-        if (cardWanted !== cardIdx) flipTo(cardWanted);
-      }, 330);
-    }, 280);
   };
   setCard(0);
 
@@ -576,12 +582,13 @@
     let ms = Math.max(0, new Date(CONFIG.deadline) - Date.now());
     const d = Math.floor(ms / 864e5); ms -= d * 864e5;
     const h = Math.floor(ms / 36e5); ms -= h * 36e5;
-    const m = Math.floor(ms / 6e4);
+    const m = Math.floor(ms / 6e4); ms -= m * 6e4;
+    const sec = Math.floor(ms / 1e3);
     $('#t-days').textContent = `${d} ${plural(d, ['день', 'дня', 'дней'])},`;
-    $('#t-hm').textContent = `${h} ${plural(h, ['час', 'часа', 'часов'])}, ${m} ${plural(m, ['минута', 'минуты', 'минут'])}`;
+    $('#t-hm').textContent = `${h} ${plural(h, ['час', 'часа', 'часов'])}, ${m} ${plural(m, ['минута', 'минуты', 'минут'])}, ${sec} ${plural(sec, ['секунда', 'секунды', 'секунд'])}`;
   };
   tick();
-  setInterval(tick, 15000);
+  setInterval(tick, 1000);
   $$('[data-free]').forEach(el => { el.textContent = CONFIG.free; });
   $$('[data-total]').forEach(el => { el.textContent = CONFIG.total; });
 
@@ -671,50 +678,41 @@
     if (musicOn) { magicChime(); playTune(); }
   });
 
-  /* ===== Скролл: 10 остановок, экран стоит, сцены сменяются ===== */
-  // остановка → сцена: 0 первый экран, 1 наборы, 2–4 «сколько вяжу» (три карточки), 5 для детей, 6 таймер, 7 сроки, 8 обо мне, 9 финал
-  const STOP_SCENE = ['hero', 'sets', 'time', 'time', 'time', 'kids', 'left', 'terms', 'about', 'book'];
+  /* ===== Скролл: каждая смена сцены — процесс, привязанный к положению скролла ===== */
+  // P — положение в «экранах»: 0 первый экран, 1 наборы, 2–4 «сколько вяжу» (три карточки), 5 для детей, 6 таймер, 7 сроки, 8 обо мне, 9 финал
+  const LAST = 9;
   const STOPS = { hero: 0, sets: 1, time: 2, kids: 5, left: 6, terms: 7, about: 8, book: 9 };
-  const scenes = $$('.scene');
-  const sceneEl = id => $(`#${id}`);
-  let scene = 0;            // текущая остановка
-  let sceneId = 'hero';
-
   const goTo = hash => {
     const id = hash.slice(1);
     if (!(id in STOPS) || html.classList.contains('is-locked')) return;
     scrollTo({ top: STOPS[id] * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
   };
   $$('[data-nav]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); goTo(a.getAttribute('href')); }));
+  $$('[data-set-pick]').forEach(el => el.addEventListener('click', () => {
+    const k = el.dataset.setPick;
+    goTo('#sets');
+    setTimeout(() => selectSet(k), 900);
+  }));
 
-  // один жест колесом или тачпадом = одна остановка, инерция тачпада не перелистывает дальше
-  let wheelUntil = 0;
-  const step = dir => {
-    const target = clamp(Math.round(scrollY / innerHeight) + dir, 0, STOP_SCENE.length - 1);
-    scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
-  };
-  addEventListener('wheel', e => {
-    if (e.ctrlKey) return;                         // масштаб страницы
-    e.preventDefault();
-    if (html.classList.contains('is-locked') || !modal.hidden) return;
-    const now = performance.now();
-    if (now < wheelUntil) { wheelUntil = Math.max(wheelUntil, now + 120); return; }
-    if (Math.abs(e.deltaY) < 3) return;
-    wheelUntil = now + 900;
-    step(Math.sign(e.deltaY));
-  }, { passive: false });
-  addEventListener('keydown', e => {
-    if (html.classList.contains('is-locked') || !modal.hidden || e.target.closest('input, textarea')) return;
-    const k = e.key;
-    let dir = 0;
-    if (k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)) dir = 1;
-    else if (k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)) dir = -1;
-    else if (k === 'Home') dir = -99;
-    else if (k === 'End') dir = 99;
-    if (!dir) return;
-    e.preventDefault();
-    step(dir);
-  });
+  // когда скролл остановился между экранами, страница мягко доезжает до следующего экрана в сторону прокрутки;
+  // совсем короткий сдвиг возвращает на текущий экран
+  let settleT = 0, base = 0;
+  addEventListener('scroll', () => {
+    clearTimeout(settleT);
+    settleT = setTimeout(() => {
+      if (html.classList.contains('is-locked') || !modal.hidden) return;
+      const P = scrollY / innerHeight;
+      let target = Math.round(P);
+      if (Math.abs(P - target) > .004) {
+        const dir = Math.sign(P - base);
+        if (Math.abs(P - base) > .04) target = dir > 0 ? Math.ceil(P - .004) : Math.floor(P + .004);
+        else target = base;
+        scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
+      } else {
+        base = target;
+      }
+    }, 160);
+  }, { passive: true });
 
   /* ===== Параллакс от мыши ===== */
   const depthEls = $$('[data-d]');
@@ -725,99 +723,127 @@
   });
   const heroProdDepth = 12;   // коробка и стикеры первого экрана двигаются рассинхронно
 
-  /* ===== Смена сцен ===== */
+  /* сцены: a…b — остановки, на которых сцена полностью на экране;
+     enter/leave: fade — растворение и элементы по очереди, clip — рамка наезжает (объекты стоят),
+     under — сцена уже лежит под уезжающей рамкой, cover — сцена стоит, пока её закрывают, split — карточка Кати раскладывается на три */
+  const SCENES = [
+    { id: 'time', a: 2, b: 4, enter: 'fade', leave: 'fade' },
+    { id: 'kids', a: 5, b: 5, enter: 'fade', leave: 'cover' },
+    { id: 'left', a: 6, b: 6, enter: 'clip', leave: 'clip' },
+    { id: 'terms', a: 7, b: 7, enter: 'under', leave: 'fade' },
+    { id: 'about', a: 8, b: 8, enter: 'fade', leave: 'split' },
+    { id: 'book', a: 9, b: 9, enter: 'split', leave: 'none' },
+  ].map(sc => {
+    const el = $(`#${sc.id}`);
+    const num = v => parseFloat(v) || 0;
+    return Object.assign(sc, {
+      el,
+      rv: $$('.rv', el).map(n => ({ n, d: num(n.style.getPropertyValue('--d')), keep: n.hasAttribute('data-split') })),
+      st: $$('.stk', el).map(n => ({ n, d: num(n.style.getPropertyValue('--d')) - .5 })),
+    });
+  });
+  const b2els = $$('.b2-el').map(n => ({ n, d: parseFloat(n.style.getPropertyValue('--d')) || 0 }));
   const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]')];
   const left = $('#left');
-  const aboutSec = $('#about');
-  // карточки финала вылетают из карточки Кати (центр 960, 683)
-  [534.5, 960.5, 1386.5].forEach((x, i) => {
-    const c = $$('.b8-card')[i];
-    c.style.setProperty('--ox', `${960 - x}px`);
-    c.style.setProperty('--oy', '324.5px');
-    c.style.setProperty('--or', `${(i - 1) * 8}deg`);
-    c.style.zIndex = i === 1 ? 2 : 1;
-  });
-  let b2on = false, heroBurst = false;
+  const b8cards = $$('.b8-card');
+  const b8fill = $('.b8-fill');
+  const B8 = [534.5, 960.5, 1386.5].map((x, i) => ({ ox: 960 - x, oy: 324.5, or: (i - 1) * 8 }));
 
-  // волшебство при входе сцены
-  const SPARK = {
-    time: () => { area(500, 120, 920, 260, 60); burst(960, 672, 70, 1.2); },
-    kids: () => { area(60, 160, 820, 240, 60); burst(1100, 520, 60); },
-    left: () => area(560, 300, 800, 500, 80),
-    terms: () => { area(60, 60, 600, 200, 50); burst(1290, 470, 70); },
-    about: () => burst(960, 683, 90, 1.3),
-    book: () => { burst(960, 683, 120, 1.6); area(363, 119, 1195, 479, 80); },
+  const fmt = v => Math.round(v * 1000) / 1000;
+  const styleEl = (n, op, ty, blur, extra = '') => {
+    n.style.opacity = fmt(op);
+    n.style.transform = `translateY(${fmt(ty)}px)${extra}`;
+    n.style.filter = blur > .05 ? `blur(${fmt(blur)}px)` : '';
   };
 
-  const setScene = stop => {
-    if (stop === scene) return;
-    const prevId = sceneId;
-    scene = stop;
-    sceneId = STOP_SCENE[stop];
-    header.classList.toggle('scrolled', stop > 0);
-    if (sceneId === 'time') flipTo(stop - 2);
-    if (sceneId === prevId) return;
-    aboutSec.classList.toggle('leave-book', prevId === 'about' && sceneId === 'book');
-    // к первому экрану возвращаемся через растворение: он лежит ниже остальных сцен
-    const prevSc = sceneEl(prevId);
-    if (prevSc && prevSc.classList.contains('scene') && (sceneId === 'hero' || sceneId === 'sets')) {
-      prevSc.classList.add('leave-fade');
-      setTimeout(() => prevSc.classList.remove('leave-fade'), 800);
-    }
-    scenes.forEach(sc => {
-      if (sc === left) return;   // таймер управляется скроллом напрямую
-      sc.classList.toggle('is-on', sc.id === sceneId);
-    });
-    // карточка Кати остаётся на месте, пока из неё вылетают карточки наборов
-    if (prevId === 'about' && sceneId === 'book') {
-      aboutSec.classList.add('is-on');
-      setTimeout(() => { if (sceneId === 'book') aboutSec.classList.remove('is-on'); }, 700);
-    }
-    if (sceneId !== 'sets' && sceneId !== 'hero') closeItem();
-    SPARK[sceneId]?.();
-    ding(stop);
-  };
+  let lastP = -1, heroBurst = false;
+  const render = P => {
+    const dP = Math.abs(P - lastP);
+    const moved = dP > 0;
+    lastP = P;
+    scene = Math.round(P);
+    header.classList.toggle('scrolled', P > .05);
 
-  const update = () => {
-    const P = scrollY / (innerHeight || 1);          // 0…9: позиция в остановках
-    setScene(Math.round(P));
-
-    // 1 → 2: продукт едет из первого экрана во второй, элементы растворяются и появляются
-    const grpA = P < 1.5;
-    body.classList.toggle('grp-a', grpA);
+    // 0 → 1: элементы первого экрана растворяются, коробка едет на место, появляются элементы наборов
     const p = clamp(P);
+    const lS = clamp(P - 1);                 // наборы уходят
+    body.classList.toggle('grp-a', P < 1.6);
     const k = 1.1834 + (1 - 1.1834) * p;
     const dx = -59.47 * (1 - p) + cx * heroProdDepth * (1 - p);
     const dy = -251.5 * (1 - p) + cy * heroProdDepth * (1 - p);
     product.style.transform = `translate(${dx}px, ${dy}px) scale(${k})`;
+    product.style.opacity = fmt(1 - clamp((lS - .05) * 2.4));
     if (focusClone) focusClone.style.transform = product.style.transform;
-    const fade = clamp(1 - p * 2.6);
-    heroFadeEls.forEach(el => { el.style.opacity = fade; });
-    if (p > .12 && !heroBurst) { heroBurst = true; area(300, 200, 1320, 800, 120); }
+    const fade = clamp(1 - p * 2.4);
+    heroFadeEls.forEach(el => { el.style.opacity = fmt(fade); });
+    $('.hero-content').style.transform = `translateY(${fmt(-40 * (1 - fade))}px)`;
+    $('.hero-content').style.pointerEvents = fade > .5 ? '' : 'none';
+    if (p > .1 && !heroBurst && body.classList.contains('is-done')) { heroBurst = true; area(300, 200, 1320, 800, 120); }
     if (p < .05) heroBurst = false;
-    if (p >= .9 && !b2on) {
-      b2on = true;
-      b2.classList.add('b2-on');
-      product.classList.add('b2-on');
-      area(60, 120, 1800, 900, 160);
-    } else if (p < .75 && b2on) {
-      b2on = false;
-      b2.classList.remove('b2-on');
-      product.classList.remove('b2-on');
-      closeItem();
+    if (!moved) return;                      // дальше всё зависит только от скролла
+    b2els.forEach(({ n, d }) => {
+      const pe = clamp((p - .5 - d * .5) / .35), pl = clamp((lS - d * .15) / .35);
+      styleEl(n, pe * (1 - pl), (1 - pe) * 30 - pl * 30, (1 - pe + pl) * 8);
+    });
+    const onSets = p > .96 && lS < .04;
+    if (onSets !== product.classList.contains('b2-on')) {
+      product.classList.toggle('b2-on', onSets);
+      b2.classList.toggle('b2-on', onSets);
+      if (onSets) ITEMS[current].forEach((it, i) => setTimeout(() => sparkleEdge(it, 14), i * 90));
+      else { setHover(null); closeItem(); ITEMS[current].forEach(it => it.el.classList.remove('lit')); }
     }
 
+    // остальные сцены
+    SCENES.forEach(sc => {
+      const e = clamp(P - (sc.a - 1)), l = clamp(P - sc.b);
+      const visible = e > 0 && (sc.leave === 'cover' || sc.leave === 'split' || sc.leave === 'clip' ? l < 1 : l < .6);
+      sc.el.style.visibility = visible ? 'visible' : 'hidden';
+      if (!visible) return;
+      sc.el.style.opacity = sc.enter === 'fade' ? fmt(clamp(e / .5)) : 1;
+      const still = sc.enter === 'clip' || sc.enter === 'under';
+      sc.rv.forEach(({ n, d, keep }) => {
+        const pe = still ? 1 : clamp((e - .3 - d * .35) / .45);
+        let pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .12) / .4) : 0;
+        if (keep) { pl = 0; n.style.opacity = fmt(pe * (1 - clamp((l - .08) * 4))); n.style.transform = `translateY(${fmt((1 - pe) * 30)}px)`; n.style.filter = ''; return; }
+        styleEl(n, pe * (1 - pl), (1 - pe) * 40 - pl * 40, (1 - pe + pl) * 8);
+      });
+      sc.st.forEach(({ n, d }) => {
+        const pe = still ? 1 : clamp((e - .35 - d * .3) / .4);
+        const pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .1) / .4) : 0;
+        const sc1 = (.5 + .5 * easeBack(pe)) * (1 - .25 * pl);
+        n.style.opacity = fmt(Math.min(1, pe * 1.4) * (1 - pl));
+        n.style.transform = `scale(${fmt(sc1)}) rotate(${fmt((1 - pe) * -12)}deg)`;
+      });
+    });
+
+    // 2…4: карточка переворачивается по вертикали, угол — от скролла
+    const q = clamp(P - 2, 0, 2);
+    let i = Math.min(2, Math.floor(q)), t = q - i;
+    if (i === 2) t = 0;
+    const tt = easeIO(t);
+    if (tt < .5) { setCard(i); flip.style.transform = `rotateX(${fmt(tt * 180)}deg)`; }
+    else { setCard(i + 1); flip.style.transform = `rotateX(${fmt((tt - 1) * 180)}deg)`; }
+
     // 5 ↔ 6 ↔ 7: жёсткий параллакс — объекты таймера стоят, рамка наезжает снизу и уезжает вверх
-    const ct = clamp(6 - P) * 100;     // верхний край рамки при въезде
-    const cb = clamp(P - 6) * 100;     // нижний край при выезде
-    left.style.setProperty('--ct', `${ct}%`);
-    left.style.setProperty('--cb', `${cb}%`);
-    const leftVisible = P > 5 && P < 7;
-    left.style.visibility = leftVisible ? 'visible' : 'hidden';
-    left.classList.toggle('is-on', leftVisible);
-    // соседние сцены не исчезают, пока рамка таймера их закрывает
-    $('#kids').classList.toggle('is-on', sceneId === 'kids' || (P > 5 && P < 6));
-    $('#terms').classList.toggle('is-on', sceneId === 'terms' || (P > 6 && P < 7));
+    left.style.setProperty('--ct', `${fmt(clamp(6 - P) * 100)}%`);
+    left.style.setProperty('--cb', `${fmt(clamp(P - 6) * 100)}%`);
+
+    // 8 → 9: карточка Кати раскладывается на три карточки наборов
+    const eb = clamp(P - 8), eq = easeIO(eb);
+    b8fill.style.opacity = fmt(clamp(eb / .6));
+    b8cards.forEach((c, j) => {
+      const o = B8[j];
+      c.style.transform = `translate(${fmt(o.ox * (1 - eq))}px, ${fmt(o.oy * (1 - eq))}px) scale(${fmt(1 + .353 * (1 - eq))}) rotate(${fmt(o.or * (1 - eq))}deg)`;
+      c.style.opacity = fmt(clamp(eb * 8));
+      c.style.zIndex = j === 1 ? 2 : 1;
+    });
+
+    // искры во время смены сцен, сколько — зависит от скорости скролла
+    const f = P - Math.floor(P);
+    if (dP > 0 && dP < 1 && f > .04 && f < .96 && !reduce) {
+      const n = Math.min(26, Math.round(dP * 260));
+      for (let j = 0; j < n; j++) mote(rand(0, 1920), rand(80, 1000), { vy: rand(-150, -40), size: rand(2, 4.5) });
+    }
   };
 
   const loop = now => {
@@ -829,7 +855,7 @@
         if (d) el.style.translate = `${cx * d}px ${cy * d}px`;
       });
     }
-    update();
+    render(clamp(scrollY / (innerHeight || 1), 0, LAST));
     if (!document.hidden) drawFx(now);
     requestAnimationFrame(loop);
   };
@@ -848,7 +874,6 @@
   const start = () => {
     body.classList.add('intro');
     renderPanel(current);
-    renderHots(current);
     addEventListener('resize', resize);
     resize();
     requestAnimationFrame(t => { last = t; loop(t); });
@@ -865,7 +890,7 @@
   addEventListener('keydown', e => { if (e.key === 'Escape' && !body.classList.contains('is-done')) finish(); });
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
-  const introImgs = [$('.closed img'), prodImg];
+  const introImgs = [$('.closed img'), $('.base', groups.L)];
   Promise.all(introImgs.map(img => (img.decode ? img.decode() : Promise.resolve()).catch(() => {})))
     .then(() => (document.fonts ? document.fonts.ready : null))
     .then(start, start);
