@@ -6,6 +6,7 @@
     free: 10,                // сколько наборов осталось
     total: 10,
     deadline: '2026-12-25T23:59:59+03:00', // последний день приёма заказов
+    music: 'assets/audio/last-christmas.mp3',   // фоновая музыка, зацикливается; положите файл по этому пути
     links: {                 // ссылки на мессенджеры, пока не заданы
       telegram: '',          // например: 'https://t.me/username'
       vk: '',                // например: 'https://vk.me/username'
@@ -469,7 +470,7 @@
   // смена набора: новый набор расходится волной от центра коробки, по фронту волны — искры
   const selectSet = key => {
     if (key === current || busy) return;
-    const from = groups[current], to = groups[key];
+    const fromKey = current, from = groups[current], to = groups[key];
     busy = true;
     setHover(null);
     ITEMS[current].forEach(it => it.el.classList.remove('lit'));
@@ -488,8 +489,10 @@
       const R = easeIO(t) * (MAXR + FEATHER);
       const m = `radial-gradient(circle at 50% 55%, #000 ${Math.max(0, R - FEATHER)}px, rgba(0,0,0,.5) ${Math.max(0, R - FEATHER / 2)}px, transparent ${R}px)`;
       to.style.webkitMaskImage = to.style.maskImage = m;
-      from.style.opacity = 1 - t * .4;
-      from.style.filter = `blur(${t * 6}px)`;
+      // старый набор стирается той же волной: где прошёл фронт, его уже нет (радиус в его масштабе)
+      const Ro = R * k / SET_K[fromKey];
+      const mo = `radial-gradient(circle at 50% 55%, transparent ${Math.max(0, Ro - FEATHER)}px, rgba(0,0,0,.5) ${Math.max(0, Ro - FEATHER / 2)}px, #000 ${Ro}px)`;
+      from.style.webkitMaskImage = from.style.maskImage = mo;
       // искры по фронту волны
       for (let i = 0; i < 9; i++) {
         const a = rand(0, Math.PI * 2), r = R * k * rand(.92, 1.02);
@@ -499,7 +502,8 @@
       if (t < 1) { requestAnimationFrame(step); return; }
       to.style.webkitMaskImage = to.style.maskImage = '';
       from.hidden = true;
-      from.style.opacity = from.style.filter = from.style.zIndex = to.style.zIndex = '';
+      from.style.webkitMaskImage = from.style.maskImage = '';
+      from.style.zIndex = to.style.zIndex = '';
       busy = false;
       litIdx = -1;
       ITEMS[key].forEach((it, i) => setTimeout(() => sparkleEdge(it, 14), i * 90));
@@ -681,14 +685,46 @@
     if (!musicOn || !ensureAudio()) return;
     bell([NOTE.C6, NOTE.E5 * 2, NOTE.G5 * 2, NOTE.A5 * 2, NOTE.C6 * 1.5, NOTE.D5 * 2][i % 6], audio.currentTime, 1.4, .35);
   }
+  // фоновая музыка включена по умолчанию: зацикленный трек CONFIG.music;
+  // если файла нет — играет музыкальная шкатулка. Браузер разрешает звук только после первого действия
+  // посетителя (клик, нажатие клавиши, касание), поэтому до него музыка ждёт
+  const bgm = new Audio();
+  bgm.loop = true;
+  bgm.preload = 'auto';
+  bgm.volume = .45;
+  let trackOk = !!CONFIG.music, started = false;
+  if (trackOk) {
+    bgm.src = CONFIG.music;
+    bgm.addEventListener('error', () => { trackOk = false; if (musicOn && started) playTune(); }, { once: true });
+  }
+  const syncButtons = () => sounds.forEach(b => {
+    b.setAttribute('aria-pressed', String(musicOn));
+    b.setAttribute('aria-label', musicOn ? 'Выключить музыку' : 'Включить музыку');
+  });
+  const startMusic = () => {
+    clearTimeout(loopTimer);
+    if (trackOk) {
+      started = true;
+      bgm.play().catch(() => { started = false; if (!trackOk) startMusic(); });
+    } else {
+      started = !!ensureAudio();
+      if (started) playTune();
+    }
+  };
+  const stopMusic = () => { clearTimeout(loopTimer); bgm.pause(); };
+  musicOn = true;
+  syncButtons();
+  const KICK = ['pointerdown', 'keydown', 'touchstart'];
+  const kick = e => {
+    if (e.target.closest && e.target.closest('.js-sound')) return;   // кнопка звука сама решает
+    KICK.forEach(ev => removeEventListener(ev, kick, true));
+    if (musicOn && !started) startMusic();
+  };
+  KICK.forEach(ev => addEventListener(ev, kick, true));
   sounds.forEach(btn => btn.addEventListener('click', () => {
     musicOn = !musicOn;
-    sounds.forEach(b => {
-      b.setAttribute('aria-pressed', String(musicOn));
-      b.setAttribute('aria-label', musicOn ? 'Выключить музыку' : 'Включить музыку');
-    });
-    clearTimeout(loopTimer);
-    if (musicOn) { magicChime(); playTune(); }
+    syncButtons();
+    if (musicOn) { magicChime(); startMusic(); } else { stopMusic(); started = false; }
   }));
 
   /* ===== Скролл: каждая смена сцены — процесс, привязанный к положению скролла ===== */
@@ -707,14 +743,14 @@
     setTimeout(() => selectSet(k), 900);
   }));
 
-  // прилипание только рядом с экраном: остановились ближе 8,4 % от него — страница доезжает
+  // прилипание только рядом с экраном: остановились ближе 16 % от него — страница доезжает
   let settleT = 0;
   addEventListener('scroll', () => {
     clearTimeout(settleT);
     settleT = setTimeout(() => {
       if (html.classList.contains('is-locked') || !modal.hidden) return;
       const P = scrollY / innerHeight, target = Math.round(P), d = Math.abs(P - target);
-      if (d > .003 && d < .084) scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
+      if (d > .003 && d < .16) scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
     }, 160);
   }, { passive: true });
 
@@ -746,6 +782,7 @@
       st: $$('.stk', el).map(n => ({ n, d: num(n.style.getPropertyValue('--d')) - .5 })),
     });
   });
+  const b2bg = $('.b2-bg');
   const b2els = $$('.b2-el').map(n => ({ n, d: parseFloat(n.style.getPropertyValue('--d')) || 0 }));
   const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]')];
   const left = $('#left');
@@ -807,7 +844,8 @@
     if (p < .05) heroBurst = false;
     if (!moved) return;                      // дальше всё зависит только от скролла
     b2els.forEach(({ n, d }) => {
-      const pe = clamp((p - .5 - d * .3) / .3), pl = clamp((lS - d * .15) / .35);
+      // интерьер проявляется с первых пикселей скролла, остальные элементы — когда коробка почти на месте
+      const pe = n === b2bg ? clamp(p / .85) : clamp((p - .5 - d * .3) / .3), pl = clamp((lS - d * .15) / .35);
       styleEl(n, pe * (1 - pl), (1 - pe) * 30 - pl * 30, (1 - pe + pl) * 8);
     });
     const onSets = p > .96 && lS < .04;
