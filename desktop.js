@@ -15,7 +15,7 @@
     hero: { dx: 1, dy: -118.5, k: .8877 },             // на первом экране: (-250, 70, 917 × 685)
     mouth: { x: 209.8, y: 451.3 }, boxc: { x: 209.8, y: 490.7 }, gift: { x: 209.8, y: 473.4 },
     b3pan: 701, b3origin: [195 + 157.5, 466 + 11.17 + 701],
-    v0: { x: -147.56, y: 239.06, w: 1232.07, h: 692.77 }, vcover: false,   // первый кадр = низ фона блока 3
+    v0: { x: -147.56, y: 239.06, w: 1232.07, h: 692.77 }, vanchor: [150, 640], vcover: false,   // первый кадр = низ фона блока 3
     kidsBg: { x: -695, y: 223, w: 1270, h: 709 },
     flip: [195, 340],
     b3cardTop: 599.5, b3cardStick: 104,                // карточка блока 3 едет с фоном и останавливается под шапкой
@@ -1169,9 +1169,10 @@
         put(el, 'translate', `${fmt(cx * d)}px ${fmt(cy * d)}px`);
       });
     }
-    render(clamp(toP(scrollY), 0, LAST + footerP));
-    if (!document.hidden) drawFx(now);
+    // ошибка в одном кадре не должна останавливать отрисовку: цикл продолжается в любом случае
     requestAnimationFrame(loop);
+    try { render(clamp(toP(scrollY), 0, LAST + footerP)); } catch (err) { console.error(err); }
+    if (!document.hidden) drawFx(now);
   };
 
   /* ===== Интро первого экрана: коробка качается, собирает пыль, открывается со вспышкой ===== */
