@@ -280,7 +280,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   width: calc(1920px + 2 * var(--px, 0px)); height: calc(1080px + 2 * var(--py, 0px));
   opacity: 0; pointer-events: none;
 }
-.b3-textwrap { position: absolute; left: 82px; top: 308px; width: 1756px; z-index: 3; }
+.b3-textwrap { position: absolute; left: 82px; top: 468px; width: 1756px; z-index: 3; }
 .b3-text { display: flex; flex-direction: column; gap: 24px; align-items: center; text-align: center; }
 .b3-card-wrap { position: absolute; left: 728px; top: 1566px; width: 463.8px; height: 648.33px; z-index: 3; perspective: 1600px; }
 
