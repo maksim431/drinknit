@@ -636,7 +636,6 @@
     toastT = setTimeout(() => toastEl.classList.remove('on'), 2600);
   };
   const NAMES = { telegram: 'Telegram', vk: 'ВК', max: 'MAX', vkGroup: 'группу ВК' };
-  $$('[data-doc]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); toast('Документ появится позже'); }));
 
   /* ===== Частые вопросы: слева список, справа ответ ===== */
   const faqList = $('#faq-list'), faqCard = $('#faq-card');
@@ -689,12 +688,16 @@
   // P — положение в «экранах»: 0 первый экран, 1 наборы, 2 «сколько вяжу» (заголовок), 3–5 там же три карточки, 6 для детей, 7 таймер, 8 сроки, 9 обо мне, 10 финал
   const LAST = 11;
   const STOPS = { hero: 0, sets: 1, time: 2, kids: 6, left: 7, terms: 8, about: 9, book: 10, faq: 11 };
+  // прокрутка ↔ положение P в экранах. Видео-переход (P 5 → 6) занимает 1,2 экрана прокрутки — он на 20 % медленнее
+  const V_START = 5, V_SLOW = 1.2;
+  const toP = y => { const u = y / innerHeight; return u <= V_START ? u : u <= V_START + V_SLOW ? V_START + (u - V_START) / V_SLOW : u - (V_SLOW - 1); };
+  const toY = P => (P <= V_START ? P : P <= V_START + 1 ? V_START + (P - V_START) * V_SLOW : P + (V_SLOW - 1)) * innerHeight;
   let auto = false;          // прокрутку ведёт сам сайт (меню, доезжание)
   const goTo = hash => {
     const id = hash.slice(1);
     if (!(id in STOPS) || html.classList.contains('is-locked')) return;
     auto = true;                 // переход по меню проезжает блоки без стопора
-    scrollTo({ top: STOPS[id] * innerHeight, behavior: reduce ? 'auto' : 'smooth' });
+    scrollTo({ top: toY(STOPS[id]), behavior: reduce ? 'auto' : 'smooth' });
   };
   $$('[data-nav]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); goTo(a.getAttribute('href')); }));
   $$('[data-set-pick]').forEach(el => el.addEventListener('click', () => {
@@ -720,12 +723,12 @@
     }
   }, { passive: false });
   addEventListener('scroll', () => {
-    const vh = innerHeight, P = scrollY / vh, P0 = lastY / vh, now = performance.now();
+    const P = toP(scrollY), P0 = toP(lastY), now = performance.now();
     lastY = scrollY;
     if (!auto && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
-        if (Math.abs(P - holdStop) > .001) { scrollTo({ top: holdStop * vh, behavior: 'instant' }); lastY = holdStop * vh; }
+        if (Math.abs(P - holdStop) > .001) { scrollTo({ top: toY(holdStop), behavior: 'instant' }); lastY = toY(holdStop); }
       } else {
         // первый экран, который скролл проскочил за это событие
         const k = P > P0 ? Math.floor(P0 + 1e-4) + 1 : Math.ceil(P0 - 1e-4) - 1;
@@ -735,8 +738,8 @@
           holdStop = k;
           holdStart = now;
           holdUntil = now + HOLD_MIN;
-          scrollTo({ top: k * vh, behavior: 'instant' });
-          lastY = k * vh;
+          scrollTo({ top: toY(k), behavior: 'instant' });
+          lastY = toY(k);
         }
       }
     }
@@ -746,8 +749,8 @@
       if (html.classList.contains('is-locked') || !modal.hidden) return;
       // колесо ещё крутят — проверим чуть позже
       if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
-      const P = scrollY / innerHeight, target = Math.round(P), d = Math.abs(P - target);
-      if (d > .003 && d < .16) { auto = true; scrollTo({ top: target * innerHeight, behavior: reduce ? 'auto' : 'smooth' }); }
+      const P = toP(scrollY), target = Math.round(P), d = Math.abs(P - target);
+      if (d > .003 && d < .16) { auto = true; scrollTo({ top: toY(target), behavior: reduce ? 'auto' : 'smooth' }); }
     };
     settleT = setTimeout(settle, 160);
   }, { passive: true });
@@ -1026,7 +1029,7 @@
         put(el, 'translate', `${fmt(cx * d)}px ${fmt(cy * d)}px`);
       });
     }
-    render(clamp(scrollY / (innerHeight || 1), 0, LAST + footerP));
+    render(clamp(toP(scrollY), 0, LAST + footerP));
     if (!document.hidden) drawFx(now);
     requestAnimationFrame(loop);
   };
