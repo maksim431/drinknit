@@ -755,8 +755,9 @@
   // P — положение в «экранах»: 0 первый экран, 1 наборы, 2 «сколько вяжу» (заголовок), 3–5 там же три карточки, 6 для детей, 7 таймер, 8 сроки, 9 обо мне, 10 финал
   const LAST = 11;
   const STOPS = { hero: 0, sets: 1, time: 2, kids: 6, left: 7, terms: 8, about: 9, book: 10, faq: 11 };
-  // прокрутка ↔ положение P в экранах. Видео-переход (P 5 → 6) занимает 1,2 экрана прокрутки — он на 20 % медленнее
-  const V_START = 5, V_SLOW = 1.2;
+  // прокрутка ↔ положение P в экранах. Видео-переход (P 5 → 6) занимает 1,5 экрана прокрутки:
+  // за одно движение колеса пролистывается на 36 % меньше кадров, чем у обычного блока (два раза по 20 %)
+  const V_START = 5, V_SLOW = 1.5;
   const toP = y => { const u = y / innerHeight; return u <= V_START ? u : u <= V_START + V_SLOW ? V_START + (u - V_START) / V_SLOW : u - (V_SLOW - 1); };
   const toY = P => (P <= V_START ? P : P <= V_START + 1 ? V_START + (P - V_START) * V_SLOW : P + (V_SLOW - 1)) * innerHeight;
   let auto = false;          // прокрутку ведёт сам сайт (меню, доезжание)
@@ -821,8 +822,8 @@
       if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
       // доезжаем до ближайшего экрана в любую сторону, в том числе назад к тому, с которого уходят
       const P = toP(scrollY), target = Math.round(P), d = Math.abs(P - target);
-      // у блока с наборами зона прилипания больше — 30 % с обеих сторон, у остальных 16 %
-      const zone = target === STOPS.sets ? .3 : .16;
+      // зона прилипания: у блока с наборами 30 %, у карточек блока 3 — на 30 % больше обычной (20,8 %), у остальных 16 %
+      const zone = target === STOPS.sets ? .3 : target >= 3 && target <= 5 ? .208 : .16;
       if (d > .003 && d < zone) { auto = true; scrollTo({ top: toY(target), behavior: reduce ? 'auto' : 'smooth' }); }
     };
     settleT = setTimeout(settle, 160);
