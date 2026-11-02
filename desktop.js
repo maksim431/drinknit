@@ -673,16 +673,78 @@
     open(full, '_blank', 'noopener');
   }));
 
-  /* ===== Кнопка звука: два состояния из макета. Музыки пока нет — кнопка только переключает вид ===== */
+  /* ===== Фоновая музыка: Vlad Gluschenko — Winter Time, по кругу без паузы на стыке.
+     Приглушённый эффект 40 %: фильтр срезает верхние частоты (как музыка из соседней комнаты).
+     Играет всегда, пока не выключить кнопкой в шапке. Браузер разрешает звук только после первого
+     действия посетителя (клик, клавиша, касание), поэтому до него музыка ждёт ===== */
+  const MUSIC = { src: 'assets/audio/winter-time.mp3', muffle: .4, volume: .6 };
   const sounds = $$('.js-sound');
-  let soundOn = false;
+  let soundOn = true, actx = null, mgain = null, msrc = null, mbuf = null, mloading = null;
+  const syncSound = () => sounds.forEach(b => {
+    b.setAttribute('aria-pressed', String(soundOn));
+    b.setAttribute('aria-label', soundOn ? 'Музыка играет' : 'Музыка выключена');
+  });
+  const setupAudio = () => {
+    if (actx) return true;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    actx = new AC();
+    // приглушение: срез частот от 20 кГц (0 %) до ~600 Гц (100 %) по логарифмической шкале
+    const lp = actx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.value = 20000 * Math.pow(600 / 20000, MUSIC.muffle);
+    lp.Q.value = .7;
+    mgain = actx.createGain();
+    mgain.gain.value = 0;
+    lp.connect(mgain).connect(actx.destination);
+    mgain.lp = lp;
+    mloading = fetch(MUSIC.src).then(r => r.arrayBuffer())
+      .then(b => new Promise((ok, no) => actx.decodeAudioData(b, ok, no)))
+      .then(buf => { mbuf = buf; if (soundOn) playMusic(); })
+      .catch(() => {});
+    return true;
+  };
+  const playMusic = () => {
+    if (!actx || !mbuf) return;
+    if (actx.state === 'suspended') actx.resume();
+    if (!msrc) {
+      msrc = actx.createBufferSource();
+      msrc.buffer = mbuf;
+      msrc.loop = true;
+      msrc.connect(mgain.lp);
+      msrc.start();
+    }
+    const t = actx.currentTime;
+    mgain.gain.cancelScheduledValues(t);
+    mgain.gain.setValueAtTime(mgain.gain.value, t);
+    mgain.gain.linearRampToValueAtTime(MUSIC.volume, t + 1.2);   // мягкое появление
+  };
+  const pauseMusic = () => {
+    if (!actx) return;
+    const t = actx.currentTime;
+    mgain.gain.cancelScheduledValues(t);
+    mgain.gain.setValueAtTime(mgain.gain.value, t);
+    mgain.gain.linearRampToValueAtTime(0, t + .4);
+  };
+  syncSound();
+  const KICK = ['pointerdown', 'keydown', 'touchstart'];
+  const kick = e => {
+    if (e.target.closest && e.target.closest('.js-sound')) return;   // кнопка звука решает сама
+    KICK.forEach(ev => removeEventListener(ev, kick, true));
+    if (soundOn && setupAudio()) playMusic();
+  };
+  KICK.forEach(ev => addEventListener(ev, kick, true));
   sounds.forEach(btn => btn.addEventListener('click', () => {
     soundOn = !soundOn;
-    sounds.forEach(b => {
-      b.setAttribute('aria-pressed', String(soundOn));
-      b.setAttribute('aria-label', soundOn ? 'Музыка играет' : 'Музыка выключена');
-    });
+    syncSound();
+    if (soundOn) { KICK.forEach(ev => removeEventListener(ev, kick, true)); if (setupAudio()) playMusic(); }
+    else pauseMusic();
   }));
+  // вкладка скрыта — музыка на паузе, вернулись — продолжается
+  document.addEventListener('visibilitychange', () => {
+    if (!actx) return;
+    if (document.hidden) actx.suspend(); else if (soundOn) actx.resume();
+  });
 
   /* ===== Скролл: каждая смена сцены — процесс, привязанный к положению скролла ===== */
   // P — положение в «экранах»: 0 первый экран, 1 наборы, 2 «сколько вяжу» (заголовок), 3–5 там же три карточки, 6 для детей, 7 таймер, 8 сроки, 9 обо мне, 10 финал
