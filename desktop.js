@@ -4,7 +4,11 @@
   /* ===== Данные: настройки, наборы, тексты и вопросы — в data.js ===== */
   const { CONFIG, SETS, FAQ, DETAILS, LAYERS, CARDS } = window.DRINKNIT;
 
-  const SET_K = { S: .7314, M: 1, L: 1 };      // набор S в макете меньше
+  const PORTRAIT0 = document.documentElement.classList.contains('is-p');
+  // масштаб набора внутри коробки и сдвиг (в % от размера коробки). На телефоне наборы S и M (пакет и коробка M
+  // выше и левее, чем L) уменьшаем и сдвигаем, чтобы они целиком помещались между заголовком и панелью, как L
+  const SET_K = PORTRAIT0 ? { S: .7314, M: .783, L: 1 } : { S: .7314, M: 1, L: 1 };   // набор S в макете меньше
+  const SET_T = PORTRAIT0 ? { S: [-.2, -9.0], M: [5.25, -7.9], L: [0, 0] } : { S: [0, 0], M: [0, 0], L: [0, 0] };
 
   // Две раскладки одного лендинга: горизонтальный кадр 1920 × 1080 (компьютер, планшет в альбомной ориентации)
   // и вертикальный 600 × 1200 (телефон, вертикальный планшет). Анимации одни и те же, меняются только координаты
@@ -518,10 +522,10 @@
 
   // точка на предмете (u, v — доли от его рамки) → координаты кадра
   const toStage = (it, u, v) => {
-    const [l, t, w, h] = it.box, k = SET_K[it.key];
+    const [l, t, w, h] = it.box, k = SET_K[it.key], [tx, ty] = SET_T[it.key];
     const x = PROD.x + (l + u * w) / 100 * PROD.w, y = PROD.y + (t + v * h) / 100 * PROD.h;
     const cx = PROD.x + PROD.w / 2, cy = PROD.y + PROD.h / 2;
-    return [cx + (x - cx) * k, cy + (y - cy) * k];
+    return [cx + (x - cx) * k + tx / 100 * PROD.w, cy + (y - cy) * k + ty / 100 * PROD.h];
   };
   const sparkleEdge = (it, n, o = {}) => {
     if (!it.edge || !it.edge.length) return;
@@ -599,7 +603,7 @@
     to.style.zIndex = 2;
     from.style.zIndex = 1;
     const k = SET_K[key];
-    const cx = PROD.x + PROD.w / 2, cy = PROD.y + PROD.h * .55;
+    const cx = PROD.x + PROD.w / 2 + SET_T[key][0] / 100 * PROD.w, cy = PROD.y + PROD.h * .55 + SET_T[key][1] / 100 * PROD.h;
     const DUR = reduce ? 1 : 1100, MAXR = 1250 * PROD.w / 1787, FEATHER = 160 * PROD.w / 1787;
     const t0 = performance.now();
     const step = now => {

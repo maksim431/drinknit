@@ -78,15 +78,19 @@ html.is-p .set-tabs { gap: 3.46px; }
 html.is-p .set-tabs button { height: 37.35px; padding: 6.92px 15.9px; font-size: 14.53px; }
 html.is-p .set-desc { flex: 1 0 0; gap: 5.53px; font-size: 13.14px; }
 html.is-p .set-price { font-size: 40.12px; line-height: 40.12px; }
-html.is-p .hint { left: 104px; top: 220px; width: 286px; height: 217px; overflow: hidden; overflow: clip; }
+html.is-p .hint { left: 104px; top: 220px; width: 286px; height: 217px; overflow: hidden; overflow: clip; pointer-events: none !important; }   /* подсказка не перехватывает тапы по открытке */
 html.is-p .hint-bubble { left: 35px; top: 26px; width: 175.27px; height: 75.43px; transform: scaleX(-1); }
 html.is-p .hint-goat { left: 171.65px; top: -21.92px; width: 207.77px; height: 216.85px; }
 html.is-p .hint-goat .stk-r { width: 144.27px !important; height: 167.81px !important; transform: rotate(150.82deg) scaleY(-1) !important; }
 html.is-p .hint-text { left: 52px; top: 40px; width: 144px; font-size: 10px; }
+/* наборы S и M помещаются между заголовком и панелью, как L (те же числа — SET_K и SET_T в desktop.js) */
+html.is-p .setg[data-set="S"] { transform: translate(-.2%, -9.0%) scale(.7314); }
+html.is-p .setg[data-set="M"] { transform: translate(5.25%, -7.9%) scale(.783); }
 /* окно предмета */
 html.is-p .modal { left: 10px; top: calc(var(--cut, 0px) + 92px); width: 370px; height: calc(740px - 2 * var(--cut, 0px)); flex-direction: column-reverse; padding: 16px; gap: 14px; border-radius: 28px; }
 html.is-p .modal-photo { width: 100%; height: auto; flex: 1 1 0; min-height: 0; border-radius: 18px; }
 html.is-p .modal-img img { width: 100%; height: 100%; }
+html.is-p .modal-info { flex: none; justify-content: flex-start; gap: 12px; }   /* текст сразу под названием, фото забирает остальную высоту */
 html.is-p .modal-title { font-size: 21px; }
 html.is-p .modal-text { font-size: 15px; line-height: 1.45; }
 html.is-p .modal-note { font-size: 11.5px; }
