@@ -774,12 +774,20 @@
     if (key === lastFrame) return;
     lastFrame = key;
     const e = easeIO(t);
-    const r = { x: V0.x + (V1.x - V0.x) * e, y: V0.y + (V1.y - V0.y) * e, w: V0.w + (V1.w - V0.w) * e, h: V0.h + (V1.h - V0.h) * e };
+    let r = { x: V0.x + (V1.x - V0.x) * e, y: V0.y + (V1.y - V0.y) * e, w: V0.w + (V1.w - V0.w) * e, h: V0.h + (V1.h - V0.h) * e };
     // координаты кадра 1920 × 1080 → холст (с полями до краёв окна и растяжением фонов --k)
     const px = tx / s, py = ty / s, k = Math.max((1920 + 2 * px) / 1920, (1080 + 2 * py) / 1080);
     const sx = W / (1920 + 2 * px), sy = H / (1080 + 2 * py);
     const X = x => (960 + (x - 960) * k + px) * sx, Y = y => (540 + (y - 540) * k + py) * sy;
-    vctx.drawImage(frames[i], X(r.x), Y(r.y), X(r.x + r.w) - X(r.x), Y(r.y + r.h) - Y(r.y));
+    let x0 = X(r.x), y0 = Y(r.y), x1 = X(r.x + r.w), y1 = Y(r.y + r.h);
+    // кадр всегда закрывает весь экран: если не хватает, увеличиваем его от домика (точки совмещения с блоком 3)
+    const ax = X(300), ay = Y(820);
+    // в самом начале кадр точно совмещён с блоком 3, а непокрытый край закрывает фон блока 3 под холстом
+    const fc = Math.max(1, ax / Math.max(1e-3, ax - x0), (W - ax) / Math.max(1e-3, x1 - ax), ay / Math.max(1e-3, ay - y0), (H - ay) / Math.max(1e-3, y1 - ay));
+    const f = 1 + (fc - 1) * clamp(t / .15);
+    x0 = ax + (x0 - ax) * f; x1 = ax + (x1 - ax) * f; y0 = ay + (y0 - ay) * f; y1 = ay + (y1 - ay) * f;
+    vctx.clearRect(0, 0, W, H);
+    vctx.drawImage(frames[i], x0, y0, x1 - x0, y1 - y0);
   };
 
   const b3bg = $('#b3-bg'), b3fg = $('#b3-fg'), b3text = $('#b3-textwrap'), b3card = $('#b3-card');
@@ -902,7 +910,7 @@
     put(b3text, 'visibility', vt > 0 ? 'hidden' : '');
     put(b3card, 'visibility', vt >= .16 ? 'hidden' : '');
     if (vt > 0) put(b3card, 'opacity', String(fmt(1 - vOut)));
-    put(vcan, 'opacity', String(fmt(clamp(vt / .06))));
+    put(vcan, 'opacity', String(fmt(clamp(vt / .015))));   // быстро: камера в видео начинает двигаться сразу
     if (vt > 0 && vt < 1) drawFrame(vt);
 
     // 3 → 4 → 5: блок стоит, карточка переворачивается по вертикали, угол — от скролла
