@@ -306,13 +306,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .b4 { background: #002d16; }
 .b4-bg { position: absolute; left: -236px; top: -22px; width: 2156px; height: 1203px; object-fit: cover; }
 .b4-title { position: absolute; left: 60px; top: 185px; width: 810px; z-index: 13; }
-.b4-bubble { position: absolute; left: 137px; top: 494px; width: 517px; height: 282px; z-index: 13; }
+.b4-bubble { position: absolute; left: 62px; top: 494px; width: 607px; height: 282px; z-index: 13; }
 .b4-bubble img {
-  position: absolute; left: -.58%; top: -1.06%; width: 101.14%; height: 97%;
+  position: absolute; left: -.49%; top: -1.06%; width: 100.97%; height: 96.94%;
   transform: scaleX(-1); max-width: none;
 }
 .b4-bubble p {
-  position: absolute; left: 61px; top: 41px; width: 396px;
+  position: absolute; left: 61px; top: 50px; width: 471px;
   font: 700 18px/normal Comfortaa, sans-serif; color: var(--deep);
 }
 
