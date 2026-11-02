@@ -104,6 +104,7 @@ html.is-p .lead { font: 400 15.05px/21.82px Manrope, sans-serif; }
 html.is-p .lead br { display: none; }
 html.is-p .b3-card-wrap { left: 29px; top: 599.54px; scale: .717; transform-origin: 0 0; }
 html.is-p .b3-card-wrap .stamp-cap { font-size: 18px; }
+html.is-p .b3-video { width: calc(390px + 2 * var(--px, 0px)); height: calc(932px + 2 * var(--py, 0px)); }   /* холст видео — по кадру телефона */
 /* затемнение над видео-переходом */
 html.is-p .b3-vshade { display: block; position: absolute; left: calc(-1 * var(--px, 0px)); right: calc(-1 * var(--px, 0px)); top: calc(-1 * var(--py, 0px)); height: calc(530px + var(--py, 0px)); opacity: 0; pointer-events: none; }
 
@@ -132,6 +133,9 @@ html.is-p .b5-hm { font-size: 15.22px; line-height: 21.3px; }
 html.is-p .b5-cap { margin-top: 5.53px; font-size: 12.45px; }
 html.is-p .b5-cta { gap: 8.3px; }
 html.is-p .b5-cta p { font-size: 12.45px; }
+
+html.is-p #left .stickers { z-index: 14; }
+html.is-p #left .stickers-back { z-index: 12; }
 
 /* 6. Сроки (1138 px — экран спускается на 206 px) */
 html.is-p .b6-bg { left: -567px; top: 0; width: 1093px; height: 496px; }
@@ -178,3 +182,4 @@ html.is-p .ft-brand img { width: 138.33px; }
 html.is-p .ft-tag { font-size: 12.45px; }
 html.is-p .ft-small { font-size: 11.07px; line-height: 16.6px; }
 html.is-p .ft-bottom { margin-top: 24.9px; padding-top: 16.6px; gap: 6.92px; }
+html.is-p #book .stickers { z-index: 16; }   /* стикеры поверх карточек наборов */

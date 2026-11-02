@@ -128,6 +128,13 @@
     });
   }
 
+  // телефон, экран «Осталось»: Дед Мороз за панелью, боковые стикеры поверх неё
+  if (PORTRAIT) {
+    const santa = $('#left .stickers .stk'), back = document.createElement('div');
+    back.className = 'stickers stickers-back';
+    santa.parentNode.parentNode.insertBefore(back, santa.parentNode);
+    back.appendChild(santa);
+  }
   // копия карточки Кати на финальном экране: карточки наборов вылетают из-за неё
   const katyaCopy = $('#about .b7-card-wrap').cloneNode(true);
   katyaCopy.className = 'b7-card-wrap b8-katya';
@@ -162,7 +169,7 @@
   const BOXED = /(^|\s)(glow|rays|hero-ray|gift-shadow|hero-ellipse|closed)(\s|$)/;
   const HOSTS = /(^|\s)(stickers|pin|gift-hint)(\s|$)/;
   // ручные привязки для тесных экранов: [селектор или «#сцена stkN», k], k = 1 — к верху экрана, −1 — к низу
-  const CUT_K = [['#left .b5-center', .3], ['#left stk0', 1], ['#left stk2', 1], ['#left stk4', 1], ['#left stk1', .3], ['#left stk3', -.6], ['#about stk6', .2]];
+  const CUT_K = [['#left .b5-center', 1], ['#left stk0', 1], ['#left stk2', 1], ['#left stk4', 1], ['#left stk1', .6], ['#left stk3', -.5], ['#about stk6', .2], ['#about .b7-card-wrap', -.3]];
   function measureCut() {
     cutTargets = [];
     const secs = ['hero', 'sets', 'time', 'kids', 'left', 'about', 'faq'].map(id => $(`#${id}`));
@@ -212,6 +219,10 @@
     const delta = top + cut - (412.5 - 282.5 * hk);                // сдвиг центра коробки
     L.hero.k = BASE.hero.k * hk;
     L.hero.dy = BASE.hero.dy + delta;
+    // коробка на экране наборов: верх под заголовком, низ над панелью выбора; подсказка едет вместе с коробкой
+    const sTop = 210 - Math.min(74, cut * .75);
+    L.setK = Math.max(.55, Math.min(1, (696 - 2 * cut - sTop) / 480));
+    L.setDy = sTop + cut - 531 + 321 * L.setK;
     L.mouth.y = BASE.mouth.y + delta; L.boxc.y = BASE.boxc.y + delta; L.gift.y = BASE.gift.y + delta;
     // стикеры на низком экране немного меньше
     const sk = fmt(1 - cut / 932 * .6);
@@ -219,6 +230,10 @@
       n.style.translate = box ? `0 ${fmt(delta)}px` : (k * cut ? `0 ${fmt(k * cut)}px` : '');
       if (stk) n.style.scale = cut ? String(sk) : '';
     });
+    // копия карточки Кати на финальном экране стоит ровно там же, где карточка на экране «Обо мне»
+    const kt = cutTargets.find(o => o.n === $('#about .b7-card-wrap'));
+    katyaCopy.style.translate = cut ? `0 ${fmt((kt ? kt.k * cut : 0) - cut)}px` : '';
+    B8 = null;
     // блок 3 и высокие блоки: начало у верха экрана, спуск длиннее
     L.b3pan = BASE.b3pan + cut; L.b3pan2 = BASE.b3pan2 + cut;
     L.termsPan = BASE.termsPan + 2 * cut; L.bookPan = BASE.bookPan + 2 * cut;
@@ -922,13 +937,18 @@
       holdUntil = Math.min(holdStart + HOLD_MAX, Math.max(holdUntil, now + HOLD_GAP));
     }
   }, { passive: false });
+  // у высокого блока (участок спуска) два края: верх — toY(k), низ — после спуска. Сверху страница встаёт на верх,
+  // снизу — на низ; доезжание выбирает ближайший край
+  const holdPx = k => { const g = SEGS.find(g => !g.span && g.p === k); return g ? g.len * innerHeight : 0; };
+  const edgeY = (k, bottom) => toY(k) + (bottom ? holdPx(k) : 0);
+  let holdY = 0;
   addEventListener('scroll', () => {
     const P = toP(scrollY), P0 = toP(lastY), now = performance.now();
     lastY = scrollY;
     if (!auto && !touching && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
-        if (Math.abs(P - holdStop) > .006) { scrollTo({ top: toY(holdStop), behavior: 'instant' }); lastY = toY(holdStop); }
+        if (Math.abs(scrollY - holdY) > innerHeight * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; }
       } else {
         // первый экран, который скролл проскочил за это событие
         // допуск 0,01 экрана: позиция прокрутки округляется до пикселей, и экран может оказаться чуть дальше целого —
@@ -941,8 +961,9 @@
           holdStop = k;
           holdStart = now;
           holdUntil = now + HOLD_MIN;
-          scrollTo({ top: toY(k), behavior: 'instant' });
-          lastY = toY(k);
+          holdY = edgeY(k, P < P0);         // прокрутка вверх встаёт на нижний край высокого блока
+          scrollTo({ top: holdY, behavior: 'instant' });
+          lastY = holdY;
         }
       }
     }
@@ -959,7 +980,9 @@
       // внутри видео-перехода (P 5…6) зона узкая: видео прокручивается свободно и не отскакивает к началу
       const inVideo = P > V_START && P < V_START + 1;
       const zone = inVideo ? .06 : target === STOPS.sets ? .3 : target >= 3 && target <= 5 ? .208 : .16;
-      if (d > .003 && d < zone) { auto = true; scrollTo({ top: toY(target), behavior: reduce ? 'auto' : 'smooth' }); }
+      const y0 = edgeY(target, false), y1 = edgeY(target, true);
+      const ty = Math.abs(scrollY - y1) < Math.abs(scrollY - y0) ? y1 : y0;   // ближайший край высокого блока
+      if (d > .003 && d < zone) { auto = true; scrollTo({ top: ty, behavior: reduce ? 'auto' : 'smooth' }); }
     };
     settleT = setTimeout(settle, 160);
   }, { passive: true });
@@ -1134,9 +1157,9 @@
     if (grpA !== body.classList.contains('grp-a')) body.classList.toggle('grp-a', grpA);
     // первый экран и наборы не рисуются, когда их полностью закрыла следующая сцена
     show(heroSec, P < 1.6); show(b2, P < 1.6); show(product, P < 1.6);
-    const k = L.hero.k + (1 - L.hero.k) * p;
+    const k = L.hero.k * (1 - p) + (L.setK || 1) * p;
     const dx = L.hero.dx * (1 - p) + cx * heroProdDepth * (1 - p);
-    const dy = L.hero.dy * (1 - p) + cy * heroProdDepth * (1 - p);
+    const dy = L.hero.dy * (1 - p) + (L.setDy || 0) * p + cy * heroProdDepth * (1 - p);
     put(product, 'transform', `translate(${fmt(dx)}px, ${fmt(dy)}px) scale(${fmt(k)})`);
     put(product, 'opacity', String(fmt(1 - clamp((lS - .05) * 2.4))));
     if (focusClone) focusClone.style.transform = product.style.transform;
@@ -1153,6 +1176,8 @@
       // интерьер проявляется с первых пикселей скролла, остальные элементы — когда коробка почти на месте
       const pe = n === b2bg ? clamp(p / .85) : clamp((p - .5 - d * .3) / .3), pl = clamp((lS - d * .15) / .35);
       styleEl(n, pe * (1 - pl), (1 - pe) * 30 - pl * 30, (1 - pe + pl) * 8);
+      // невидимые элементы наборов не перехватывают тапы (на телефоне подсказка лежит над подарком)
+      put(n, 'pointerEvents', pe * (1 - pl) > .5 ? '' : 'none');
     });
     const onSets = p > .96 && lS < .04;
     if (onSets !== product.classList.contains('b2-on')) {

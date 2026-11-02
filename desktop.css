@@ -445,6 +445,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   pointer-events: none; cursor: pointer;
 }
 .is-waiting .gift-hit { pointer-events: auto; }
+body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока подарок закрыт, текст не перехватывает тапы */
 .gift-hit:focus-visible { outline: none; }
 .is-waiting .closed:has(.gift-hit:hover) img, .closed:has(.gift-hit:focus-visible) img { filter: brightness(1.06) drop-shadow(0 0 22px rgba(255, 220, 150, .5)); }
 /* деформация: изнутри что-то рвётся наружу */
