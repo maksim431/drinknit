@@ -14,169 +14,21 @@
   <!-- десктоп и мобильная версия: разные стили и скрипты, переключение по ширине и ориентации окна -->
   <script>
     (function () {
-      var isM = function () { return innerWidth < 821 || innerWidth / innerHeight < 1; };
+      // телефон и вертикальный планшет — мобильная версия; телефон в альбомной ориентации (высота меньше 560) — тоже
+      var isM = function () { return innerWidth < 821 || innerWidth / innerHeight < 1 || innerHeight < 560; };
       var m = isM();
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-m' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      if (m) { add('preload', 'assets/box-closed.webp', 'image'); add('preload', 'assets/box-open.webp', 'image'); add('stylesheet', 'style.css'); }
+      if (m) { add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'mobile.css'); }
       else { add('preload', 'assets/d/sets/L-base.webp', 'image'); add('stylesheet', 'desktop.css'); }
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
   </script>
-  <style>html.is-d body:not(.d-ready) > :not(template):not(script) { display: none; } html.is-d { background: #002510; }</style>
+  <style>html { background: #002510; }</style>
 </head>
-<body class="is-loading">
-  <!-- scroll track: two screens, the artboard itself is fixed -->
-  <div class="track" aria-hidden="true"><div class="track__screen" id="hero"></div><div class="track__screen" id="sets"></div></div>
-
-  <!-- ============ block 3: how I knit (slides) ============ -->
-  <section class="story" id="story" aria-label="Как я вяжу">
-    <div class="story__head">
-      <h2 class="story__title">Маленькую игрушку я вяжу <br>2 часа, среднюю 7 часов</h2>
-      <p class="story__sub">Поэтому к Новому году получится только 10 наборов, и все они будут немного разными.</p>
-    </div>
-    <div class="story__pin" id="story-pin">
-      <i class="story__mark" style="top:0"></i><i class="story__mark" style="top:100vh"></i><i class="story__mark" style="top:200vh"></i>
-      <div class="story__sticky">
-        <div class="stage story__stage" id="story-stage">
-          <figure class="slide">
-            <img src="assets/story/1.webp" alt="Детали вязаного пряничного человечка: голова, туловище, ручки, ножки, клубок и крючок">
-            <figcaption class="slide__cap" style="top:901px">Каждую деталь вяжу крючком сама, потом сшиваю и набиваю игрушку вручную.</figcaption>
-          </figure>
-          <figure class="slide">
-            <img src="assets/story/2.webp" alt="Малыш обнимает вязаного пряничного человечка у ёлки">
-            <figcaption class="slide__cap" style="top:934px">Пряжа: хлопок и акрил. Игрушки мягкие и после стирки держат форму.</figcaption>
-          </figure>
-          <figure class="slide">
-            <img src="assets/story/3.webp" alt="Весы: магазинный мишка в упаковке легче, чем коробка с вязаными игрушками">
-            <figcaption class="slide__cap" style="top:901px">Одна вязаная игрушка в&nbsp;сетевом магазине стоит около 1&nbsp;600&nbsp;₽. <br>В&nbsp;наборе M их три.</figcaption>
-          </figure>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <main class="viewport" aria-label="Новогодние наборы Drinknit">
-    <div class="stage scene" id="scene">
-      <img class="shadow" src="assets/shadow.svg" alt="" aria-hidden="true">
-      <div class="glow" aria-hidden="true"></div>
-      <div class="rays" aria-hidden="true"></div>
-
-      <!-- frame 1: closed gift -->
-      <div class="closed" aria-hidden="true">
-        <img class="closed__img" src="assets/box-closed.webp" alt="">
-      </div>
-
-      <!-- frame 2: open gift (back layer) -->
-      <img class="open open--back" src="assets/box-open.webp"
-           alt="Открытая коробка: козлик, барашек, варежка, зелёный воришка, открытка и крем">
-
-      <!-- the six items, cut out along their contours (glow layer) -->
-      <div class="items" id="items" aria-hidden="true"></div>
-
-      <!-- cream frame of the first screen -->
-      <img class="frame" src="assets/frame.svg" alt="" aria-hidden="true">
-
-      <!-- open gift front layer: the lid goes over the frame -->
-      <div class="open-crop" aria-hidden="true">
-        <img class="open open--front" src="assets/box-open.webp" alt="">
-      </div>
-    </div>
-
-    <div class="stage layer" id="layer">
-      <!-- ============ screen 1 ============ -->
-      <div class="s1" id="s1">
-        <a class="logo ui" href="./" aria-label="Drinknit — вещи ручной работы" data-morph="hint">
-          <img src="assets/logo.svg" alt="" width="108" height="61">
-          <span>Вещи ручной работы</span>
-        </a>
-
-        <p class="stock ui" data-morph="chip"><span>Свободно</span><span>10 из 10 наборов</span></p>
-
-        <h1 class="title ui" data-morph="title2">
-          <span class="title__line ui">Новогодние наборы</span>
-          <span class="title__line ui">с вязаными игрушками</span>
-          <span class="title__line ui">ручной работы</span>
-        </h1>
-
-        <div class="offer">
-          <p class="offer__text ui" data-morph="desc">Свяжу, упакую и подпишу открытку вашим текстом.<br>
-            Три набора: 900, 1&nbsp;700 и 2&nbsp;400&nbsp;₽.<br>
-            До Нового года успею сделать только 10.</p>
-          <div class="offer__actions" data-morph="buy">
-            <a class="btn btn--primary ui" href="#sets" data-goto="sets">Выбрать набор</a>
-            <a class="btn btn--ghost ui" href="#contact">Написать мне</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- ============ screen 2: sets ============ -->
-      <section class="s2" id="s2" aria-label="Наборы">
-        <div class="fade-bottom" aria-hidden="true"></div>
-        <p class="hint" data-from="logo">Кликните на предмет,<br>чтобы узнать подробнее</p>
-
-        <div class="mbox" id="mbox">
-          <img class="mbox__img" src="assets/box-open.webp" alt="">
-          <div class="items items--m" id="items-m"></div>
-        </div>
-
-        <h2 class="title2" data-from="title">Три набора: <br>выберите по тому, кому дарите</h2>
-
-        <div class="tabsbar">
-          <div class="tabs" role="tablist" aria-label="Наборы">
-            <button class="tab is-active" role="tab" aria-selected="true" data-set="S">Набор S</button>
-            <button class="tab" role="tab" aria-selected="false" data-set="M">Набор M</button>
-            <button class="tab" role="tab" aria-selected="false" data-set="L">Набор L</button>
-          </div>
-        </div>
-
-        <div class="panel">
-          <p class="chip" data-from="stock"><span id="set-hours">4 часа вязания</span></p>
-          <p class="desc" id="set-desc" data-from="offer__text">Небольшой подарок учителю, воспитателю или коллеге</p>
-          <div class="buy" data-from="offer__actions">
-            <p class="price" id="set-price">900 ₽</p>
-            <a class="btn btn--primary btn--want" href="#contact" id="set-cta">Хочу набор S</a>
-          </div>
-        </div>
-      </section>
-
-      <button class="sound ui" type="button" aria-pressed="false" aria-label="Включить музыку">
-        <img src="assets/sound.svg" alt="" width="32" height="32">
-        <i class="sound__waves" aria-hidden="true"><b></b><b></b></i>
-      </button>
-    </div>
-  </main>
-
-  <div class="snow" aria-hidden="true"><i class="snow__l snow__l--far"></i><i class="snow__l snow__l--near"></i></div>
-  <canvas class="fx" id="fx" aria-hidden="true"></canvas>
-
-  <!-- item details -->
-  <div class="dim" id="dim" aria-hidden="true"></div>
-  <div class="stage focus" id="focus" aria-hidden="true"></div>
-  <div class="stage modal-stage" id="modal-stage">
-    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
-      <div class="modal__text">
-        <h3 class="modal__title" id="modal-title"></h3>
-        <div class="modal__info">
-          <p class="modal__body" id="modal-body"></p>
-          <p class="modal__note" id="modal-note"></p>
-        </div>
-      </div>
-      <div class="modal__photo">
-        <div class="modal__slides" id="modal-slides"></div>
-        <div class="modal__nav">
-          <button class="modal__arrow modal__arrow--prev" type="button" aria-label="Предыдущее фото"><img src="assets/cane.webp" alt=""></button>
-          <button class="modal__arrow modal__arrow--next" type="button" aria-label="Следующее фото"><img src="assets/cane.webp" alt=""></button>
-        </div>
-      </div>
-      <button class="modal__close" type="button" aria-label="Закрыть"><img src="assets/close.svg" alt="" width="44" height="44"></button>
-    </div>
-  </div>
-
-  <button class="skip" type="button">Пропустить</button>
-
+<body>
   <!-- ============ десктопная версия по новому макету ============ -->
   <template id="tpl-desktop">
 
@@ -480,21 +332,228 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
   </template>
 
+  <!-- ============ мобильная версия: телефоны и вертикальные планшеты ============ -->
+  <template id="tpl-mobile">
+  <div class="m-snow" aria-hidden="true"></div>
+
+  <header class="mh" id="mh">
+    <a class="mh-logo" href="#m-hero" aria-label="Drinknit — в начало"><img src="assets/d/logo.svg" width="70" height="40" alt="Drinknit"></a>
+    <div class="mh-right">
+      <a class="mh-book" href="#m-book">Забронировать</a>
+      <button class="mh-round js-sound" type="button" aria-label="Музыка играет" aria-pressed="true"><img class="ic-on" src="assets/d/ic-sound-on.svg" width="22" height="22" alt=""><img class="ic-off" src="assets/d/ic-sound-off.svg" width="22" height="22" alt=""></button>
+      <button class="mh-round mh-burger" id="m-menu-btn" type="button" aria-label="Меню" aria-expanded="false" aria-controls="m-menu"><i></i><i></i><i></i></button>
+    </div>
+  </header>
+  <nav class="m-menu" id="m-menu" aria-label="Разделы" hidden>
+    <a href="#m-sets">Наборы</a>
+    <a href="#m-kids">Для детей</a>
+    <a href="#m-terms">Сроки и доставка</a>
+    <a href="#m-faq">Частые вопросы</a>
+    <a class="btn btn-red" href="#m-book">Забронировать набор</a>
+  </nav>
+
+  <main>
+    <!-- 1. Первый экран: подарок открывается по нажатию -->
+    <section class="m-hero" id="m-hero">
+      <img class="m-ray" src="assets/d/hero-ray.svg" alt="" aria-hidden="true">
+      <div class="m-glow" aria-hidden="true"></div>
+      <div class="m-gift-wrap">
+        <img class="m-gift-shadow" src="assets/d/gift-shadow.svg" alt="" aria-hidden="true">
+        <button class="m-gift" id="m-gift" type="button" aria-label="Открыть подарок"><img src="assets/box-closed.webp" alt=""></button>
+        <img class="m-open" src="assets/d/sets/L-base.webp" alt="Открытый новогодний набор: вязаные игрушки, открытка и крем">
+      </div>
+      <div class="m-hint" aria-hidden="true">
+        <p class="m-hint-bubble">Нажми на подарок</p>
+        <div class="m-hint-goat" data-st="hintGoat"></div>
+      </div>
+      <div class="m-hero-stickers" id="m-hero-stickers" aria-hidden="true"></div>
+      <div class="m-hero-ui">
+        <p class="m-chip"><img src="assets/d/ic-gift.svg" width="20" height="20" alt=""><span>Свободно <b data-free>10</b> из <b data-total>10</b> наборов</span></p>
+        <h1 class="m-h1">Новогодние наборы с вязаными игрушками ручной работы</h1>
+        <div class="m-btns">
+          <a class="btn btn-red" href="#m-sets">Выбрать набор</a>
+          <a class="btn btn-glass" href="#" data-msg="telegram">Написать мне</a>
+        </div>
+      </div>
+      <button class="m-skip" id="m-skip" type="button">Пропустить</button>
+    </section>
+
+    <!-- 2. Наборы -->
+    <section class="m-sec m-sets" id="m-sets">
+      <img class="m-sets-bg" src="assets/d/card-bg.webp" alt="" aria-hidden="true">
+      <h2 class="m-h2 rv">Три набора: выберите для того, кому дарите</h2>
+      <div class="m-stage rv" id="m-stage" aria-label="Набор: нажмите на предмет, чтобы узнать подробнее"></div>
+      <p class="m-tap rv">Нажмите на предмет, чтобы узнать подробнее</p>
+      <div class="m-panel rv">
+        <div class="m-tabs" role="tablist" aria-label="Наборы">
+          <button type="button" role="tab" data-m-tab="S">Набор S</button>
+          <button type="button" role="tab" data-m-tab="M">Набор M</button>
+          <button type="button" role="tab" data-m-tab="L">Набор L</button>
+        </div>
+        <p class="m-for" id="m-for"></p>
+        <p class="m-hours" id="m-hours"></p>
+        <div class="m-buy">
+          <p class="m-price"><span id="m-price"></span> ₽</p>
+          <a class="btn btn-red" href="#" data-msg="telegram" id="m-want"></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Сколько вяжу -->
+    <section class="m-sec m-time" id="m-time">
+      <img class="m-time-bg" src="assets/d/b3-01.webp" alt="" aria-hidden="true">
+      <img class="m-branch m-branch-l" src="assets/d/b3-03.webp" alt="" aria-hidden="true">
+      <img class="m-branch m-branch-r" src="assets/d/b3-02.webp" alt="" aria-hidden="true">
+      <div class="m-time-text rv">
+        <h2 class="m-h2">Маленькую игрушку я вяжу 2 часа, среднюю 7 часов</h2>
+        <p class="m-lead">Поэтому к Новому году получится только 10 наборов, и все они будут немного разными</p>
+      </div>
+      <div class="m-cards rv" id="m-cards" tabindex="0" aria-label="Три карточки, листайте вбок"></div>
+      <div class="m-dots" id="m-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    </section>
+
+    <!-- переход из блока 3 в блок 4: кадры видео сменяются при прокрутке -->
+    <section class="m-video" id="m-video" aria-hidden="true">
+      <div class="m-video-sticky"><canvas id="m-video-canvas"></canvas></div>
+    </section>
+
+    <!-- 4. Для детей -->
+    <section class="m-sec m-kids" id="m-kids">
+      <div class="m-kids-pic"><img src="assets/d/b4-bg1.webp" alt="Малыш обнимает вязаного пряничного человечка у ёлки"></div>
+      <h2 class="m-h2 rv">Можно дарить детям: глазки и мелкие детали держатся на безопасном креплении</h2>
+      <div class="m-bubble rv">
+        <p>Пряжа гипоаллергенная: [какой хлопок и акрил, производитель].</p>
+        <p>Мелкие детали [пришиты или на безопасных замках], их не оторвать руками.</p>
+        <p>Подходит детям с [возраст].</p>
+        <p>Стирка: [ручная, 30°, как сушить].</p>
+      </div>
+      <div class="m-st" data-st="kidsSanta"></div>
+      <div class="m-st" data-st="kidsGoat"></div>
+      <div class="m-st" data-st="kidsDeer"></div>
+    </section>
+
+    <!-- 5. Осталось наборов и таймер -->
+    <section class="m-sec m-left" id="m-left">
+      <div class="m-st" data-st="leftClock"></div>
+      <div class="m-panel-dark rv">
+        <p class="m-left-n">Осталось<br><span data-free>10</span> из <span data-total>10</span> наборов</p>
+        <div class="m-and"><i></i><span>и</span><i></i></div>
+        <p class="m-days" id="m-days">— дней,</p>
+        <p class="m-hms" id="m-hms"></p>
+        <p class="m-cap">до окончания приёма заказов</p>
+      </div>
+      <div class="m-cta rv">
+        <a class="btn btn-red" href="#" data-msg="telegram">Забронировать набор</a>
+        <p>Напишите, какой набор хотите и что подписать на открытке. Остальное подскажу в переписке</p>
+      </div>
+      <div class="m-st" data-st="leftDeer"></div>
+      <div class="m-st" data-st="leftBear"></div>
+      <div class="m-st" data-st="leftGinger"></div>
+    </section>
+
+    <!-- 6. Сроки и доставка -->
+    <section class="m-sec m-terms" id="m-terms">
+      <div class="m-terms-pic"><img class="m-terms-wall" src="assets/d/b5-bg2.webp" alt="" aria-hidden="true"><img class="m-terms-cal" src="assets/d/b5-bg1.webp" alt="Календарь на декабрь 2026, 25-е число обведено"></div>
+      <h2 class="m-h2 rv">Чтобы набор успел к празднику, напишите до 25.12</h2>
+      <div class="m-steps rv">
+        <ol>
+          <li>Напишите мне, какой набор хотите и какой текст написать на открытке.</li>
+          <li>Я ставлю ваш набор в очередь. Вы вносите 100% предоплату за набор переводом на карту.</li>
+          <li>Вяжу и собираю набор за 1–3 дня, в зависимости от размера набора.</li>
+          <li>Получаете набор: самовывоз Нижний Новгород (район ТЦ Фантастика), Яндекс Доставка по городу или отправка по России (СДЭК / Яндекс / Озон / Почта). Доставку оплачиваете отдельно по тарифу службы.</li>
+        </ol>
+        <a class="btn btn-red" href="#" data-msg="telegram">Забронировать набор</a>
+      </div>
+      <div class="m-st" data-st="termsGoat"></div>
+    </section>
+
+    <!-- 7. Обо мне -->
+    <section class="m-sec m-about" id="m-about">
+      <h2 class="m-h2 rv">Привет, я Катя, вяжу игрушки 30 лет</h2>
+      <div class="m-stamp-about rv">
+        <div class="m-stamp-win"><img src="assets/d/katya.webp" alt="Катя, мастер"></div>
+        <p>Первые игрушки я вязала по схемам из журнала «Валентина». Сейчас придумываю свои: идеи беру из природы и ищу на небольших сайтах мастеров, куда редко заходят производители массовых игрушек.</p>
+      </div>
+      <div class="m-st" data-st="aboutMag1"></div>
+      <div class="m-st" data-st="aboutMag2"></div>
+      <div class="m-st" data-st="aboutSnow"></div>
+    </section>
+
+    <!-- 8. Финальный призыв -->
+    <section class="m-sec m-book" id="m-book">
+      <h2 class="m-h2 rv">Займите один из 10 наборов до 25.12</h2>
+      <div class="m-book-cards rv" id="m-book-cards">
+        <button class="m-bcard" type="button" data-pick="S"><span class="m-bcard-win"><img src="assets/d/card-S.webp" alt="Набор S"></span><span class="m-bcard-name">Набор S</span><span class="m-bcard-price"><span data-price="S"></span> ₽</span></button>
+        <button class="m-bcard" type="button" data-pick="M"><span class="m-bcard-win"><img src="assets/d/card-M.webp" alt="Набор M"></span><span class="m-bcard-name">Набор M</span><span class="m-bcard-price"><span data-price="M"></span> ₽</span></button>
+        <button class="m-bcard" type="button" data-pick="L"><span class="m-bcard-win"><img src="assets/d/card-L.webp" alt="Набор L"></span><span class="m-bcard-name">Набор L</span><span class="m-bcard-price"><span data-price="L"></span> ₽</span></button>
+      </div>
+      <div class="m-book-btns rv">
+        <a class="btn btn-red" href="#" data-msg="telegram">Написать в Telegram</a>
+        <a class="btn btn-red" href="#" data-msg="vk">Написать в ВК</a>
+        <a class="btn btn-red" href="#" data-msg="max">Написать в MAX</a>
+        <a class="mh-round m-vk" href="#" data-msg="vkGroup" aria-label="Группа ВКонтакте"><img src="assets/d/ic-vk.svg" width="22" height="22" alt=""></a>
+      </div>
+      <div class="m-st" data-st="bookTree"></div>
+      <div class="m-st" data-st="bookSnow"></div>
+    </section>
+
+    <!-- 9. Частые вопросы -->
+    <section class="m-sec m-faq" id="m-faq">
+      <h2 class="m-h2 rv">Частые вопросы</h2>
+      <div class="m-faq-list rv" id="m-faq-list"></div>
+      <div class="m-faq-more rv">
+        <p>Не нашли ответ? Спросите меня в переписке, отвечу сама.</p>
+        <a class="btn btn-red" href="#" data-msg="telegram">Задать вопрос</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="m-footer">
+    <img src="assets/d/logo.svg" width="130" height="74" alt="Drinknit">
+    <p class="m-ft-tag">Вещи ручной работы</p>
+    <p class="m-ft-small">Новогодние наборы с вязаными игрушками. Нижний Новгород, доставка по России.</p>
+    <div class="m-ft-cols">
+      <nav aria-label="Разделы">
+        <p class="m-ft-h">Разделы</p>
+        <a href="#m-sets">Наборы</a>
+        <a href="#m-kids">Для детей</a>
+        <a href="#m-terms">Сроки и доставка</a>
+        <a href="#m-faq">Частые вопросы</a>
+      </nav>
+      <div>
+        <p class="m-ft-h">Связаться</p>
+        <a href="#" data-msg="telegram">Telegram</a>
+        <a href="#" data-msg="vk">ВКонтакте</a>
+        <a href="#" data-msg="max">MAX</a>
+        <p>Телефон: [+7 ___ ___-__-__]</p>
+        <p>Почта: [email@example.ru]</p>
+      </div>
+    </div>
+    <p class="m-ft-small">Цены указаны в рублях. Изделия ручной работы, внешний вид может немного отличаться от фото. Доставка оплачивается отдельно по тарифу службы.</p>
+    <p class="m-ft-small">Музыка: Vlad Gluschenko — Winter Time. Лицензия CC BY 3.0.</p>
+    <p class="m-ft-small">© 2026 Drinknit</p>
+  </footer>
+
+  <div class="m-sheet-dim" id="m-dim" hidden></div>
+  <div class="m-sheet" id="m-sheet" role="dialog" aria-modal="true" aria-labelledby="m-sheet-title" hidden>
+    <button class="m-sheet-close" id="m-sheet-close" type="button" aria-label="Закрыть"><img src="assets/d/ic-close.svg" width="36" height="36" alt=""></button>
+    <div class="m-sheet-photo" id="m-sheet-photo"></div>
+    <h3 class="m-sheet-title" id="m-sheet-title"></h3>
+    <p class="m-sheet-text" id="m-sheet-text"></p>
+    <p class="m-sheet-note" id="m-sheet-note"></p>
+  </div>
+  <canvas class="m-fx" id="m-fx" aria-hidden="true"></canvas>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </template>
+
   <script>
     (function () {
-      var s = document.createElement('script');
-      if (window.__drinknitMode === 'd') {
-        var tpl = document.getElementById('tpl-desktop');
-        Array.prototype.slice.call(document.body.children).forEach(function (n) {
-          if (n !== tpl && n.tagName !== 'SCRIPT') n.remove();
-        });
-        document.body.className = 'd-ready';
-        document.body.appendChild(tpl.content);
-        s.src = 'desktop.js';
-      } else {
-        s.src = 'app.js';
-      }
-      document.body.appendChild(s);
+      var m = window.__drinknitMode === 'm';
+      var tpl = document.getElementById(m ? 'tpl-mobile' : 'tpl-desktop');
+      document.body.className = m ? 'm-ready' : 'd-ready';
+      document.body.appendChild(tpl.content);
+      var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
+      load('data.js', function () { load(m ? 'mobile.js' : 'desktop.js'); });
     })();
   </script>
 </body>
