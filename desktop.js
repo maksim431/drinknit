@@ -677,7 +677,7 @@
      Приглушённый эффект 40 %: фильтр срезает верхние частоты (как музыка из соседней комнаты).
      Играет всегда, пока не выключить кнопкой в шапке. Браузер разрешает звук только после первого
      действия посетителя (клик, клавиша, касание), поэтому до него музыка ждёт ===== */
-  const MUSIC = { src: 'assets/audio/winter-time.mp3', muffle: .4, volume: .6 };
+  const MUSIC = { src: 'assets/audio/winter-time.mp3', muffle: .4, volume: .3 };
   const sounds = $$('.js-sound');
   let soundOn = true, actx = null, mgain = null, msrc = null, mbuf = null, mloading = null;
   const syncSound = () => sounds.forEach(b => {
@@ -734,6 +734,11 @@
     if (soundOn && setupAudio()) playMusic();
   };
   KICK.forEach(ev => addEventListener(ev, kick, true));
+  // пробуем включить сразу при загрузке: браузер разрешит, если посетитель уже бывал на сайте
+  // или разрешил звук для него; иначе музыка начнётся с первого клика или нажатия клавиши
+  if (soundOn && setupAudio()) {
+    actx.resume().then(() => { if (actx.state === 'running') KICK.forEach(ev => removeEventListener(ev, kick, true)); }).catch(() => {});
+  }
   sounds.forEach(btn => btn.addEventListener('click', () => {
     soundOn = !soundOn;
     syncSound();
@@ -773,6 +778,7 @@
   // Стопор держит экран 0,3 с, колесо и инерция тачпада в это время не листают дальше,
   // потом прокрутка снова свободная
   const HOLD_MIN = 300, HOLD_MAX = 300, HOLD_GAP = 180;   // стопор держит экран 0,3 с
+  let scrollDir = 0;
   let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY;
   let lastWheel = 0;
   addEventListener('wheel', e => {
@@ -787,6 +793,7 @@
   addEventListener('scroll', () => {
     const P = toP(scrollY), P0 = toP(lastY), now = performance.now();
     lastY = scrollY;
+    if (!auto && P !== P0) scrollDir = Math.sign(P - P0);
     if (!auto && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
@@ -811,7 +818,8 @@
       if (html.classList.contains('is-locked') || !modal.hidden) return;
       // колесо ещё крутят — проверим чуть позже
       if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
-      const P = toP(scrollY), target = Math.round(P), d = Math.abs(P - target);
+      // доезжаем только до экрана по направлению прокрутки — назад к экрану, с которого уходят, не тянем
+      const P = toP(scrollY), target = scrollDir > 0 ? Math.ceil(P - 1e-4) : scrollDir < 0 ? Math.floor(P + 1e-4) : Math.round(P), d = Math.abs(P - target);
       if (d > .003 && d < .16) { auto = true; scrollTo({ top: toY(target), behavior: reduce ? 'auto' : 'smooth' }); }
     };
     settleT = setTimeout(settle, 160);
