@@ -4,7 +4,7 @@
 
 /* Кадр */
 html.is-p #stage { width: 390px; height: 844px; }
-html.is-p .scr { width: calc(390px + 2 * var(--px, 0px)); height: calc(844px + 2 * var(--py, 0px)); }
+html.is-p .scr { width: calc(390px + 2 * var(--px, 0px)); height: calc(844px + 2 * var(--py, 0px) + var(--ext, 0px)); }
 html.is-p .fr { width: 390px; height: 844px; }
 html.is-p .track > div { height: calc(var(--vh, 1vh) * 100); }
 html.is-p .track > .track-video { height: calc(var(--vh, 1vh) * 150); }
@@ -55,7 +55,7 @@ html.is-p .hero-content { left: 3px; top: 527px; width: 385px; height: 277px; ju
 html.is-p .chip { gap: 6.92px; padding: 8.3px 15.22px; border-radius: 11.07px; font-size: 13.83px; }
 html.is-p .chip img { width: 16.6px; height: 16.6px; }
 html.is-p .h1 { width: 384.57px; font-size: 22px; line-height: 31.75px; letter-spacing: .747px; }
-html.is-p .row-btns { flex-direction: column; width: 280px; gap: 4px; }
+html.is-p .row-btns { flex-direction: column; width: 359px; gap: 4px; }
 html.is-p .row-btns .btn { width: 100%; height: 48px; font-size: 14px; }
 /* подсказка «Нажми на подарок» (в мобильном макете не нарисована) */
 html.is-p .gift-hint-bubble { left: 8px; top: 660px; width: 236px; height: 137px; }
@@ -116,8 +116,8 @@ html.is-p .b4-shade {
   background: linear-gradient(180deg, #547490 204.5px, rgba(84, 116, 144, 0) 376.6px);
 }
 html.is-p .b4-shade2 { display: block; position: absolute; left: -40px; width: 470px; top: 707px; height: 389px; background: linear-gradient(180deg, rgba(51, 103, 71, 0) 0%, #012711 32.21%); }
-html.is-p .b4-title { left: 10px; top: 87px; width: 370px; }
-html.is-p .b4-bubble { left: 12.45px; top: 811.5px; width: 390.1px; height: 186.75px; opacity: .94; }
+html.is-p .b4-title { left: 10px; top: 107px; width: 370px; }
+html.is-p .b4-bubble { left: 12.45px; top: 719.5px; width: 390.1px; height: 186.75px; opacity: .94; }
 html.is-p .b4-bubble-d { display: none; }
 html.is-p .b4-bubble-m { display: block; position: absolute; left: -1.75px; top: -2.07px; width: 367px; height: 182px; max-width: none; transform: scaleX(-1); }
 html.is-p .b4-bubble p { left: 27.67px; top: 24.96px; width: 337.53px; font-size: 12.45px; line-height: 17.43px; }
@@ -150,7 +150,7 @@ html.is-p .b6-steps { left: 26px; top: 617px; width: 339px; padding-left: 17.98p
 html.is-p .b6-btn { left: 28px; top: 866px; width: 333px; }
 
 /* 7. Обо мне */
-html.is-p .b7-title { width: 390px; top: 76.94px; }
+html.is-p .b7-title { width: 390px; top: 96.94px; }
 html.is-p .b7-card-wrap { left: 35px; top: 248.5px; scale: .6917; transform-origin: 0 0; }
 html.is-p .stamp-about .stamp-cap { font-size: 17px; }
 
@@ -175,7 +175,7 @@ html.is-p .faq-a { font-size: 13.5px; line-height: 1.45; }
 html.is-p .faq-more p { font-size: 12.5px; max-width: 200px; }
 
 /* Подвал */
-html.is-p .footer { top: calc(844px + var(--py, 0px)); width: calc(390px + 2 * var(--px, 0px)); padding: 38.73px calc(19.37px + var(--px, 0px)) 30.43px; border-top-width: .69px; }
+html.is-p .footer { top: calc(844px + var(--py, 0px) + var(--ext, 0px)); width: calc(390px + 2 * var(--px, 0px)); padding: 38.73px calc(19.37px + var(--px, 0px)) 30.43px; border-top-width: .69px; }
 html.is-p .ft-in { grid-template-columns: 1fr 1fr; gap: 27.67px 19.37px; }
 html.is-p .ft-brand { grid-column: 1 / -1; gap: 8.3px; }
 html.is-p .ft-col { gap: 8.3px; font-size: 14.53px; line-height: 21.06px; }

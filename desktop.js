@@ -99,7 +99,7 @@
   const STICKERS_P = {
     hero: [null, [273, 175, 140.45, 140.24, 106.32, 105.9, 24.26], null,
       [133.95, 93.01, 141.26, 155.04, 121.35, 137.89, 8.92], [-24, 126, 189.68, 200.66, 146.93, 163.82, -17.65], null],
-    kids: [[275, 367, 126.84, 131.49, 97.02, 104.75, 19.86], [44, 902, 240.66, 258.37, 207.5, 228.79, -8.98], [156.33, 594.3, 155.27, 166.23, 126.61, 141.26, -13.07]],
+    kids: [[275, 367, 126.84, 131.49, 97.02, 104.75, 19.86], [44, 810, 240.66, 258.37, 207.5, 228.79, -8.98], [166.33, 554.3, 155.27, 166.23, 126.61, 141.26, -13.07]],
     left: [[85.79, 46, 238.5, 238.5, 213.9, 213.9, 7.04], [15, 661, 183.91, 184.67, 142.29, 143.6, 20.73], null, [-43.97, 113.61, 171.54, 181.95, 141.45, 155.13, -12.44],
       [214, 703, 139.66, 140.27, 123.11, 123.83, -8.28], null, [285, 159.96, 130, 150.04, 130, 150.04, 0]],
     terms: [[86, 852, 344.77, 397.4, 269.12, 341.81, 'rotate(-165.79deg) scaleY(-1)']],
@@ -180,6 +180,7 @@
     const walk = (el, oy, list) => {
       [...el.children].forEach(n => {
         const cls = typeof n.className === 'string' ? n.className : '';
+        if (cls.includes('hero-fade')) { cutTargets.push({ n, k: -1 }); return; }   // затемнение едет вместе с текстом
         if (FIXED.test(cls)) return;
         if (BOXED.test(cls)) { cutTargets.push({ n, box: true }); return; }
         if (HOSTS.test(cls)) { walk(n, oy + n.offsetTop, list); return; }
@@ -217,7 +218,7 @@
     CUT = cut;
     // коробка первого экрана: верх под шапкой, низ над плашкой «Свободно…»
     const top = 110 - Math.min(30, cut * .5);                       // верх коробки на экране
-    const hk = Math.max(.55, Math.min(1, (527 - 2 * cut + 43 - top) / 460));
+    const hk = Math.max(.6, Math.min(1, (527 - 2 * cut + 43 + Math.min(40, cut * .6) - top) / 460));   // низ коробки может уйти под затемнение
     const delta = top + cut - (392.5 - 282.5 * hk);                // сдвиг центра коробки
     L.hero.k = BASE.hero.k * hk;
     L.hero.dy = BASE.hero.dy + delta;
@@ -245,8 +246,15 @@
     if (typeof sizeFooterRef === 'function') sizeFooterRef();
   }
   let sizeFooterRef = null;
+  // высота экрана для раскладки и прокрутки. На телефоне адресная строка браузера прячется и появляется при прокрутке,
+  // и innerHeight меняется на лету — раскладка и соответствие «прокрутка ↔ экран» от этого прыгали.
+  // Поэтому берём наименьшую высоту при текущей ширине; лишняя полоса снизу просто заполняется фоном (--ext)
+  let VHs = innerHeight;
+  const VH = () => VHs;
   const resize = () => {
-    const vw = html.clientWidth, vh = innerHeight;
+    const vw = html.clientWidth, vhNow = innerHeight;
+    if (!PORTRAIT || Math.abs(vw - lastVW) > 1 || !lastVH) VHs = vhNow; else VHs = Math.min(VHs, vhNow);
+    const vh = VHs;
     // телефон: кадр 390 px по ширине экрана. Если экран короче кадра, кадр обрезается сверху и снизу поровну,
     // а элементы сдвигаются к краям (applyCut). Совсем низкие окна — кадр не короче 640 px
     s = PORTRAIT ? Math.min(vw / FW, vh / 640) : Math.min(vw / FW, vh / FH);
@@ -261,12 +269,13 @@
     vp.style.setProperty('--py', `${py}px`);
     vp.style.setProperty('--k', Math.max((FW + 2 * px) / FW, (FH + 2 * py) / FH).toFixed(4));
     // высота экрана прокрутки в пикселях: на телефоне 100vh не совпадает с видимой высотой окна
-    if (!PORTRAIT || Math.abs(vw - lastVW) > 1 || !lastVH) { lastVW = vw; lastVH = vh; html.style.setProperty('--vh', `${vh / 100}px`); }
+    if (vh !== lastVH || Math.abs(vw - lastVW) > 1) { lastVW = vw; lastVH = vh; html.style.setProperty('--vh', `${vh / 100}px`); }
+    vp.style.setProperty('--ext', `${Math.max(0, vhNow - vh) / s}px`);
     // фоны растягиваются от центра кадра
     cdpr = Math.min(devicePixelRatio || 1, 1.25);
     if (PORTRAIT) applyCut(Math.max(0, (FH - vh / s) / 2));
     fx.width = Math.round(vw * cdpr);
-    fx.height = Math.round(vh * cdpr);
+    fx.height = Math.round(vhNow * cdpr);
   };
 
   /* ===== Частицы «новогоднего волшебства» (движок с прошлой версии сайта), координаты сцены 1920 × 1080 ===== */
@@ -865,7 +874,7 @@
   buildSegs();
   const holdF = {};                 // насколько пройден спуск по высокому блоку, 0…1
   const toP = y => {
-    const u = y / innerHeight;
+    const u = y / VH();
     let off = 0;
     for (const g of SEGS) holdF[g.p] = 0;
     for (const g of SEGS) {
@@ -885,10 +894,10 @@
     let off = 0;
     for (const g of SEGS) {
       if (P <= g.p) break;
-      if (g.span && P < g.p + g.span) return (g.p + off + (P - g.p) * g.len) * innerHeight;
+      if (g.span && P < g.p + g.span) return (g.p + off + (P - g.p) * g.len) * VH();
       off += g.len - g.span;
     }
-    return (P + off) * innerHeight;
+    return (P + off) * VH();
   };
   let auto = false;          // прокрутку ведёт сам сайт (меню, доезжание)
   const goTo = hash => {
@@ -942,7 +951,7 @@
   }, { passive: false });
   // у высокого блока (участок спуска) два края: верх — toY(k), низ — после спуска. Сверху страница встаёт на верх,
   // снизу — на низ; доезжание выбирает ближайший край
-  const holdPx = k => { const g = SEGS.find(g => !g.span && g.p === k); return g ? g.len * innerHeight : 0; };
+  const holdPx = k => { const g = SEGS.find(g => !g.span && g.p === k); return g ? g.len * VH() : 0; };
   const edgeY = (k, bottom) => toY(k) + (bottom ? holdPx(k) : 0);
   let holdY = 0;
   addEventListener('scroll', () => {
@@ -951,7 +960,7 @@
     if (!auto && !touching && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
-        if (Math.abs(scrollY - holdY) > innerHeight * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; }
+        if (Math.abs(scrollY - holdY) > VH() * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; }
       } else {
         // первый экран, который скролл проскочил за это событие
         // допуск 0,01 экрана: позиция прокрутки округляется до пикселей, и экран может оказаться чуть дальше целого —
@@ -1094,7 +1103,10 @@
   // где карточки наборов стоят под карточкой Кати: считаем по раскладке, чтобы работало в обоих кадрах
   let B8 = null;
   const measureB8 = () => {
+    const kSaved = katyaCopy.style.transform;
+    katyaCopy.style.transform = 'none';             // мерим по карточке в покое, а не в середине её анимации
     const kr = katyaCopy.getBoundingClientRect();
+    katyaCopy.style.transform = kSaved;
     const kx = kr.left + kr.width / 2, ky = kr.top + kr.height / 2;
     const saved = b8cards.map(c => c.style.transform);
     b8cards.forEach(c => { c.style.transform = 'none'; });
@@ -1129,8 +1141,8 @@
   let footerP = 0;   // высота подвала в «экранах»
   const sizeFooter = () => {
     const h = footer.offsetHeight;            // в координатах кадра
-    footerP = h * s / innerHeight;
-    trackFooter.style.height = `${h * s + HOLD_TOTAL * innerHeight}px`;
+    footerP = h * s / VH();
+    trackFooter.style.height = `${h * s + HOLD_TOTAL * VH()}px`;
   };
   addEventListener('resize', sizeFooter);
   sizeFooterRef = sizeFooter;
@@ -1139,7 +1151,7 @@
     const hsum = (holdF[8] || 0) + (holdF[10] || 0) * 7 + (holdF[5] || 0) * 3 + (holdF[6] || 0) * 13;
     const moved = dP > 0 || hsum !== lastH;
     lastH = hsum;
-    const up = Math.max(0, P - LAST) * innerHeight / s;
+    const up = Math.max(0, P - LAST) * VH() / s;
     put(faqSec, 'transform', up ? `translateY(${fmt(-up)}px)` : '');
     put(footer, 'transform', up ? `translateY(${fmt(-up)}px)` : '');
     const rawP = P;
