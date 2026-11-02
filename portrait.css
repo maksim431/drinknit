@@ -196,6 +196,6 @@ html.is-p .scroll-arrow { display: block; position: absolute; left: 183px; width
 html.is-p .hero-arrow { top: 808px; }
 html.is-p body:not(.is-ui) .hero-arrow { visibility: hidden; }
 html.is-p .b3-arrow1 { top: 498px; }
-html.is-p .b3-arrow2 { top: 1579px; }
+html.is-p .b3-arrow2 { top: 1119px; }
 @keyframes arrowDown { from { transform: translateY(-4px); } to { transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) { html.is-p .scroll-arrow { animation: none; } }
