@@ -5,7 +5,31 @@
   const { CONFIG, SETS, FAQ, DETAILS, LAYERS, CARDS } = window.DRINKNIT;
 
   const SET_K = { S: .7314, M: 1, L: 1 };      // набор S в макете меньше
-  const PROD = { x: 122.97, y: -125, w: 1787, h: 1334 };   // коробка на экране наборов
+
+  // Две раскладки одного лендинга: горизонтальный кадр 1920 × 1080 (компьютер, планшет в альбомной ориентации)
+  // и вертикальный 600 × 1200 (телефон, вертикальный планшет). Анимации одни и те же, меняются только координаты
+  const PORTRAIT = document.documentElement.classList.contains('is-p');
+  const FW = PORTRAIT ? 600 : 1920, FH = PORTRAIT ? 1200 : 1080, CX = FW / 2, CY = FH / 2;
+  const L = PORTRAIT ? {
+    prod: { x: -307, y: 200, w: 1167, h: 871 },        // коробка на экране наборов
+    hero: { dx: 0, dy: -120, k: 1.06 },                // коробка на первом экране относительно экрана наборов
+    mouth: { x: 300, y: 440 }, boxc: { x: 300, y: 500 }, gift: { x: 300, y: 470 },
+    b3pan: 817, b3origin: [300 + 141, 600 + 100 + 817],
+    v0: { x: -128.2, y: 307.8, w: 1585.8, h: 892 }, vanchor: [189, 843],
+    kidsBg: { x: -1145, y: -50, w: 2330, h: 1300 },
+    flip: [300, 700],
+  } : {
+    prod: { x: 122.97, y: -125, w: 1787, h: 1334 },
+    hero: { dx: -59.47, dy: -251.5, k: 1.1834 },
+    mouth: { x: 960, y: 380 }, boxc: { x: 960, y: 470 }, gift: { x: 960, y: 430 },
+    b3pan: 1316, b3origin: [960 + 15, 540 + 166 + 1316],
+    v0: { x: 0, y: 0, w: 1920, h: 1080 }, vanchor: [300, 820],
+    kidsBg: { x: -236, y: -22, w: 2156, h: 1203 },
+    flip: [960, 672],
+  };
+  const PROD = L.prod;
+  // координаты искр, заданные для кадра 1920 × 1080, в текущем кадре
+  const sx0 = x => x * FW / 1920, sy0 = y => y * FH / 1080;
 
   // Стикеры: [картинка, left, top, w, h, ширина, высота, поворот, img left%, top%, w%, h%, глубина параллакса, тень]
   const STICKERS = {
@@ -65,9 +89,25 @@
   let scene = 0;            // ближайшая остановка скролла
 
   /* ===== Стикеры ===== */
+  // вертикальный кадр: свои места и размер стикеров [left, top, масштаб]; null — стикер не показываем
+  const STICKERS_P = {
+    hero: [[-36, 660, .55], [452, 96, .62], [470, 640, .6], [-6, 470, .62], [6, 92, .6], [470, 440, .6]],
+    kids: [[452, 250, .62], [-40, 960, .5], [400, 1010, .6]],
+    left: [[205, 50, .52], [-30, 980, .5], [-24, 250, .58], [-20, 1040, null], [470, 230, .55], [440, 1000, .55], [455, 640, null]],
+    terms: [[428, 1020, .44]],
+    about: [[-70, 1000, .45], [-50, 290, .45], [0, 0, null], [440, 1010, .45], [0, 0, null], [0, 0, null], [470, 300, .5], [-46, 680, .45]],
+    book: [[-24, 930, .55], [-40, 960, null], [452, 920, .55], [430, 990, null]],
+    faq: [null, null],
+  };
   for (const [set, list] of Object.entries(STICKERS)) {
     const host = $(`.stickers[data-set="${set}"]`);
     list.forEach(([src, l, t, w, h, iw, ih, rot, il, it, iwp, ihp, d, shadow = true], i) => {
+      if (PORTRAIT) {
+        const pp = STICKERS_P[set] && STICKERS_P[set][i];
+        if (!pp || pp[2] == null) return;
+        const k = pp[2];
+        [l, t, w, h, iw, ih] = [pp[0], pp[1], w * k, h * k, iw * k, ih * k];
+      }
       const el = document.createElement('div');
       el.className = 'stk pop';
       el.style.cssText = `left:${l}px;top:${t}px;width:${w}px;height:${h}px;--d:${(set === 'hero' ? .5 : .55) + i * .09}s`;
@@ -94,16 +134,16 @@
   const fx = $('#fx');
   const ctx = fx.getContext('2d');
   const bgls = $$('.bgl');
-  let s = 1, tx = 0, ty = 0, cdpr = 1;
+  let s = 1, tx = 0, ty = 0, cdpr = 1, lastVW = 0, lastVH = 0;
   // фоны растягиваются от центра кадра; считаем один раз, координаты кадра от размера окна не зависят
-  bgls.forEach(el => { el.style.transformOrigin = `${960 - el.offsetLeft}px ${540 - el.offsetTop}px`; });
+  bgls.forEach(el => { el.style.transformOrigin = `${CX - el.offsetLeft}px ${CY - el.offsetTop}px`; });
   // фон блока 3 растягиваем от точки, которая в конце спуска стоит в центре экрана — там он совмещён с первым кадром видео
-  $('.b3-l01').style.transformOrigin = `${960 + 15}px ${540 + 166 + 1316}px`;
+  $('.b3-l01').style.transformOrigin = `${L.b3origin[0]}px ${L.b3origin[1]}px`;
   const resize = () => {
     const vw = html.clientWidth, vh = innerHeight;
-    s = Math.min(vw / 1920, vh / 1080);
-    tx = (vw - 1920 * s) / 2;
-    ty = (vh - 1080 * s) / 2;
+    s = Math.min(vw / FW, vh / FH);
+    tx = (vw - FW * s) / 2;
+    ty = (vh - FH * s) / 2;
     const px = tx / s, py = ty / s;
     vp.style.setProperty('--s', s);
     html.style.setProperty('--s', s);
@@ -111,7 +151,9 @@
     vp.style.setProperty('--ty', `${ty}px`);
     vp.style.setProperty('--px', `${px}px`);
     vp.style.setProperty('--py', `${py}px`);
-    vp.style.setProperty('--k', Math.max((1920 + 2 * px) / 1920, (1080 + 2 * py) / 1080).toFixed(4));
+    vp.style.setProperty('--k', Math.max((FW + 2 * px) / FW, (FH + 2 * py) / FH).toFixed(4));
+    // высота экрана прокрутки в пикселях: на телефоне 100vh не совпадает с видимой высотой окна
+    if (!PORTRAIT || Math.abs(vw - lastVW) > 1 || !lastVH) { lastVW = vw; lastVH = vh; html.style.setProperty('--vh', `${vh / 100}px`); }
     // фоны растягиваются от центра кадра
     cdpr = Math.min(devicePixelRatio || 1, 1.25);
     fx.width = Math.round(vw * cdpr);
@@ -121,8 +163,8 @@
   /* ===== Частицы «новогоднего волшебства» (движок с прошлой версии сайта), координаты сцены 1920 × 1080 ===== */
   const rand = (a, b) => a + Math.random() * (b - a);
   const pick = arr => arr[(Math.random() * arr.length) | 0];
-  const MOUTH = { x: 960, y: 380 };     // откуда вырывается волшебство при открытии
-  const BOXC = { x: 960, y: 470 };
+  const MOUTH = L.mouth;     // откуда вырывается волшебство при открытии
+  const BOXC = L.boxc;
   const parts = [];
   const MAX_PARTS = 280;
   let flash = 0, ring = null, dustUntil = 0, twinkleOn = false, twinkleAcc = 0;
@@ -238,7 +280,7 @@
       g.addColorStop(1, 'rgba(255,230,170,0)');
       ctx.globalAlpha = 1;
       ctx.fillStyle = g;
-      ctx.fillRect(-500, -500, 2920, 2080);
+      ctx.fillRect(-1500, -1500, FW + 3000, FH + 3000);
       flash = Math.max(0, flash - dt * 1.6);
     }
     if (ring) {
@@ -440,7 +482,7 @@
     from.style.zIndex = 1;
     const k = SET_K[key];
     const cx = PROD.x + PROD.w / 2, cy = PROD.y + PROD.h * .55;
-    const DUR = reduce ? 1 : 1100, MAXR = 1250, FEATHER = 160;
+    const DUR = reduce ? 1 : 1100, MAXR = 1250 * PROD.w / 1787, FEATHER = 160 * PROD.w / 1787;
     const t0 = performance.now();
     const step = now => {
       const t = clamp((now - t0) / DUR);
@@ -455,7 +497,7 @@
       for (let i = 0; i < 9; i++) {
         const a = rand(0, Math.PI * 2), r = R * k * rand(.92, 1.02);
         const x = cx + Math.cos(a) * r, y = cy + Math.sin(a) * r * .9;
-        if (x > 100 && x < 1900 && y > -100 && y < 1100) mote(x, y, { vx: Math.cos(a) * rand(40, 160), vy: Math.sin(a) * rand(40, 160) - 50, size: rand(2, 5) });
+        if (x > 0 && x < FW && y > -100 && y < FH + 20) mote(x, y, { vx: Math.cos(a) * rand(40, 160), vy: Math.sin(a) * rand(40, 160) - 50, size: rand(2, 5) });
       }
       if (t < 1) { requestAnimationFrame(step); return; }
       to.style.webkitMaskImage = to.style.maskImage = '';
@@ -543,7 +585,7 @@
     flipImg.src = c.src;
     flipImg.style.cssText = `width:${c.w}px;height:${c.h}px;transform:translate(calc(-50% + ${c.dx}px), calc(-50% + ${c.dy}px))`;
     flipCap.innerHTML = c.cap;
-    if (cardIdx >= 0) burst(960, 672, 50, 1.1);
+    if (cardIdx >= 0) burst(L.flip[0], L.flip[1], 50, 1.1);
     cardIdx = i;
   };
   setCard(0);
@@ -770,7 +812,8 @@
   /* ===== Параллакс от мыши ===== */
   const depthEls = $$('[data-d]');
   let mx = 0, my = 0, cx = 0, cy = 0;
-  addEventListener('mousemove', e => {
+  const noParallax = PORTRAIT || matchMedia('(hover: none)').matches;   // на телефоне и планшете параллакса от мыши нет
+  if (!noParallax) addEventListener('mousemove', e => {
     mx = e.clientX / innerWidth * 2 - 1;
     my = e.clientY / innerHeight * 2 - 1;
   });
@@ -826,7 +869,9 @@
     for (let k = 0; k < 4; k++) pump();
   };
   // геометрия кадра: в начале — ровно экран (низ фона блока 3 и есть первый кадр), в конце — как фон блока 4
-  const V0 = { x: 0, y: 0, w: 1920, h: 1080 }, V1 = { x: -11.8, y: -4.8, w: 1940.4, h: 1091.5 };   // подобрано по совпадению кадров с фонами
+  // последний кадр видео относительно фона блока 4 (подобрано по совпадению кадров с фоном)
+  const KB = L.kidsBg;
+  const V0 = L.v0, V1 = { x: KB.x + .1040 * KB.w, y: KB.y + .0143 * KB.h, w: .9000 * KB.w, h: .9073 * KB.h };
   const drawFrame = t => {
     let i = Math.round(t * (FRAMES - 1));
     if (!frames[i]) {   // ближайший загруженный
@@ -843,12 +888,12 @@
     const e = easeIO(t);
     let r = { x: V0.x + (V1.x - V0.x) * e, y: V0.y + (V1.y - V0.y) * e, w: V0.w + (V1.w - V0.w) * e, h: V0.h + (V1.h - V0.h) * e };
     // координаты кадра 1920 × 1080 → холст (с полями до краёв окна и растяжением фонов --k)
-    const px = tx / s, py = ty / s, k = Math.max((1920 + 2 * px) / 1920, (1080 + 2 * py) / 1080);
-    const sx = W / (1920 + 2 * px), sy = H / (1080 + 2 * py);
-    const X = x => (960 + (x - 960) * k + px) * sx, Y = y => (540 + (y - 540) * k + py) * sy;
+    const px = tx / s, py = ty / s, k = Math.max((FW + 2 * px) / FW, (FH + 2 * py) / FH);
+    const sx = W / (FW + 2 * px), sy = H / (FH + 2 * py);
+    const X = x => (CX + (x - CX) * k + px) * sx, Y = y => (CY + (y - CY) * k + py) * sy;
     let x0 = X(r.x), y0 = Y(r.y), x1 = X(r.x + r.w), y1 = Y(r.y + r.h);
     // кадр всегда закрывает весь экран: если не хватает, увеличиваем его от домика (точки совмещения с блоком 3)
-    const ax = X(300), ay = Y(820);
+    const ax = X(L.vanchor[0]), ay = Y(L.vanchor[1]);
     // в самом начале кадр точно совмещён с блоком 3, а непокрытый край закрывает фон блока 3 под холстом
     const fc = Math.max(1, ax / Math.max(1e-3, ax - x0), (W - ax) / Math.max(1e-3, x1 - ax), ay / Math.max(1e-3, ay - y0), (H - ay) / Math.max(1e-3, y1 - ay));
     const f = 1 + (fc - 1) * clamp(t / .15);
@@ -860,7 +905,19 @@
   const b3bg = $('#b3-bg'), b3fg = $('#b3-fg'), b3text = $('#b3-textwrap'), b3card = $('#b3-card');
   const b8cards = $$('.b8-card');
   const b8fill = $('.b8-fill');
-  const B8 = [534.5, 960.5, 1386.5].map(x => ({ ox: 960 - x, oy: 324.5 }));
+  // где карточки наборов стоят под карточкой Кати: считаем по раскладке, чтобы работало в обоих кадрах
+  let B8 = null;
+  const measureB8 = () => {
+    const kr = katyaCopy.getBoundingClientRect();
+    const kx = kr.left + kr.width / 2, ky = kr.top + kr.height / 2;
+    const saved = b8cards.map(c => c.style.transform);
+    b8cards.forEach(c => { c.style.transform = 'none'; });
+    B8 = b8cards.map(c => {
+      const r = c.getBoundingClientRect(), u = r.width / c.offsetWidth;
+      return { ox: (kx - (r.left + r.width / 2)) / u, oy: (ky - (r.top + r.height / 2)) / u, k: kr.width / r.width - 1 };
+    });
+    b8cards.forEach((c, j) => { c.style.transform = saved[j]; });
+  };
 
   const fmt = v => Math.round(v * 1000) / 1000;
   // запись в стиль только если значение изменилось: без лишних пересчётов страницы
@@ -915,9 +972,9 @@
     if (grpA !== body.classList.contains('grp-a')) body.classList.toggle('grp-a', grpA);
     // первый экран и наборы не рисуются, когда их полностью закрыла следующая сцена
     show(heroSec, P < 1.6); show(b2, P < 1.6); show(product, P < 1.6);
-    const k = 1.1834 + (1 - 1.1834) * p;
-    const dx = -59.47 * (1 - p) + cx * heroProdDepth * (1 - p);
-    const dy = -251.5 * (1 - p) + cy * heroProdDepth * (1 - p);
+    const k = L.hero.k + (1 - L.hero.k) * p;
+    const dx = L.hero.dx * (1 - p) + cx * heroProdDepth * (1 - p);
+    const dy = L.hero.dy * (1 - p) + cy * heroProdDepth * (1 - p);
     put(product, 'transform', `translate(${fmt(dx)}px, ${fmt(dy)}px) scale(${fmt(k)})`);
     put(product, 'opacity', String(fmt(1 - clamp((lS - .05) * 2.4))));
     if (focusClone) focusClone.style.transform = product.style.transform;
@@ -926,7 +983,8 @@
     show(heroContent.parentNode.querySelector('.hero-ray'), fade > 0);
     put(heroContent, 'transform', `translateY(${fmt(-40 * (1 - fade))}px)`);
     put(heroContent, 'pointerEvents', fade > .5 ? '' : 'none');
-    if (p > .1 && !heroBurst && body.classList.contains('is-done')) { heroBurst = true; area(300, 200, 1320, 800, 120); }
+    if (noParallax) mouseMoving = false;
+    if (p > .1 && !heroBurst && body.classList.contains('is-done')) { heroBurst = true; area(sx0(300), sy0(200), sx0(1320), sy0(800), 120); }
     if (p < .05) heroBurst = false;
     if (!moved) return;                      // дальше всё зависит только от скролла
     b2els.forEach(({ n, d }) => {
@@ -977,7 +1035,7 @@
     // 2 → 3: свободный скролл по высокому блоку — фон и карточка едут ровно вместе со скроллом, без замедлений;
     // заголовок и обе ветки стоят на месте, заголовок постепенно гаснет, карточка появляется
     const pan = clamp(P - 2);
-    const panY = `translateY(${fmt(-1316 * pan)}px)`;
+    const panY = `translateY(${fmt(-L.b3pan * pan)}px)`;
     put(b3bg, 'transform', panY);
     put(b3fg, 'transform', panY);
     put(b3text, 'opacity', String(fmt(1 - clamp(pan / .55))));
@@ -1011,24 +1069,26 @@
 
     // 9 → 10: из-за карточки Кати вылетают три карточки наборов — соосно, без поворота, потом карточка Кати исчезает
     const eb = clamp(P - 9), eq = easeIO(clamp((eb - .08) / .72));
+    if (!B8 && eb > 0) measureB8();
     b8fill.style.opacity = fmt(clamp(eb / .6));
     b8cards.forEach((c, j) => {
-      const o = B8[j];
-      c.style.transform = `translate(${fmt(o.ox * (1 - eq))}px, ${fmt(o.oy * (1 - eq))}px) scale(${fmt(1 + .353 * (1 - eq))})`;
+      const o = B8 && B8[j];
+      if (!o) return;
+      c.style.transform = `translate(${fmt(o.ox * (1 - eq))}px, ${fmt(o.oy * (1 - eq))}px) scale(${fmt(1 + o.k * (1 - eq))})`;
       c.style.opacity = eb > 0 ? 1 : 0;
       c.style.zIndex = j === 1 ? 2 : 1;
     });
     // карточка Кати уходит вниз, пока карточки наборов поднимаются, — без наложения полупрозрачных слоёв
     const kf = easeIO(clamp((eb - .22) / .5));
     katyaCopy.style.opacity = fmt(1 - clamp((kf - .35) / .65));
-    katyaCopy.style.transform = `translateY(${fmt(kf * 420)}px) scale(${fmt(1 - .12 * kf)})`;
+    katyaCopy.style.transform = `translateY(${fmt(kf * FH * .39)}px) scale(${fmt(1 - .12 * kf)})`;
     katyaCopy.style.visibility = kf >= 1 ? 'hidden' : '';
 
     // искры во время смены сцен, сколько — зависит от скорости скролла
     const f = P - Math.floor(P);
     if (dP > 0 && dP < 1 && f > .04 && f < .96 && !reduce) {
       const n = Math.min(14, Math.round(dP * 180));
-      for (let j = 0; j < n; j++) mote(rand(0, 1920), rand(80, 1000), { vy: rand(-150, -40), size: rand(2, 4.5) });
+      for (let j = 0; j < n; j++) mote(rand(0, FW), rand(FH * .07, FH * .93), { vy: rand(-150, -40), size: rand(2, 4.5) });
     }
   };
 
@@ -1088,8 +1148,8 @@
   // стикеры вылетают из центра коробки, по очереди
   $$('.stickers[data-set="hero"] .stk').forEach((el, i) => {
     const x = el.offsetLeft + el.offsetWidth / 2, y = el.offsetTop + el.offsetHeight / 2;
-    el.style.setProperty('--fx', `${960 - x}px`);
-    el.style.setProperty('--fy', `${430 - y}px`);
+    el.style.setProperty('--fx', `${L.gift.x - x}px`);
+    el.style.setProperty('--fy', `${L.gift.y - y}px`);
     el.style.setProperty('--fr', `${(i % 2 ? 1 : -1) * (25 + i * 7)}deg`);
     el.style.setProperty('--fd', `${.05 + i * .07}s`);
   });
