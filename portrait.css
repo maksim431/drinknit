@@ -7,7 +7,7 @@ html.is-p #stage { width: 390px; height: 844px; }
 html.is-p .scr { width: calc(390px + 2 * var(--px, 0px)); height: calc(844px + 2 * var(--py, 0px) + var(--ext, 0px)); }
 html.is-p .fr { width: 390px; height: 844px; }
 html.is-p .track > div { height: calc(var(--vh, 1vh) * 100); }
-html.is-p .track > .track-video { height: calc(var(--vh, 1vh) * 150); }
+html.is-p .track > .track-video { height: calc(var(--vh, 1vh) * 187.5); }
 html.is-p .h1, html.is-p .h2, html.is-p .b5-left { -webkit-text-stroke: 1.2px var(--cream); }
 html.is-p .h2 { font-size: 22.13px; line-height: 30.99px; letter-spacing: .996px; }
 html.is-p .btn { padding: 11.07px 20.75px; font-size: 13.14px; border-width: 1.383px; }
@@ -20,7 +20,7 @@ html.is-p .snow-all .near { --sz: calc(.43 * var(--s, 1)); --th: calc(1064px * .
 /* Шапка: логотип, «Забронировать набор», звук и меню разделов */
 html.is-p #header { width: 390px; top: var(--cut, 0px); }   /* шапка у верха экрана, даже если кадр обрезан */
 html.is-p .hd { display: none; }
-html.is-p .hd2 { left: 0; top: 0; width: 390px; height: 85.91px; padding: 0 20px; transform: translateY(-16px); justify-content: space-between; gap: 0; }
+html.is-p .hd2 { left: 0; top: 0; width: 390px; height: 65.91px; padding: 0 20px; transform: translateY(-16px); justify-content: space-between; gap: 0; }
 html.is-p body.is-ui .hd2, html.is-p body.is-ui #header.scrolled .hd2 { opacity: 1; transform: none; pointer-events: auto; }
 html.is-p .hd2-logo { width: 66.4px; gap: 2.56px; }
 html.is-p .hd2-logo img { width: 66.4px; height: 37.35px; }
@@ -51,7 +51,7 @@ html.is-p .glow { left: 203.8px; top: 470.7px; width: 477px; height: 477px; marg
 html.is-p .rays { left: 203.8px; top: 457.7px; width: 824px; height: 824px; margin: -412px 0 0 -412px; }
 html.is-p .hero-ray { left: 214.5px; top: 322.25px; width: 659px; height: 659px; margin: -329.5px 0 0 -329.5px; }
 html.is-p .hero-fade { left: -19px; top: 495px; width: 467px; height: 349px; background: linear-gradient(180deg, rgba(1, 38, 17, 0) 9.92%, #012611 30.95%); }
-html.is-p .hero-content { left: 3px; top: 527px; width: 385px; height: 277px; justify-content: space-between; }
+html.is-p .hero-content { left: 3px; top: 527px; width: 385px; height: 263px; justify-content: space-between; }
 html.is-p .chip { gap: 6.92px; padding: 8.3px 15.22px; border-radius: 11.07px; font-size: 13.83px; }
 html.is-p .chip img { width: 16.6px; height: 16.6px; }
 html.is-p .h1 { width: 384.57px; font-size: 22px; line-height: 31.75px; letter-spacing: .747px; }
@@ -64,12 +64,13 @@ html.is-p .gift-hint-goat { left: 210px; top: 630px; scale: .55; transform-origi
 html.is-p .skip { right: 16px; bottom: 16px; }
 
 /* 2. Наборы */
-html.is-p #product, html.is-p #focus { left: -319px; top: 45.3px; width: 1033px; height: 770px; }
-html.is-p .b2-bg { left: -625px; top: 0; width: 1511px; height: 845px; object-fit: cover; }
+html.is-p #product, html.is-p #focus { left: -203.5px; top: 192.6px; width: 788.2px; height: 588.6px; }
+html.is-p .b2-bg { left: -415px; top: -123px; width: 1071px; height: 1055px; object-fit: cover; }
+html.is-p .b2-topshade { display: block; position: absolute; z-index: 2; left: -19px; width: 467px; top: -120px; height: 330px; pointer-events: none; background: linear-gradient(180deg, #012611 120px, rgba(1, 38, 17, 0) 309.2px); }
 html.is-p .br-p { display: inline; }
-html.is-p .b2-title { left: 10px; top: 71px; width: 370px; line-height: 30.99px; }
+html.is-p .b2-title { left: 10px; top: 111px; width: 370px; line-height: 30.99px; }
 html.is-p .set-panel {
-  left: 10px; top: 608px; width: 370px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
+  left: 10px; top: 622px; width: 370px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
   border-radius: 24.9px; border-width: 1.383px; -webkit-backdrop-filter: blur(8.3px); backdrop-filter: blur(8.3px);
 }
 html.is-p .set-panel-title { display: none; }
@@ -77,7 +78,7 @@ html.is-p .set-tabs { gap: 3.46px; }
 html.is-p .set-tabs button { height: 37.35px; padding: 6.92px 15.9px; font-size: 14.53px; }
 html.is-p .set-desc { flex: 1 0 0; gap: 5.53px; font-size: 13.14px; }
 html.is-p .set-price { font-size: 40.12px; line-height: 40.12px; }
-html.is-p .hint { left: 104px; top: 170px; width: 286px; height: 217px; overflow: hidden; overflow: clip; }
+html.is-p .hint { left: 104px; top: 220px; width: 286px; height: 217px; overflow: hidden; overflow: clip; }
 html.is-p .hint-bubble { left: 35px; top: 26px; width: 175.27px; height: 75.43px; transform: scaleX(-1); }
 html.is-p .hint-goat { left: 171.65px; top: -21.92px; width: 207.77px; height: 216.85px; }
 html.is-p .hint-goat .stk-r { width: 144.27px !important; height: 167.81px !important; transform: rotate(150.82deg) scaleY(-1) !important; }
@@ -185,3 +186,12 @@ html.is-p .ft-tag { font-size: 12.45px; }
 html.is-p .ft-small { font-size: 11.07px; line-height: 16.6px; }
 html.is-p .ft-bottom { margin-top: 24.9px; padding-top: 16.6px; gap: 6.92px; }
 html.is-p #book .stickers { z-index: 16; }   /* стикеры поверх карточек наборов */
+
+/* Стрелка «листайте вниз»: зацикленное движение вниз (transform — translate занят сдвигом под высоту экрана) */
+html.is-p .scroll-arrow { display: block; position: absolute; left: 183px; width: 24px; height: 24px; z-index: 12; pointer-events: none; animation: arrowDown 1.4s ease-in-out infinite alternate; }
+html.is-p .hero-arrow { top: 808px; }
+html.is-p body:not(.is-ui) .hero-arrow { visibility: hidden; }
+html.is-p .b3-arrow1 { top: 498px; }
+html.is-p .b3-arrow2 { top: 1579px; }
+@keyframes arrowDown { from { transform: translateY(-4px); } to { transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { html.is-p .scroll-arrow { animation: none; } }

@@ -22,7 +22,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Экран стоит на месте: сцена 1920 × 1080 вписана в окно, скролл только переключает сцены */
 .track { position: relative; z-index: 0; }
 .track > div { height: 100vh; }
-.track > .track-video { height: 150vh; }   /* видео-переход: 1,5 экрана прокрутки */
+.track > .track-video { height: 187.5vh; }   /* видео-переход: 1,875 экрана прокрутки */
 .vp {
   /* clip, а не hidden: иначе на телефоне касание по экрану не прокручивает страницу */
   position: fixed; inset: 0; overflow: hidden; overflow: clip; z-index: 1;
@@ -158,7 +158,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hd2 a:focus-visible, .hd2 button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 .hd2-right { display: flex; gap: 2px; }
 /* меню разделов есть только на телефоне */
-.hd-menu, .mnav, .br-p { display: none; }
+.hd-menu, .mnav, .br-p, .scroll-arrow, .b2-topshade { display: none; }
 
 /* 1. Первый экран */
 .hero-ray {

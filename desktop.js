@@ -11,8 +11,8 @@
   const PORTRAIT = document.documentElement.classList.contains('is-p');
   const FW = PORTRAIT ? 390 : 1920, FH = PORTRAIT ? 844 : 1080, CX = FW / 2, CY = FH / 2;
   const L = PORTRAIT ? {                              // мобильный макет Figma, кадр 390 × 844
-    prod: { x: -319, y: 45.3, w: 1033, h: 770 },       // коробка на экране наборов
-    hero: { dx: 5, dy: -37.8, k: .8881 },              // на первом экране: (-256.2, 50, 917.4 × 685)
+    prod: { x: -203.5, y: 192.6, w: 788.2, h: 588.6 }, // коробка на экране наборов
+    hero: { dx: 11.9, dy: -94.4, k: 1.1639 },          // на первом экране: (-256.2, 50, 917.4 × 685)
     mouth: { x: 203.8, y: 431.3 }, boxc: { x: 203.8, y: 470.7 }, gift: { x: 203.8, y: 453.4 },
     // блок 3 (1633 px): экран спускается, пока карточка не встанет по центру (409,7 px), карточки листаются,
     // затем свободный спуск к домику (ещё 379,3 px) и только потом видео
@@ -170,7 +170,7 @@
   const HOSTS = /(^|\s)(stickers|pin|gift-hint)(\s|$)/;
   // ручные привязки для тесных экранов: [селектор или «#сцена stkN», k], k = 1 — к верху экрана, −1 — к низу
   // таймер и «Обо мне» сдвигаются целиком (стикеры лежат на панели и карточке), вопросы прижаты к верху
-  const CUT_K = [['#left .b5-center', .5], ['#left stk*', .5], ['#about .b7-card-wrap', .3], ['#about stk*', .3],
+  const CUT_K = [['#sets .hint', 1], ['#left .b5-center', .5], ['#left stk*', .5], ['#about .b7-card-wrap', .3], ['#about stk*', .3],
     ['#faq .h2', 1], ['#faq .faq-list', 1], ['#faq .faq-side', 1]];
   function measureCut() {
     cutTargets = [];
@@ -223,9 +223,9 @@
     L.hero.k = BASE.hero.k * hk;
     L.hero.dy = BASE.hero.dy + delta;
     // коробка на экране наборов: верх под заголовком, низ над панелью выбора; подсказка едет вместе с коробкой
-    const sTop = 110 - Math.min(50, cut * .75), pc = L.prod.y + L.prod.h / 2;
-    L.setK = Math.max(.55, Math.min(1, (608 - 2 * cut - 18 - sTop) / 480));
-    L.setDy = sTop + cut - pc + 320 * L.setK;
+    const sTop = 240 - Math.min(60, cut * .75), pc = L.prod.y + L.prod.h / 2;   // видимый верх коробки 244 px над центром, низ 122 px под ним
+    L.setK = Math.max(.55, Math.min(1, (622 - 2 * cut - 12 - sTop) / 366));
+    L.setDy = sTop + cut - pc + 244 * L.setK;
     L.mouth.y = BASE.mouth.y + delta; L.boxc.y = BASE.boxc.y + delta; L.gift.y = BASE.gift.y + delta;
     // стикеры на низком экране немного меньше
     const sk = fmt(1 - cut / FH * .6);
@@ -857,7 +857,7 @@
   // за одно движение колеса пролистывается на 36 % меньше кадров, чем у обычного блока (два раза по 20 %)
   // На телефоне блоки «Сроки» и финальный выше экрана: на них прокрутка не переключает сцену, а спускает экран
   // по блоку (участки hold, P стоит на месте). Длина участка = высота спуска, палец и блок двигаются вместе
-  const V_START = 5, V_SLOW = 1.5;
+  const V_START = 5, V_SLOW = 1.875;   // ещё на 20 % медленнее: 1,5 / 0,8
   // длина спуска в экранах: высота спуска делится на видимую высоту кадра — палец и блок двигаются вместе
   const SEGS = [];
   let HOLD_TOTAL = 0;
@@ -1031,7 +1031,7 @@
   });
   const b2bg = $('.b2-bg');
   const b2els = $$('.b2-el').map(n => ({ n, d: parseFloat(n.style.getPropertyValue('--d')) || 0 }));
-  const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]')];
+  const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]'), $('.hero-arrow')];
   const left = $('#left');
   /* ===== Видео-переход: кадры assets/d/trans/000…144.webp, грузятся, когда посетитель дошёл до блока 3 ===== */
   const FRAMES = 145;
