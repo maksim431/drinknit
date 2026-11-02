@@ -9,19 +9,19 @@
   // Две раскладки одного лендинга: горизонтальный кадр 1920 × 1080 (компьютер, планшет в альбомной ориентации)
   // и вертикальный 600 × 1200 (телефон, вертикальный планшет). Анимации одни и те же, меняются только координаты
   const PORTRAIT = document.documentElement.classList.contains('is-p');
-  const FW = PORTRAIT ? 390 : 1920, FH = PORTRAIT ? 932 : 1080, CX = FW / 2, CY = FH / 2;
-  const L = PORTRAIT ? {                              // мобильный макет Figma, кадр 390 × 932
-    prod: { x: -309, y: 146, w: 1033, h: 770 },        // коробка на экране наборов
-    hero: { dx: 1, dy: -118.5, k: .8877 },             // на первом экране: (-250, 70, 917 × 685)
-    mouth: { x: 209.8, y: 451.3 }, boxc: { x: 209.8, y: 490.7 }, gift: { x: 209.8, y: 473.4 },
-    // блок 3 (1633 px): экран спускается, пока карточка не встанет по центру (365,7 px), карточки листаются,
-    // затем свободный спуск к домику (ещё 335,3 px) и только потом видео
-    b3pan: 365.74, b3pan2: 335.26, b3origin: [195 + 157.5, 466 + 11.17 + 701],
-    v0: { x: -147.56, y: 239.06, w: 1232.07, h: 692.77 }, vanchor: [150, 640], vcover: false,   // первый кадр = низ фона блока 3
-    kidsBg: { x: -695, y: 223, w: 1270, h: 709 },
-    flip: [195, 340],
+  const FW = PORTRAIT ? 390 : 1920, FH = PORTRAIT ? 844 : 1080, CX = FW / 2, CY = FH / 2;
+  const L = PORTRAIT ? {                              // мобильный макет Figma, кадр 390 × 844
+    prod: { x: -319, y: 45.3, w: 1033, h: 770 },       // коробка на экране наборов
+    hero: { dx: 5, dy: -37.8, k: .8881 },              // на первом экране: (-256.2, 50, 917.4 × 685)
+    mouth: { x: 203.8, y: 431.3 }, boxc: { x: 203.8, y: 470.7 }, gift: { x: 203.8, y: 453.4 },
+    // блок 3 (1633 px): экран спускается, пока карточка не встанет по центру (409,7 px), карточки листаются,
+    // затем свободный спуск к домику (ещё 379,3 px) и только потом видео
+    b3pan: 409.74, b3pan2: 379.26, b3origin: [195 + 157.5, 422 + 11.17 + 789],
+    v0: { x: -147.56, y: 151.06, w: 1232.07, h: 692.77 }, vanchor: [150, 552], vcover: false,   // первый кадр = низ фона блока 3
+    kidsBg: { x: -695, y: 135, w: 1270, h: 709 },
+    flip: [195, 422],
     b3cardTop: 599.5,
-    termsPan: 206, bookPan: 1008,                      // блоки выше экрана: экран спускается по ним
+    kidsPan: 252, termsPan: 294, bookPan: 1096,        // блоки выше экрана: экран спускается по ним
   } : {
     prod: { x: 122.97, y: -125, w: 1787, h: 1334 },
     hero: { dx: -59.47, dy: -251.5, k: 1.1834 },
@@ -97,15 +97,15 @@
   // вертикальный кадр: свои места и размер стикеров [left, top, масштаб]; null — стикер не показываем
   // мобильный макет: [left, top, ширина и высота рамки, ширина и высота наклейки, поворот (или transform)]; null — стикер не показываем
   const STICKERS_P = {
-    hero: [[-81, 802, 180.41, 188.9, 149.19, 160.37, 12.52], [268, 127, 140.44, 140.23, 106.32, 105.9, 24.26], [259, 821, 192.93, 192.86, 137.14, 136.42, 40.74],
-      [-40, 437, 161.17, 171.06, 121.35, 137.89, -19.99], [-20, 124.16, 189.68, 200.66, 146.93, 163.82, -17.65], [305, 509, 115.96, 115.96, 89.8, 89.8, 20.94]],
-    kids: [[275, 367, 126.84, 131.49, 97.02, 104.75, 19.86], [124, 714, 240.66, 258.37, 207.5, 228.79, -8.98], [14.36, 788, 117.92, 126.85, 98.36, 109.74, 11.27]],
-    left: [[75.8, 86, 238.5, 238.5, 213.9, 213.9, 7.04], [15, 719, 183.91, 184.67, 142.29, 143.6, 20.73], null, [-13, 204.04, 119.69, 126.96, 98.69, 108.24, -12.44],
-      [214.04, 841, 139.66, 140.27, 123.11, 123.83, -8.28], null, [285, 214, 91.8, 106, 91.8, 106, 0]],
+    hero: [null, [273, 175, 140.45, 140.24, 106.32, 105.9, 24.26], null,
+      [133.95, 93.01, 141.26, 155.04, 121.35, 137.89, 8.92], [-24, 126, 189.68, 200.66, 146.93, 163.82, -17.65], null],
+    kids: [[275, 367, 126.84, 131.49, 97.02, 104.75, 19.86], [44, 902, 240.66, 258.37, 207.5, 228.79, -8.98], [156.33, 594.3, 155.27, 166.23, 126.61, 141.26, -13.07]],
+    left: [[85.79, 46, 238.5, 238.5, 213.9, 213.9, 7.04], [15, 661, 183.91, 184.67, 142.29, 143.6, 20.73], null, [-43.97, 113.61, 171.54, 181.95, 141.45, 155.13, -12.44],
+      [214, 703, 139.66, 140.27, 123.11, 123.83, -8.28], null, [285, 159.96, 130, 150.04, 130, 150.04, 0]],
     terms: [[86, 852, 344.77, 397.4, 269.12, 341.81, 'rotate(-165.79deg) scaleY(-1)']],
-    about: [[6.56, 221, 158.34, 144.04, 138.14, 120.11, -10.89], [-12, 221.29, 87.28, 97.12, 69.45, 82.9, 13.86], [10, 764.63, 104, 95, 104, 95, 0],
-      [254, 229, 127.63, 119.65, 103.03, 89.58, 20.2], [220, 787, 137.75, 138.28, 118.39, 119.06, -10.29], [307.91, 824.8, 65, 92, 65, 92, 0],
-      [316.46, 300.57, 79.56, 96.56, 75.15, 93.03, -2.78], [59.76, 720, 89.1, 95.39, 75.81, 83.57, 9.94]],
+    about: [[6.56, 181, 158.34, 144.04, 138.14, 120.11, -10.89], [-12, 181.29, 87.28, 97.12, 69.45, 82.9, 13.86], [10, 684.63, 104, 95, 104, 95, 0],
+      [254, 169, 127.63, 119.65, 103.03, 89.58, 20.2], [220, 707, 137.75, 138.28, 118.39, 119.06, -10.29], [307.91, 744.8, 65, 92, 65, 92, 0],
+      [316.46, 240.57, 79.56, 96.56, 75.15, 93.03, -2.78], [59.76, 640, 89.1, 95.39, 75.81, 83.57, 9.94]],
     book: [[217, 607, 288.92, 340.69, 220.43, 293.65, 15], [-61, 197, 233.66, 258.19, 178.61, 215.49, -16.95], [-80, 1052, 243.71, 270.38, 180.73, 223.74, 18.99],
       [236.24, 1425.35, 219.25, 234.93, 191.33, 209.84, 8.18]],
     faq: [null, null],
@@ -157,22 +157,24 @@
   bgls.forEach(el => { el.style.transformOrigin = `${CX - el.offsetLeft}px ${CY - el.offsetTop}px`; });
   // фон блока 3 растягиваем от точки, которая в конце спуска стоит в центре экрана — там он совмещён с первым кадром видео
   $('.b3-l01').style.transformOrigin = `${L.b3origin[0]}px ${L.b3origin[1]}px`;
-  /* ===== Телефон с экраном короче кадра 390 × 932 =====
-     Кадр по ширине экрана, сверху и снизу обрезано по CUT px. Элементы верхней части экрана (центр выше 300 px)
-     сдвигаются вниз на CUT, нижней (ниже 632 px) — вверх на CUT, между ними — плавно. Коробка первого экрана
+  /* ===== Телефон с экраном короче кадра 390 × 844 =====
+     Кадр по ширине экрана, сверху и снизу обрезано по CUT px. Элементы верхней части экрана (центр выше 272 px)
+     сдвигаются вниз на CUT, нижней (ниже 572 px) — вверх на CUT, между ними — плавно. Коробка первого экрана
      уменьшается, чтобы поместиться между шапкой и текстом. Высокие блоки начинаются от верха экрана,
      спуск по ним длиннее на 2 × CUT */
   let CUT = 0, cutTargets = null;
   const BASE = PORTRAIT ? JSON.parse(JSON.stringify({ hero: L.hero, mouth: L.mouth, boxc: L.boxc, gift: L.gift, v0: L.v0,
-    b3pan: L.b3pan, b3pan2: L.b3pan2, termsPan: L.termsPan, bookPan: L.bookPan })) : null;
+    b3pan: L.b3pan, b3pan2: L.b3pan2, kidsPan: L.kidsPan, termsPan: L.termsPan, bookPan: L.bookPan })) : null;
   const FIXED = /(^|\s)(b\d-bg|b2-bg|dim|modal|b3-world|b3-video|b3-vshade|b4-shade|b6-shade|bgl)(\s|$)/;
   const BOXED = /(^|\s)(glow|rays|hero-ray|gift-shadow|hero-ellipse|closed)(\s|$)/;
   const HOSTS = /(^|\s)(stickers|pin|gift-hint)(\s|$)/;
   // ручные привязки для тесных экранов: [селектор или «#сцена stkN», k], k = 1 — к верху экрана, −1 — к низу
-  const CUT_K = [['#left .b5-center', 1], ['#left stk0', 1], ['#left stk2', 1], ['#left stk4', 1], ['#left stk1', .6], ['#left stk3', -.5], ['#about stk6', .2], ['#about .b7-card-wrap', -.3]];
+  // таймер и «Обо мне» сдвигаются целиком (стикеры лежат на панели и карточке), вопросы прижаты к верху
+  const CUT_K = [['#left .b5-center', .5], ['#left stk*', .5], ['#about .b7-card-wrap', .3], ['#about stk*', .3],
+    ['#faq .h2', 1], ['#faq .faq-list', 1], ['#faq .faq-side', 1]];
   function measureCut() {
     cutTargets = [];
-    const secs = ['hero', 'sets', 'time', 'kids', 'left', 'about', 'faq'].map(id => $(`#${id}`));
+    const secs = ['hero', 'sets', 'time', 'left', 'about', 'faq'].map(id => $(`#${id}`));
     const saved = secs.map(sec => [sec.style.display, sec.style.visibility]);
     secs.forEach(sec => { sec.style.display = ''; sec.style.visibility = 'hidden'; });
     const walk = (el, oy, list) => {
@@ -182,7 +184,7 @@
         if (BOXED.test(cls)) { cutTargets.push({ n, box: true }); return; }
         if (HOSTS.test(cls)) { walk(n, oy + n.offsetTop, list); return; }
         const t = oy + n.offsetTop, h = n.offsetHeight, c = t + h / 2;
-        list.push({ n, t, b: t + h, stk: cls.includes('stk'), k: Math.max(-1, Math.min(1, (466 - c) / 166)) });
+        list.push({ n, t, b: t + h, stk: cls.includes('stk'), k: Math.max(-1, Math.min(1, (CY - c) / 150)) });
       });
     };
     secs.forEach(sec => {
@@ -196,12 +198,12 @@
           blocks.forEach(bk => { const ov = Math.min(o.b, bk.b) - Math.max(o.t, bk.t); if (ov > bestOv) { bestOv = ov; best = bk; } });
           if (best && bestOv > (o.b - o.t) * .5) o.k = best.k;
         }
-        const ov = CUT_K.find(([sel]) => o.n.matches(sel));
+        const ov = CUT_K.find(([sel]) => !sel.includes(' stk') && o.n.matches(sel));
         if (ov) o.k = ov[1];
         cutTargets.push({ n: o.n, k: o.k, stk: o.stk });
       });
       $$('.stickers .stk', sec).forEach((n, i) => {
-        const ov = CUT_K.find(([sel]) => sel === `${'#' + sec.id} stk${i}`);
+        const ov = CUT_K.find(([sel]) => sel === `${'#' + sec.id} stk${i}` || sel === `${'#' + sec.id} stk*`);
         const t = cutTargets.find(o => o.n === n);
         if (ov && t) t.k = ov[1];
       });
@@ -214,18 +216,18 @@
     if (!cutTargets) measureCut();
     CUT = cut;
     // коробка первого экрана: верх под шапкой, низ над плашкой «Свободно…»
-    const top = 130 - Math.min(38, cut * .4);                       // верх коробки на экране
-    const hk = Math.max(.55, Math.min(1, (597 - 2 * cut + 6 - top) / 460));
-    const delta = top + cut - (412.5 - 282.5 * hk);                // сдвиг центра коробки
+    const top = 110 - Math.min(30, cut * .5);                       // верх коробки на экране
+    const hk = Math.max(.55, Math.min(1, (527 - 2 * cut + 43 - top) / 460));
+    const delta = top + cut - (392.5 - 282.5 * hk);                // сдвиг центра коробки
     L.hero.k = BASE.hero.k * hk;
     L.hero.dy = BASE.hero.dy + delta;
     // коробка на экране наборов: верх под заголовком, низ над панелью выбора; подсказка едет вместе с коробкой
-    const sTop = 210 - Math.min(74, cut * .75);
-    L.setK = Math.max(.55, Math.min(1, (696 - 2 * cut - sTop) / 480));
-    L.setDy = sTop + cut - 531 + 321 * L.setK;
+    const sTop = 110 - Math.min(50, cut * .75), pc = L.prod.y + L.prod.h / 2;
+    L.setK = Math.max(.55, Math.min(1, (608 - 2 * cut - 18 - sTop) / 480));
+    L.setDy = sTop + cut - pc + 320 * L.setK;
     L.mouth.y = BASE.mouth.y + delta; L.boxc.y = BASE.boxc.y + delta; L.gift.y = BASE.gift.y + delta;
     // стикеры на низком экране немного меньше
-    const sk = fmt(1 - cut / 932 * .6);
+    const sk = fmt(1 - cut / FH * .6);
     cutTargets.forEach(({ n, k, box, stk }) => {
       n.style.translate = box ? `0 ${fmt(delta)}px` : (k * cut ? `0 ${fmt(k * cut)}px` : '');
       if (stk) n.style.scale = cut ? String(sk) : '';
@@ -236,7 +238,7 @@
     B8 = null;
     // блок 3 и высокие блоки: начало у верха экрана, спуск длиннее
     L.b3pan = BASE.b3pan + cut; L.b3pan2 = BASE.b3pan2 + cut;
-    L.termsPan = BASE.termsPan + 2 * cut; L.bookPan = BASE.bookPan + 2 * cut;
+    L.kidsPan = BASE.kidsPan + 2 * cut; L.termsPan = BASE.termsPan + 2 * cut; L.bookPan = BASE.bookPan + 2 * cut;
     L.v0.y = BASE.v0.y - cut;                                      // первый кадр видео совпадает с низом блока 3
     vp.style.setProperty('--cut', `${cut}px`);
     buildSegs();
@@ -855,6 +857,7 @@
     SEGS.length = 0;
     if (L.b3pan2) SEGS.push({ p: V_START, len: L.b3pan2 / vis, span: 0 });   // спуск к домику перед видео
     SEGS.push({ p: V_START, len: V_SLOW, span: 1 });
+    if (L.kidsPan) SEGS.push({ p: 6, len: L.kidsPan / vis, span: 0 });
     if (L.termsPan) SEGS.push({ p: 8, len: L.termsPan / vis, span: 0 });
     if (L.bookPan) SEGS.push({ p: 10, len: L.bookPan / vis, span: 0 });
     HOLD_TOTAL = SEGS.filter(g => !g.span).reduce((a, g) => a + g.len, 0);
@@ -1066,7 +1069,8 @@
     if (key === lastFrame) return;
     lastFrame = key;
     const e = easeIO(t);
-    let r = { x: V0.x + (V1.x - V0.x) * e, y: V0.y + (V1.y - V0.y) * e, w: V0.w + (V1.w - V0.w) * e, h: V0.h + (V1.h - V0.h) * e };
+    const v1y = V1.y + (L.kidsPan ? CUT : 0);   // блок «Для детей» на телефоне начинается от верха экрана
+    let r = { x: V0.x + (V1.x - V0.x) * e, y: V0.y + (v1y - V0.y) * e, w: V0.w + (V1.w - V0.w) * e, h: V0.h + (V1.h - V0.h) * e };
     // координаты кадра 1920 × 1080 → холст (с полями до краёв окна и растяжением фонов --k)
     const px = tx / s, py = ty / s, k = Math.max((FW + 2 * px) / FW, (FH + 2 * py) / FH);
     const sx = W / (FW + 2 * px), sy = H / (FH + 2 * py);
@@ -1083,7 +1087,7 @@
     vctx.drawImage(frames[i], x0, y0, x1 - x0, y1 - y0);
   };
 
-  const vshade = PORTRAIT ? $('#b3-vshade') : null, termsFr = $('#terms .fr'), bookFr = $('#book .fr');
+  const vshade = PORTRAIT ? $('#b3-vshade') : null, termsFr = $('#terms .fr'), bookFr = $('#book .fr'), kidsFr = $('#kids .fr');
   const b3bg = $('#b3-bg'), b3fg = $('#b3-fg'), b3text = $('#b3-textwrap'), b3card = $('#b3-card');
   const b8cards = $$('.b8-card');
   const b8fill = $('.b8-fill');
@@ -1132,7 +1136,7 @@
   sizeFooterRef = sizeFooter;
   const render = P => {
     const dP = Math.abs(P - lastP);
-    const hsum = (holdF[8] || 0) + (holdF[10] || 0) * 7 + (holdF[5] || 0) * 3;
+    const hsum = (holdF[8] || 0) + (holdF[10] || 0) * 7 + (holdF[5] || 0) * 3 + (holdF[6] || 0) * 13;
     const moved = dP > 0 || hsum !== lastH;
     lastH = hsum;
     const up = Math.max(0, P - LAST) * innerHeight / s;
@@ -1247,10 +1251,12 @@
       put(vshade, 'opacity', String(fmt(clamp(vt / .015))));
       const c0 = [72, 84, 102], c1 = [84, 116, 144], e2 = easeIO(vt);
       const col = c0.map((v, j) => Math.round(v + (c1[j] - v) * e2)).join(',');
-      const pyy = ty / s;   // затемнение уходит под верхний край окна, если экран выше кадра
-      put(vshade, 'background', `linear-gradient(180deg, rgb(${col}) ${fmt(pyy + 232 - 13 * e2)}px, rgba(${col},0) ${fmt(pyy + 530 - 150 * e2)}px)`);
+      // координаты от верха экрана: в начале — как в кадре видео (низ блока 3 у низа экрана), в конце — как у блока «Для детей»
+      const a0 = 153 - 2 * CUT, b0 = 442 - 2 * CUT;
+      put(vshade, 'background', `linear-gradient(180deg, rgb(${col}) ${fmt(Math.max(0, a0 + (144.5 - a0) * e2))}px, rgba(${col},0) ${fmt(b0 + (316.6 - b0) * e2)}px)`);
     }
     // высокие блоки на телефоне: спуск экрана по блоку
+    if (L.kidsPan) put(kidsFr, 'transform', `translateY(${fmt(CUT - L.kidsPan * (holdF[6] || 0))}px)`);
     if (L.termsPan) put(termsFr, 'transform', `translateY(${fmt(CUT - L.termsPan * (holdF[8] || 0))}px)`);
     if (L.bookPan) put(bookFr, 'transform', `translateY(${fmt(CUT - L.bookPan * (holdF[10] || 0))}px)`);
 

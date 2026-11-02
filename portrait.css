@@ -1,11 +1,11 @@
-/* Мобильный макет (телефон, вертикальный планшет): кадр 390 × 932 из Figma, те же блоки и анимации,
+/* Мобильный макет (телефон, вертикальный планшет): кадр 390 × 844 из Figma, те же блоки и анимации,
    что на компьютере. Подключается после desktop.css. Блоки «Сроки» и финальный выше экрана —
    экран спускается по ним (desktop.js, L.termsPan и L.bookPan) */
 
 /* Кадр */
-html.is-p #stage { width: 390px; height: 932px; }
-html.is-p .scr { width: calc(390px + 2 * var(--px, 0px)); height: calc(932px + 2 * var(--py, 0px)); }
-html.is-p .fr { width: 390px; height: 932px; }
+html.is-p #stage { width: 390px; height: 844px; }
+html.is-p .scr { width: calc(390px + 2 * var(--px, 0px)); height: calc(844px + 2 * var(--py, 0px)); }
+html.is-p .fr { width: 390px; height: 844px; }
 html.is-p .track > div { height: calc(var(--vh, 1vh) * 100); }
 html.is-p .track > .track-video { height: calc(var(--vh, 1vh) * 150); }
 html.is-p .h1, html.is-p .h2, html.is-p .b5-left { -webkit-text-stroke: 1.2px var(--cream); }
@@ -44,32 +44,32 @@ html.is-p .mnav a:active { background: rgba(255, 255, 255, .12); }
 html.is-p .mnav-book { margin-top: 6px; text-align: center; font-weight: 700; color: #022712 !important; background: linear-gradient(180deg, #ffedc8 0%, #b8a274 100%); border: 1.383px solid #bca372; }
 
 /* 1. Первый экран */
-html.is-p .closed { left: -79px; top: 197.6px; width: 577.7px; height: 577.7px; }
+html.is-p .closed { left: -85px; top: 177.6px; width: 577.7px; height: 577.7px; }
 html.is-p .gift-shadow { left: 45.93px; top: 494.64px; width: 337.14px; height: 75.52px; }
 html.is-p .hero-ellipse { left: 41.58px; top: 472.92px; width: 345.83px; height: 74.7px; }
-html.is-p .glow { left: 209.8px; top: 490.7px; width: 477px; height: 477px; margin: -238.5px 0 0 -238.5px; }
-html.is-p .rays { left: 209.8px; top: 477.7px; width: 824px; height: 824px; margin: -412px 0 0 -412px; }
-html.is-p .hero-ray { left: 214.5px; top: 362.25px; width: 659px; height: 659px; margin: -329.5px 0 0 -329.5px; }
-html.is-p .hero-fade { left: -19px; top: 495px; width: 467px; height: 437px; background: linear-gradient(180deg, rgba(1, 38, 17, 0) 11.54%, #012611 26.67%); }
-html.is-p .hero-content { left: 3px; top: 597px; width: 385px; height: 277px; justify-content: space-between; }
+html.is-p .glow { left: 203.8px; top: 470.7px; width: 477px; height: 477px; margin: -238.5px 0 0 -238.5px; }
+html.is-p .rays { left: 203.8px; top: 457.7px; width: 824px; height: 824px; margin: -412px 0 0 -412px; }
+html.is-p .hero-ray { left: 214.5px; top: 322.25px; width: 659px; height: 659px; margin: -329.5px 0 0 -329.5px; }
+html.is-p .hero-fade { left: -19px; top: 495px; width: 467px; height: 349px; background: linear-gradient(180deg, rgba(1, 38, 17, 0) 9.92%, #012611 30.95%); }
+html.is-p .hero-content { left: 3px; top: 527px; width: 385px; height: 277px; justify-content: space-between; }
 html.is-p .chip { gap: 6.92px; padding: 8.3px 15.22px; border-radius: 11.07px; font-size: 13.83px; }
 html.is-p .chip img { width: 16.6px; height: 16.6px; }
 html.is-p .h1 { width: 384.57px; font-size: 22px; line-height: 31.75px; letter-spacing: .747px; }
 html.is-p .row-btns { flex-direction: column; width: 280px; gap: 4px; }
 html.is-p .row-btns .btn { width: 100%; height: 48px; font-size: 14px; }
 /* подсказка «Нажми на подарок» (в мобильном макете не нарисована) */
-html.is-p .gift-hint-bubble { left: 8px; top: 680px; width: 236px; height: 137px; }
-html.is-p .gift-hint-text { left: 118px; top: 722px; font-size: 14px; }
-html.is-p .gift-hint-goat { left: 210px; top: 650px; scale: .55; transform-origin: 0 0; }
+html.is-p .gift-hint-bubble { left: 8px; top: 660px; width: 236px; height: 137px; }
+html.is-p .gift-hint-text { left: 118px; top: 702px; font-size: 14px; }
+html.is-p .gift-hint-goat { left: 210px; top: 630px; scale: .55; transform-origin: 0 0; }
 html.is-p .skip { right: 16px; bottom: 16px; }
 
 /* 2. Наборы */
-html.is-p #product, html.is-p #focus { left: -309px; top: 146px; width: 1033px; height: 770px; }
-html.is-p .b2-bg { left: -703px; top: 0; width: 1667px; height: 932px; object-fit: cover; }
+html.is-p #product, html.is-p #focus { left: -319px; top: 45.3px; width: 1033px; height: 770px; }
+html.is-p .b2-bg { left: -625px; top: 0; width: 1511px; height: 845px; object-fit: cover; }
 html.is-p .br-p { display: inline; }
-html.is-p .b2-title { left: 16.6px; top: 103.22px; width: 381.8px; line-height: 30.99px; }
+html.is-p .b2-title { left: 10px; top: 71px; width: 370px; line-height: 30.99px; }
 html.is-p .set-panel {
-  left: 1.5px; top: 696px; width: 387px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
+  left: 10px; top: 608px; width: 370px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
   border-radius: 24.9px; border-width: 1.383px; -webkit-backdrop-filter: blur(8.3px); backdrop-filter: blur(8.3px);
 }
 html.is-p .set-panel-title { display: none; }
@@ -77,13 +77,13 @@ html.is-p .set-tabs { gap: 3.46px; }
 html.is-p .set-tabs button { height: 37.35px; padding: 6.92px 15.9px; font-size: 14.53px; }
 html.is-p .set-desc { flex: 1 0 0; gap: 5.53px; font-size: 13.14px; }
 html.is-p .set-price { font-size: 40.12px; line-height: 40.12px; }
-html.is-p .hint { left: 104px; top: 180px; width: 326px; height: 217.33px; }
-html.is-p .hint-bubble { left: 15px; top: 81px; width: 175.3px; height: 75.4px; transform: rotate(180deg); }
-html.is-p .hint-goat { left: 139px; top: -56px; width: 273.08px; height: 285.01px; }
-html.is-p .hint-goat .stk-r { width: 189.62px !important; height: 220.55px !important; transform: rotate(150.82deg) scaleY(-1) !important; }
-html.is-p .hint-text { left: 24px; top: 120px; width: 144px; font-size: 10px; }
+html.is-p .hint { left: 104px; top: 170px; width: 286px; height: 217px; overflow: hidden; overflow: clip; }
+html.is-p .hint-bubble { left: 35px; top: 26px; width: 175.27px; height: 75.43px; transform: scaleX(-1); }
+html.is-p .hint-goat { left: 171.65px; top: -21.92px; width: 207.77px; height: 216.85px; }
+html.is-p .hint-goat .stk-r { width: 144.27px !important; height: 167.81px !important; transform: rotate(150.82deg) scaleY(-1) !important; }
+html.is-p .hint-text { left: 52px; top: 40px; width: 144px; font-size: 10px; }
 /* окно предмета */
-html.is-p .modal { left: 10px; top: calc(var(--cut, 0px) + 92px); width: 370px; height: calc(828px - 2 * var(--cut, 0px)); flex-direction: column-reverse; padding: 16px; gap: 14px; border-radius: 28px; }
+html.is-p .modal { left: 10px; top: calc(var(--cut, 0px) + 92px); width: 370px; height: calc(740px - 2 * var(--cut, 0px)); flex-direction: column-reverse; padding: 16px; gap: 14px; border-radius: 28px; }
 html.is-p .modal-photo { width: 100%; height: auto; flex: 1 1 0; min-height: 0; border-radius: 18px; }
 html.is-p .modal-img img { width: 100%; height: 100%; }
 html.is-p .modal-title { font-size: 21px; }
@@ -104,25 +104,27 @@ html.is-p .lead { font: 400 15.05px/21.82px Manrope, sans-serif; }
 html.is-p .lead br { display: none; }
 html.is-p .b3-card-wrap { left: 29px; top: 599.54px; scale: .717; transform-origin: 0 0; }
 html.is-p .b3-card-wrap .stamp-cap { font-size: 18px; }
-html.is-p .b3-video { width: calc(390px + 2 * var(--px, 0px)); height: calc(932px + 2 * var(--py, 0px)); }   /* холст видео — по кадру телефона */
+html.is-p .b3-video { width: calc(390px + 2 * var(--px, 0px)); height: calc(844px + 2 * var(--py, 0px)); }   /* холст видео — по кадру телефона */
 /* затемнение над видео-переходом */
-html.is-p .b3-vshade { display: block; position: absolute; left: calc(-1 * var(--px, 0px)); right: calc(-1 * var(--px, 0px)); top: calc(-1 * var(--py, 0px)); height: calc(530px + var(--py, 0px)); opacity: 0; pointer-events: none; }
+html.is-p .b3-vshade { display: block; position: absolute; left: calc(-1 * var(--px, 0px)); right: calc(-1 * var(--px, 0px)); top: calc(-1 * var(--py, 0px)); height: 460px; opacity: 0; pointer-events: none; }
 
-/* 4. Для детей */
-html.is-p .b4-bg { left: -695px; top: 223px; width: 1270px; height: 709px; }
+/* 4. Для детей (1096 px — экран спускается на 252 px) */
+html.is-p .b4 { background: #012711; }
+html.is-p .b4-bg { left: -695px; top: 135px; width: 1270px; height: 709px; }
 html.is-p .b4-shade {
-  display: block; position: absolute; left: calc(-1 * var(--px, 0px)); right: calc(-1 * var(--px, 0px)); top: calc(-1 * var(--py, 0px)); height: calc(380px + var(--py, 0px));
-  background: linear-gradient(180deg, #547490 calc(219px + var(--py, 0px)), rgba(84, 116, 144, 0) 100%);
+  display: block; position: absolute; left: -40px; right: -40px; top: -60px; height: 502px;
+  background: linear-gradient(180deg, #547490 204.5px, rgba(84, 116, 144, 0) 376.6px);
 }
-html.is-p .b4-title { left: 10px; top: 157px; width: 370px; }
-html.is-p .b4-bubble { left: 12.45px; top: 607.51px; width: 390.1px; height: 186.75px; opacity: .94; }
+html.is-p .b4-shade2 { display: block; position: absolute; left: -40px; width: 470px; top: 707px; height: 389px; background: linear-gradient(180deg, rgba(51, 103, 71, 0) 0%, #012711 32.21%); }
+html.is-p .b4-title { left: 10px; top: 87px; width: 370px; }
+html.is-p .b4-bubble { left: 12.45px; top: 811.5px; width: 390.1px; height: 186.75px; opacity: .94; }
 html.is-p .b4-bubble-d { display: none; }
 html.is-p .b4-bubble-m { display: block; position: absolute; left: -1.75px; top: -2.07px; width: 367px; height: 182px; max-width: none; transform: scaleX(-1); }
 html.is-p .b4-bubble p { left: 27.67px; top: 24.96px; width: 337.53px; font-size: 12.45px; line-height: 17.43px; }
 
 /* 5. Таймер */
-html.is-p .pin { width: 390px; height: 932px; }
-html.is-p .b5-center { left: 10px; top: 279px; width: 370px; gap: 30.43px; }
+html.is-p .pin { width: 390px; height: 844px; }
+html.is-p .b5-center { left: 10px; top: 239px; width: 370px; gap: 30.43px; }
 html.is-p .b5-panel { padding: 23.52px 17.98px; gap: 15.22px; border-radius: 27.67px; }
 html.is-p .b5-left { width: 348.6px; font-size: 29.05px; line-height: 40.67px; letter-spacing: .913px; }
 html.is-p .b5-and { width: 348.6px; gap: 16.6px; }
@@ -148,8 +150,8 @@ html.is-p .b6-steps { left: 26px; top: 617px; width: 339px; padding-left: 17.98p
 html.is-p .b6-btn { left: 28px; top: 866px; width: 333px; }
 
 /* 7. Обо мне */
-html.is-p .b7-title { width: 390px; top: 126.94px; }
-html.is-p .b7-card-wrap { left: 35px; top: 328.5px; scale: .6917; transform-origin: 0 0; }
+html.is-p .b7-title { width: 390px; top: 76.94px; }
+html.is-p .b7-card-wrap { left: 35px; top: 248.5px; scale: .6917; transform-origin: 0 0; }
 html.is-p .stamp-about .stamp-cap { font-size: 17px; }
 
 /* 8. Финальный призыв (1940 px — карточки столбиком, экран спускается к кнопкам) */
@@ -162,18 +164,18 @@ html.is-p .b8-cta .round { margin-top: 20.75px; padding: 12.45px; border-width: 
 html.is-p .b8-cta .round img { width: 16.6px; height: 16.6px; }
 
 /* 9. Частые вопросы (в мобильном макете не нарисованы) */
-html.is-p .b9-title { width: 390px; top: 104px; }
-html.is-p .faq-list { left: 10px; top: 160px; width: 370px; gap: 6px; }
-html.is-p .faq-list button { min-height: 34px; padding: 8px 15px; gap: 10px; font-size: 13px; }
+html.is-p .b9-title { width: 390px; top: 96px; }
+html.is-p .faq-list { left: 10px; top: 146px; width: 370px; gap: 3px; }
+html.is-p .faq-list button { min-height: 28px; padding: 6px 14px; gap: 10px; font-size: 12.5px; }
 html.is-p .faq-list button::before { width: 6px; height: 6px; }
-html.is-p .faq-side { left: 10px; top: 600px; width: 370px; gap: 16px; }
-html.is-p .faq-card { min-height: 170px; padding: 18px 20px; gap: 10px; border-radius: 22px; border-width: 2px; }
+html.is-p .faq-side { left: 10px; top: 526px; width: 370px; gap: 16px; }
+html.is-p .faq-card { min-height: 134px; padding: 18px 20px; gap: 10px; border-radius: 22px; border-width: 2px; }
 html.is-p .faq-q { font-size: 16px; }
 html.is-p .faq-a { font-size: 13.5px; line-height: 1.45; }
 html.is-p .faq-more p { font-size: 12.5px; max-width: 200px; }
 
 /* Подвал */
-html.is-p .footer { top: calc(932px + var(--py, 0px)); width: calc(390px + 2 * var(--px, 0px)); padding: 38.73px calc(19.37px + var(--px, 0px)) 30.43px; border-top-width: .69px; }
+html.is-p .footer { top: calc(844px + var(--py, 0px)); width: calc(390px + 2 * var(--px, 0px)); padding: 38.73px calc(19.37px + var(--px, 0px)) 30.43px; border-top-width: .69px; }
 html.is-p .ft-in { grid-template-columns: 1fr 1fr; gap: 27.67px 19.37px; }
 html.is-p .ft-brand { grid-column: 1 / -1; gap: 8.3px; }
 html.is-p .ft-col { gap: 8.3px; font-size: 14.53px; line-height: 21.06px; }

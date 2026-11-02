@@ -581,4 +581,4 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 .footer a:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
 
 /* элементы только для мобильного макета */
-.b3-vshade, .b4-shade, .b6-shade, .b6-bubble-m, .b4-bubble-m { display: none; }
+.b3-vshade, .b4-shade, .b4-shade2, .b6-shade, .b6-bubble-m, .b4-bubble-m { display: none; }
