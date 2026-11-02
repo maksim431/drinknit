@@ -778,7 +778,6 @@
   // Стопор держит экран 0,3 с, колесо и инерция тачпада в это время не листают дальше,
   // потом прокрутка снова свободная
   const HOLD_MIN = 300, HOLD_MAX = 300, HOLD_GAP = 180;   // стопор держит экран 0,3 с
-  let scrollDir = 0;
   let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY;
   let lastWheel = 0;
   addEventListener('wheel', e => {
@@ -793,7 +792,6 @@
   addEventListener('scroll', () => {
     const P = toP(scrollY), P0 = toP(lastY), now = performance.now();
     lastY = scrollY;
-    if (!auto && P !== P0) scrollDir = Math.sign(P - P0);
     if (!auto && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
@@ -821,8 +819,8 @@
       if (html.classList.contains('is-locked') || !modal.hidden) return;
       // колесо ещё крутят — проверим чуть позже
       if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
-      // доезжаем только до экрана по направлению прокрутки — назад к экрану, с которого уходят, не тянем
-      const P = toP(scrollY), target = scrollDir > 0 ? Math.ceil(P - 1e-4) : scrollDir < 0 ? Math.floor(P + 1e-4) : Math.round(P), d = Math.abs(P - target);
+      // доезжаем до ближайшего экрана в любую сторону, в том числе назад к тому, с которого уходят
+      const P = toP(scrollY), target = Math.round(P), d = Math.abs(P - target);
       // у блока с наборами зона прилипания больше — 30 % с обеих сторон, у остальных 16 %
       const zone = target === STOPS.sets ? .3 : .16;
       if (d > .003 && d < zone) { auto = true; scrollTo({ top: toY(target), behavior: reduce ? 'auto' : 'smooth' }); }
