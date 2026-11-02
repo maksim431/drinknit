@@ -198,8 +198,8 @@
       <a href="#book" data-nav>Забронировать набор</a>
     </nav>
     <div class="hd-right ui" style="--d:.08s">
-      <button class="hd-sound glass-dark js-sound" type="button" aria-label="Включить музыку" aria-pressed="false">
-        <img src="assets/d/ic-sound.svg" width="24" height="24" alt="">
+      <button class="hd-sound glass-dark js-sound" type="button" aria-label="Музыка выключена" aria-pressed="false">
+        <img class="ic-on" src="assets/d/ic-sound-on.svg" width="24" height="24" alt=""><img class="ic-off" src="assets/d/ic-sound-off.svg" width="24" height="24" alt="">
       </button>
     </div>
   </div>
@@ -217,8 +217,8 @@
       </nav>
       <a class="hd2-book" href="#book" data-nav tabindex="-1">Забронировать набор</a>
     </div>
-    <button class="hd-sound glass-dark js-sound" type="button" tabindex="-1" aria-label="Включить музыку" aria-pressed="false">
-      <img src="assets/d/ic-sound.svg" width="24" height="24" alt="">
+    <button class="hd-sound glass-dark js-sound" type="button" tabindex="-1" aria-label="Музыка выключена" aria-pressed="false">
+      <img class="ic-on" src="assets/d/ic-sound-on.svg" width="24" height="24" alt=""><img class="ic-off" src="assets/d/ic-sound-off.svg" width="24" height="24" alt="">
     </button>
   </div>
 </header>
@@ -293,21 +293,25 @@
     <div class="prod-inner"></div>
   </div>
 
-  <!-- 3. Сколько вяжу -->
+  <!-- 3. Сколько вяжу: высокий блок, экран спускается от заголовка к домику, потом листаются три карточки -->
   <section id="time" class="scr scene b3"><div class="fr">
-    <div class="b3-layers bgl">
-      <img src="assets/d/b3-01.webp" alt="" data-d="6">
-      <img src="assets/d/b3-02.webp" alt="" data-d="14">
-      <img src="assets/d/b3-03.webp" alt="" data-d="26">
+    <div class="b3-world" id="b3-bg">
+      <div class="b3-l01 bgl"><img src="assets/d/b3-01.webp" alt="" data-d="6"></div>
+      <img class="b3-l02 bgl" src="assets/d/b3-02.webp" alt="" data-d="14">
     </div>
-    <div class="b3-text rv" style="--d:.15s">
-      <h2 class="h2">Маленькую игрушку<br>я вяжу 2 часа, среднюю 7 часов</h2>
-      <p class="lead">Поэтому к Новому году<br>получится только 10 наборов, и все они будут немного разными</p>
-    </div>
-    <div class="b3-card-wrap rv" style="--d:.35s" data-d="10">
-      <div class="stamp" id="flip">
-        <div class="stamp-win"><img id="flip-img" src="assets/d/card-gingerbread.webp" alt=""></div>
-        <p class="stamp-cap" id="flip-cap"></p>
+    <img class="b3-l03 bgl" src="assets/d/b3-03.webp" alt="" data-d="26">
+    <div class="b3-world" id="b3-fg">
+      <div class="b3-textwrap" id="b3-textwrap">
+        <div class="b3-text rv" style="--d:.15s">
+          <h2 class="h2">Маленькую игрушку<br>я вяжу 2 часа, среднюю 7 часов</h2>
+          <p class="lead">Поэтому к Новому году<br>получится только 10 наборов, и все они будут немного разными</p>
+        </div>
+      </div>
+      <div class="b3-card-wrap" id="b3-card" data-d="10">
+        <div class="stamp" id="flip">
+          <div class="stamp-win"><img id="flip-img" src="assets/d/card-gingerbread.webp" alt=""></div>
+          <p class="stamp-cap" id="flip-cap"></p>
+        </div>
       </div>
     </div>
   </div></section>
@@ -408,8 +412,8 @@
 <!-- снег поверх всех сцен -->
 <div class="snow-all" aria-hidden="true"><i class="far"></i><i class="near"></i></div>
 
-<!-- скролл: 10 остановок, экран при этом стоит на месте -->
-<div class="track" aria-hidden="true"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+<!-- скролл: 11 остановок, экран при этом стоит на месте -->
+<div class="track" aria-hidden="true"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
 
 <canvas id="fx"></canvas>
 <button class="skip" type="button">Пропустить</button>

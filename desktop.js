@@ -6,7 +6,6 @@
     free: 10,                // сколько наборов осталось
     total: 10,
     deadline: '2026-12-25T23:59:59+03:00', // последний день приёма заказов
-    music: 'assets/audio/last-christmas.mp3',   // фоновая музыка, зацикливается; положите файл по этому пути
     links: {                 // ссылки на мессенджеры, пока не заданы
       telegram: '',          // например: 'https://t.me/username'
       vk: '',                // например: 'https://vk.me/username'
@@ -476,7 +475,6 @@
     ITEMS[current].forEach(it => it.el.classList.remove('lit'));
     current = key;
     renderPanel(key);
-    magicChime();
     to.hidden = false;
     to.style.zIndex = 2;
     from.style.zIndex = 1;
@@ -539,7 +537,6 @@
     note.textContent = openData.note;
     note.hidden = !openData.note;
     renderPhoto();
-    ding(i);
     setHover(null);
     // выбранный предмет остаётся подсвеченным поверх затемнения
     focusClone = product.cloneNode(true);
@@ -626,111 +623,21 @@
     open(full, '_blank', 'noopener');
   }));
 
-  /* ===== Музыкальная шкатулка (с прошлой версии сайта) ===== */
+  /* ===== Кнопка звука: два состояния из макета. Музыки пока нет — кнопка только переключает вид ===== */
   const sounds = $$('.js-sound');
-  let audio = null, musicOn = false, loopTimer = null;
-  const NOTE = { C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880, C6: 1046.5 };
-  // «Jingle Bells», общественное достояние
-  const TUNE = [
-    ['E5', 1], ['E5', 1], ['E5', 2], ['E5', 1], ['E5', 1], ['E5', 2],
-    ['E5', 1], ['G5', 1], ['C5', 1.5], ['D5', .5], ['E5', 4],
-    ['F5', 1], ['F5', 1], ['F5', 1.5], ['F5', .5], ['F5', 1], ['E5', 1], ['E5', 1], ['E5', .5], ['E5', .5],
-    ['E5', 1], ['D5', 1], ['D5', 1], ['E5', 1], ['D5', 2], ['G5', 2],
-    ['E5', 1], ['E5', 1], ['E5', 2], ['E5', 1], ['E5', 1], ['E5', 2],
-    ['E5', 1], ['G5', 1], ['C5', 1.5], ['D5', .5], ['E5', 4],
-    ['F5', 1], ['F5', 1], ['F5', 1.5], ['F5', .5], ['F5', 1], ['E5', 1], ['E5', 1], ['E5', .5], ['E5', .5],
-    ['G5', 1], ['G5', 1], ['F5', 1], ['D5', 1], ['C5', 4],
-  ];
-  const BEAT = .3;
-  const ensureAudio = () => {
-    if (!audio) {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return null;
-      audio = new AC();
-      audio.master = audio.createGain();
-      audio.master.gain.value = .22;
-      audio.master.connect(audio.destination);
-    }
-    if (audio.state === 'suspended') audio.resume();
-    return audio;
-  };
-  const bell = (freq, at, len = 1.2, vol = .5) => {
-    [[1, 1], [2.01, .35], [3.98, .12]].forEach(([m, v]) => {
-      const o = audio.createOscillator();
-      const g = audio.createGain();
-      o.type = 'sine';
-      o.frequency.value = freq * m;
-      g.gain.setValueAtTime(0, at);
-      g.gain.linearRampToValueAtTime(vol * v, at + .006);
-      g.gain.exponentialRampToValueAtTime(.0001, at + len / m);
-      o.connect(g).connect(audio.master);
-      o.start(at);
-      o.stop(at + len + .05);
-    });
-  };
-  function playTune() {
-    if (!musicOn || !ensureAudio()) return;
-    let t = audio.currentTime + .08;
-    for (const [n, d] of TUNE) { bell(NOTE[n], t, 1.1, .45); t += d * BEAT; }
-    const total = TUNE.reduce((acc, [, d]) => acc + d, 0) * BEAT;
-    loopTimer = setTimeout(playTune, (total + 1.2) * 1000);
-  }
-  function magicChime() {
-    if (!musicOn || !ensureAudio()) return;
-    const t = audio.currentTime;
-    ['C5', 'E5', 'G5', 'C6', 'E5', 'G5', 'A5', 'C6'].forEach((n, i) =>
-      bell(NOTE[n] * (i > 3 ? 2 : 1), t + i * .055, 1.6, .3));
-  }
-  function ding(i) {
-    if (!musicOn || !ensureAudio()) return;
-    bell([NOTE.C6, NOTE.E5 * 2, NOTE.G5 * 2, NOTE.A5 * 2, NOTE.C6 * 1.5, NOTE.D5 * 2][i % 6], audio.currentTime, 1.4, .35);
-  }
-  // фоновая музыка включена по умолчанию: зацикленный трек CONFIG.music;
-  // если файла нет — играет музыкальная шкатулка. Браузер разрешает звук только после первого действия
-  // посетителя (клик, нажатие клавиши, касание), поэтому до него музыка ждёт
-  const bgm = new Audio();
-  bgm.loop = true;
-  bgm.preload = 'auto';
-  bgm.volume = .45;
-  let trackOk = !!CONFIG.music, started = false;
-  if (trackOk) {
-    bgm.src = CONFIG.music;
-    bgm.addEventListener('error', () => { trackOk = false; if (musicOn && started) playTune(); }, { once: true });
-  }
-  const syncButtons = () => sounds.forEach(b => {
-    b.setAttribute('aria-pressed', String(musicOn));
-    b.setAttribute('aria-label', musicOn ? 'Выключить музыку' : 'Включить музыку');
-  });
-  const startMusic = () => {
-    clearTimeout(loopTimer);
-    if (trackOk) {
-      started = true;
-      bgm.play().catch(() => { started = false; if (!trackOk) startMusic(); });
-    } else {
-      started = !!ensureAudio();
-      if (started) playTune();
-    }
-  };
-  const stopMusic = () => { clearTimeout(loopTimer); bgm.pause(); };
-  musicOn = true;
-  syncButtons();
-  const KICK = ['pointerdown', 'keydown', 'touchstart'];
-  const kick = e => {
-    if (e.target.closest && e.target.closest('.js-sound')) return;   // кнопка звука сама решает
-    KICK.forEach(ev => removeEventListener(ev, kick, true));
-    if (musicOn && !started) startMusic();
-  };
-  KICK.forEach(ev => addEventListener(ev, kick, true));
+  let soundOn = false;
   sounds.forEach(btn => btn.addEventListener('click', () => {
-    musicOn = !musicOn;
-    syncButtons();
-    if (musicOn) { magicChime(); startMusic(); } else { stopMusic(); started = false; }
+    soundOn = !soundOn;
+    sounds.forEach(b => {
+      b.setAttribute('aria-pressed', String(soundOn));
+      b.setAttribute('aria-label', soundOn ? 'Музыка играет' : 'Музыка выключена');
+    });
   }));
 
   /* ===== Скролл: каждая смена сцены — процесс, привязанный к положению скролла ===== */
-  // P — положение в «экранах»: 0 первый экран, 1 наборы, 2–4 «сколько вяжу» (три карточки), 5 для детей, 6 таймер, 7 сроки, 8 обо мне, 9 финал
-  const LAST = 9;
-  const STOPS = { hero: 0, sets: 1, time: 2, kids: 5, left: 6, terms: 7, about: 8, book: 9 };
+  // P — положение в «экранах»: 0 первый экран, 1 наборы, 2 «сколько вяжу» (заголовок), 3–5 там же три карточки, 6 для детей, 7 таймер, 8 сроки, 9 обо мне, 10 финал
+  const LAST = 10;
+  const STOPS = { hero: 0, sets: 1, time: 2, kids: 6, left: 7, terms: 8, about: 9, book: 10 };
   let auto = false;          // прокрутку ведёт сам сайт (меню, доезжание)
   const goTo = hash => {
     const id = hash.slice(1);
@@ -807,12 +714,12 @@
      enter/leave: fade — растворение и элементы по очереди, clip — рамка наезжает (объекты стоят),
      under — сцена уже лежит под уезжающей рамкой, cover — сцена стоит, пока её закрывают, split — карточка Кати раскладывается на три */
   const SCENES = [
-    { id: 'time', a: 2, b: 4, enter: 'fade', leave: 'fade' },
-    { id: 'kids', a: 5, b: 5, enter: 'fade', leave: 'cover' },
-    { id: 'left', a: 6, b: 6, enter: 'clip', leave: 'clip' },
-    { id: 'terms', a: 7, b: 7, enter: 'under', leave: 'fade' },
-    { id: 'about', a: 8, b: 8, enter: 'fade', leave: 'split' },
-    { id: 'book', a: 9, b: 9, enter: 'split', leave: 'none' },
+    { id: 'time', a: 2, b: 5, enter: 'fade', leave: 'fade' },
+    { id: 'kids', a: 6, b: 6, enter: 'fade', leave: 'cover' },
+    { id: 'left', a: 7, b: 7, enter: 'clip', leave: 'clip' },
+    { id: 'terms', a: 8, b: 8, enter: 'under', leave: 'fade' },
+    { id: 'about', a: 9, b: 9, enter: 'fade', leave: 'split' },
+    { id: 'book', a: 10, b: 10, enter: 'split', leave: 'none' },
   ].map(sc => {
     const el = $(`#${sc.id}`);
     const num = v => parseFloat(v) || 0;
@@ -826,6 +733,7 @@
   const b2els = $$('.b2-el').map(n => ({ n, d: parseFloat(n.style.getPropertyValue('--d')) || 0 }));
   const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]')];
   const left = $('#left');
+  const b3bg = $('#b3-bg'), b3fg = $('#b3-fg'), b3text = $('#b3-textwrap'), b3card = $('#b3-card');
   const b8cards = $$('.b8-card');
   const b8fill = $('.b8-fill');
   const B8 = [534.5, 960.5, 1386.5].map(x => ({ ox: 960 - x, oy: 324.5 }));
@@ -909,7 +817,7 @@
       sc.rv.forEach(({ n, d, keep }) => {
         const pe = still ? 1 : clamp((e - .25 - Math.min(d, 1) * .3) / .4);
         let pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .12) / .4) : 0;
-        if (keep) { n.style.opacity = P > 8 ? 0 : fmt(pe); n.style.transform = `translateY(${fmt((1 - pe) * 30)}px)`; n.style.filter = ''; return; }
+        if (keep) { n.style.opacity = P > 9 ? 0 : fmt(pe); n.style.transform = `translateY(${fmt((1 - pe) * 30)}px)`; n.style.filter = ''; return; }
         styleEl(n, pe * (1 - pl), (1 - pe) * 40 - pl * 40, (1 - pe + pl) * 8);
       });
       sc.st.forEach(({ n, d }) => {
@@ -922,19 +830,31 @@
     });
 
     // 2…4: карточка переворачивается по вертикали, угол — от скролла
-    const q = clamp(P - 2, 0, 2);
+    // 2 → 3: экран спускается по высокому блоку от заголовка к домику, заголовок гаснет, появляется карточка;
+    // ветки сверху (слой 03) стоят на месте
+    const pan = easeIO(clamp(P - 2));
+    const panY = `translateY(${fmt(-1316 * pan)}px)`;
+    put(b3bg, 'transform', panY);
+    put(b3fg, 'transform', panY);
+    put(b3text, 'opacity', String(fmt(1 - clamp(pan / .55))));
+    const ce = clamp((pan - .4) / .45);
+    put(b3card, 'opacity', String(fmt(ce)));
+    put(b3card, 'transform', `translateY(${fmt((1 - ce) * 50)}px) scale(${fmt(.94 + .06 * ce)})`);
+
+    // 3 → 4 → 5: блок стоит, карточка переворачивается по вертикали, угол — от скролла
+    const q = clamp(P - 3, 0, 2);
     let i = Math.min(2, Math.floor(q)), t = q - i;
     if (i === 2) t = 0;
     const tt = easeIO(t);
     if (tt < .5) { setCard(i); flip.style.transform = `rotateX(${fmt(tt * 180)}deg)`; }
     else { setCard(i + 1); flip.style.transform = `rotateX(${fmt((tt - 1) * 180)}deg)`; }
 
-    // 5 ↔ 6 ↔ 7: жёсткий параллакс — объекты таймера стоят, рамка наезжает снизу и уезжает вверх
-    left.style.setProperty('--ct', `${fmt(clamp(6 - P) * 100)}%`);
-    left.style.setProperty('--cb', `${fmt(clamp(P - 6) * 100)}%`);
+    // 6 ↔ 7 ↔ 8: жёсткий параллакс — объекты таймера стоят, рамка наезжает снизу и уезжает вверх
+    left.style.setProperty('--ct', `${fmt(clamp(7 - P) * 100)}%`);
+    left.style.setProperty('--cb', `${fmt(clamp(P - 7) * 100)}%`);
 
-    // 8 → 9: из-за карточки Кати вылетают три карточки наборов — соосно, без поворота, потом карточка Кати исчезает
-    const eb = clamp(P - 8), eq = easeIO(clamp((eb - .08) / .72));
+    // 9 → 10: из-за карточки Кати вылетают три карточки наборов — соосно, без поворота, потом карточка Кати исчезает
+    const eb = clamp(P - 9), eq = easeIO(clamp((eb - .08) / .72));
     b8fill.style.opacity = fmt(clamp(eb / .6));
     b8cards.forEach((c, j) => {
       const o = B8[j];
@@ -994,7 +914,7 @@
     html.classList.add('is-locked');
     scrollTo(0, 0);
     at(700, () => { body.classList.add('is-charging'); dustUntil = performance.now() + 1500; });
-    at(2400, () => { body.classList.add('is-open'); openBurst(); magicChime(); });
+    at(2400, () => { body.classList.add('is-open'); openBurst(); });
     at(3000, () => body.classList.add('is-frame'));
     at(3500, () => body.classList.add('is-ui'));
     at(5200, finish);

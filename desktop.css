@@ -122,7 +122,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hd-nav a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
 .hd-right { width: 198px; display: flex; justify-content: flex-end; }
 .hd-sound { display: flex; padding: 14px; border-radius: 100px; }
-.hd-sound[aria-pressed="true"] { background: rgba(255, 237, 200, .25); }
+/* два состояния кнопки звука из макета */
+.hd-sound .ic-on, .hd-sound[aria-pressed="true"] .ic-off { display: none; }
+.hd-sound[aria-pressed="true"] .ic-on { display: block; }
 /* Второй вариант шапки после начала скролла */
 /* второй вариант шапки после начала скролла: компактная строка по центру */
 .hd { transition: opacity .4s ease, transform .5s cubic-bezier(.16, 1, .3, 1); }
@@ -269,14 +271,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* 3. Сколько вяжу */
 .b3 { background: #002d16; }
-.b3-layers { position: absolute; inset: 0; }
-.b3-layers img { position: absolute; left: -15px; bottom: 0; width: 1935px; height: 1080px; object-fit: cover; }
-.b3-text {
-  position: absolute; left: 82px; top: 138px; width: 1756px; z-index: 3;
-  display: flex; flex-direction: column; gap: 24px; align-items: center; text-align: center;
-}
-.lead { font: 500 20px/normal Manrope, sans-serif; }
-.b3-card-wrap { position: absolute; left: 728px; top: 348px; width: 463.8px; height: 648.33px; z-index: 3; perspective: 1600px; }
+.b3-world { position: absolute; left: 0; top: 0; width: 1920px; height: 2396px; }
+.b3-l01 { position: absolute; left: -15px; top: -166px; width: 1935px; height: 2562px; }
+.b3-l01 img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
+.b3-l02, .b3-l03 { position: absolute; left: -15px; top: 0; width: 1935px; height: 1080px; object-fit: cover; }
+.b3-textwrap { position: absolute; left: 82px; top: 308px; width: 1756px; z-index: 3; }
+.b3-text { display: flex; flex-direction: column; gap: 24px; align-items: center; text-align: center; }
+.b3-card-wrap { position: absolute; left: 728px; top: 1566px; width: 463.8px; height: 648.33px; z-index: 3; perspective: 1600px; }
 
 /* Карточка-марка */
 .stamp {
