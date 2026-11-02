@@ -1112,6 +1112,7 @@
   const at = (ms, fn) => timers.push(setTimeout(fn, ms));
   const finish = () => {
     timers.forEach(clearTimeout);
+    body.classList.remove('is-waiting');
     dustUntil = 0;
     body.classList.add('is-charging', 'is-open', 'is-frame', 'is-ui', 'is-done');
     html.classList.remove('is-locked');
@@ -1128,12 +1129,28 @@
     if (reduce) { finish(); return; }
     html.classList.add('is-locked');
     scrollTo(0, 0);
-    at(700, () => { body.classList.add('is-charging'); dustUntil = performance.now() + 1500; });
-    at(2400, () => { body.classList.add('is-open'); openBurst(); });
-    at(3000, () => body.classList.add('is-frame'));
-    at(3500, () => body.classList.add('is-ui'));
-    at(5200, finish);
+    body.classList.add('is-waiting');   // подарок покачивается в воздухе и ждёт клика
   };
+  // клик по подарку запускает открытие и переход к лендингу
+  const openGift = () => {
+    if (!body.classList.contains('is-waiting')) return;
+    body.classList.remove('is-waiting');
+    body.classList.add('is-charging');
+    dustUntil = performance.now() + 1500;
+    at(1700, () => { body.classList.add('is-open'); openBurst(); });
+    at(2300, () => body.classList.add('is-frame'));
+    at(2800, () => body.classList.add('is-ui'));
+    at(4500, finish);
+  };
+  $('#gift').addEventListener('click', openGift);
+  // стикеры вылетают из центра коробки, по очереди
+  $$('.stickers[data-set="hero"] .stk').forEach((el, i) => {
+    const x = el.offsetLeft + el.offsetWidth / 2, y = el.offsetTop + el.offsetHeight / 2;
+    el.style.setProperty('--fx', `${960 - x}px`);
+    el.style.setProperty('--fy', `${430 - y}px`);
+    el.style.setProperty('--fr', `${(i % 2 ? 1 : -1) * (25 + i * 7)}deg`);
+    el.style.setProperty('--fd', `${.05 + i * .07}s`);
+  });
   $('.skip').addEventListener('click', finish);
   addEventListener('keydown', e => { if (e.key === 'Escape' && !body.classList.contains('is-done')) finish(); });
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';

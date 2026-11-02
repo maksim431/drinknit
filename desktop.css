@@ -44,10 +44,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .grp-a #hero, .grp-a #sets, .grp-a #product { visibility: visible; transition: none; }
 .scene { z-index: 30; opacity: 0; visibility: hidden; }
 #left { z-index: 40; }
-#hero .stk.pop { opacity: 0; transform: scale(.5) rotate(-10deg); }
-.is-ui #hero .stk.pop {
+/* стикеры первого экрана вылетают из коробки при открытии */
+#hero .stk.pop { opacity: 0; transform: translate(var(--fx, 0px), var(--fy, 0px)) scale(.15) rotate(var(--fr, -30deg)); }
+.is-open #hero .stk.pop {
   opacity: 1; transform: none;
-  transition: opacity .5s ease var(--d, 0s), transform .9s cubic-bezier(.34, 1.45, .5, 1) var(--d, 0s);
+  transition: opacity .25s ease var(--fd, 0s), transform 1.2s cubic-bezier(.22, 1.35, .4, 1) var(--fd, 0s);
 }
 
 .bg-green { background: linear-gradient(180deg, #346949 0%, #002510 82.692%); }
@@ -430,17 +431,64 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   100% { opacity: 0; transform: scale(1.25) rotate(55deg); }
 }
 .closed {
-  position: absolute; left: 172px; top: -330px; width: 1564px; height: 1564px; z-index: 5; pointer-events: none;
-  animation: float 3.2s ease-in-out infinite;
+  position: absolute; left: 294px; top: -205px; width: 1332px; height: 1332px; z-index: 7; pointer-events: none;
+  animation: float 3.6s ease-in-out infinite;
 }
-.closed img { width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 46%; }
-.is-charging .closed img { animation: wiggle 1.7s cubic-bezier(.36, .07, .19, .97) forwards; }
-.is-open .closed { animation: none; }
+.closed img { width: 100%; height: 100%; object-fit: cover; transform-origin: 50% 46%; transition: filter .3s ease; }
+/* зона клика — только сама коробка, а не весь квадрат картинки */
+.gift-hit {
+  position: absolute; left: 17%; top: 27%; width: 66%; height: 50%; padding: 0; border-radius: 30%;
+  pointer-events: none; cursor: pointer;
+}
+.is-waiting .gift-hit { pointer-events: auto; }
+.gift-hit:focus-visible { outline: none; }
+.is-waiting .closed:has(.gift-hit:hover) img, .closed:has(.gift-hit:focus-visible) img { filter: brightness(1.06) drop-shadow(0 0 22px rgba(255, 220, 150, .5)); }
+/* деформация: изнутри что-то рвётся наружу */
+.is-charging .closed { animation: none; }
+.is-charging .closed img { animation: burst-out 1.7s cubic-bezier(.36, .07, .19, .97) forwards; }
 .is-open .closed img { animation: closed-out .55s ease-in forwards; }
 .is-done .closed, .is-done .rays, .is-done .glow { display: none; }
+.gift-shadow {
+  position: absolute; left: 421px; top: 709px; width: 1015px; height: 228px; z-index: 6; pointer-events: none;
+  animation: shadow-float 3.6s ease-in-out infinite; transition: opacity .6s ease;
+}
+.is-open .gift-shadow, .is-done .gift-shadow { opacity: 0; }
+@keyframes shadow-float {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(.9); opacity: .78; }
+}
+/* подсказка «Нажми на подарок» */
+.gift-hint { position: absolute; inset: 0; z-index: 13; pointer-events: none; transition: opacity .4s ease, transform .5s cubic-bezier(.34, 1.45, .5, 1); }
+.gift-hint-bubble { position: absolute; left: 1225px; top: 712px; width: 330.5px; height: 191.6px; }
+.gift-hint-text {
+  position: absolute; left: 1384.6px; top: 772px; transform: translateX(-50%); white-space: nowrap;
+  font: 700 20px/1.4 Comfortaa, sans-serif; letter-spacing: .6px; text-transform: uppercase; color: #012611;
+}
+.gift-hint-goat { position: absolute; left: 1502px; top: 696px; width: 351.772px; height: 377.651px; display: flex; align-items: center; justify-content: center; }
+.gift-hint-goat .stk-r { filter: drop-shadow(0 8px 4px rgba(0, 0, 0, .55)); }
+.gift-hint-goat .stk-r > i { position: absolute; inset: 0; overflow: hidden; }
+.gift-hint-goat .stk-r > i > img { position: absolute; max-width: none; }
+.intro:not(.is-waiting) .gift-hint, .is-done .gift-hint { opacity: 0; transform: translateY(20px) scale(.9); }
+.is-waiting .gift-hint { animation: hint-in .7s cubic-bezier(.34, 1.45, .5, 1) .8s both; }
+@keyframes hint-in { from { opacity: 0; transform: translateY(30px) scale(.85); } }
 @keyframes float {
   0%, 100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-22px) rotate(-.6deg); }
+}
+@keyframes burst-out {
+  0% { transform: none; filter: brightness(1); }
+  10% { transform: translateY(-4px) scale(1.03, .97) rotate(-1.5deg); }
+  18% { transform: translateY(2px) scale(.97, 1.04) rotate(1.5deg); }
+  27% { transform: translateY(-8px) scale(1.05, .95) rotate(-2.5deg); }
+  35% { transform: translateY(0) scale(.95, 1.06) skewX(1.5deg) rotate(2.5deg); }
+  44% { transform: translateY(-12px) scale(1.07, .93) skewX(-2deg) rotate(-3deg); filter: brightness(1.1); }
+  52% { transform: translateY(-4px) scale(.94, 1.09) skewX(2deg) rotate(3deg); }
+  61% { transform: translateY(-16px) scale(1.09, .92) skewX(-2.5deg) rotate(-4deg); filter: brightness(1.22); }
+  69% { transform: translateY(-8px) scale(.93, 1.11) skewX(2.5deg) rotate(4deg); }
+  78% { transform: translateY(-20px) scale(1.11, .91) skewX(-3deg) rotate(-3deg); filter: brightness(1.35); }
+  87% { transform: translateY(-14px) scale(.94, 1.13) skewX(2deg) rotate(2deg); }
+  94% { transform: translateY(-24px) scale(1.12, .92) rotate(-1deg); filter: brightness(1.45); }
+  100% { transform: translateY(-26px) scale(1.08, 1.04); filter: brightness(1.55); }
 }
 @keyframes wiggle {
   0% { transform: none; filter: brightness(1); }
@@ -481,7 +529,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   transition: opacity .4s ease;
 }
 .skip:hover { background: rgba(255, 255, 255, .2); }
-.is-ui .skip { opacity: 0; pointer-events: none; }
+.is-ui .skip, .is-waiting .skip { opacity: 0; pointer-events: none; }
 
 /* 9. Частые вопросы */
 .b9-title { position: absolute; left: 0; top: 140px; width: 1920px; text-align: center; line-height: 1.4; letter-spacing: 1.08px; }
