@@ -24,7 +24,8 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .track > div { height: 100vh; }
 .track > .track-video { height: 150vh; }   /* видео-переход: 1,5 экрана прокрутки */
 .vp {
-  position: fixed; inset: 0; overflow: hidden; z-index: 1;
+  /* clip, а не hidden: иначе на телефоне касание по экрану не прокручивает страницу */
+  position: fixed; inset: 0; overflow: hidden; overflow: clip; z-index: 1;
   background: linear-gradient(180deg, #346949 0%, #002510 100%);
 }
 #stage {
@@ -32,7 +33,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   transform: translate(var(--tx, 0px), var(--ty, 0px)) scale(var(--s)); transform-origin: 0 0;
 }
 .scr {
-  position: absolute; overflow: hidden;
+  position: absolute; overflow: hidden; overflow: clip;
   left: calc(-1 * var(--px, 0px)); top: calc(-1 * var(--py, 0px));
   width: calc(1920px + 2 * var(--px, 0px)); height: calc(1080px + 2 * var(--py, 0px));
 }
@@ -92,11 +93,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stk { position: absolute; display: flex; align-items: center; justify-content: center; }
 .stk-r { position: relative; flex: none; filter: drop-shadow(0 8px 4px rgba(0, 0, 0, .55)); }
 .stk-r.ns { filter: none; }
-.stk-r > i { position: absolute; inset: 0; overflow: hidden; }
+.stk-r > i { position: absolute; inset: 0; overflow: hidden; overflow: clip; }
 .stk-r > i > img { position: absolute; max-width: none; }
 
 /* Снег: всегда на экране, поверх всех сцен, два слоя */
-.snow-all { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+.snow-all { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; overflow: clip; }
 .snow-all i {
   position: absolute; left: 0; right: 0; bottom: 0; top: calc(-1 * var(--th));
   background: url(assets/d/snow-glow.webp) 0 0 / calc(1920px * var(--sz)) var(--th) repeat;
@@ -253,7 +254,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .modal-bottom { display: flex; flex-direction: column; gap: 24px; }
 .modal-text { font: 500 16px/normal Manrope, sans-serif; }
 .modal-note { font: 500 12px/normal Manrope, sans-serif; opacity: .7; }
-.modal-photo { position: relative; width: 331px; height: 100%; border-radius: 24px; overflow: hidden; flex: none; }
+.modal-photo { position: relative; width: 331px; height: 100%; border-radius: 24px; overflow: hidden; overflow: clip; flex: none; }
 .modal-img { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
 .modal-img img { width: 346px; height: 464px; object-fit: cover; flex: none; }
 .ph {
@@ -293,7 +294,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   filter: drop-shadow(0 8px 7px rgba(0, 0, 0, .35));
   transform-style: preserve-3d;
 }
-.stamp-win { position: absolute; left: 58.87px; top: 58.46px; width: 346.14px; height: 444.27px; background: #fff; overflow: hidden; }
+.stamp-win { position: absolute; left: 58.87px; top: 58.46px; width: 346.14px; height: 444.27px; background: #fff; overflow: hidden; overflow: clip; }
 .stamp-win img { position: absolute; left: 50%; top: 50%; max-width: none; object-fit: cover; }
 .stamp-cap {
   position: absolute; left: 59.05px; top: 510.02px; width: 346.16px; padding: 7.38px 11.44px;
@@ -466,7 +467,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .gift-hint-goat { position: absolute; left: 1502px; top: 696px; width: 351.772px; height: 377.651px; display: flex; align-items: center; justify-content: center; }
 .gift-hint-goat .stk-r { filter: drop-shadow(0 8px 4px rgba(0, 0, 0, .55)); }
-.gift-hint-goat .stk-r > i { position: absolute; inset: 0; overflow: hidden; }
+.gift-hint-goat .stk-r > i { position: absolute; inset: 0; overflow: hidden; overflow: clip; }
 .gift-hint-goat .stk-r > i > img { position: absolute; max-width: none; }
 .intro:not(.is-waiting) .gift-hint, .is-done .gift-hint { opacity: 0; transform: translateY(20px) scale(.9); }
 .is-waiting .gift-hint { animation: hint-in .7s cubic-bezier(.34, 1.45, .5, 1) .8s both; }
