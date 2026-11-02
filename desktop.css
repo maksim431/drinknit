@@ -275,6 +275,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .b3-l01 { position: absolute; left: -15px; top: -166px; width: 1935px; height: 2562px; }
 .b3-l01 img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; }
 .b3-l02, .b3-l03 { position: absolute; left: -15px; top: 0; width: 1935px; height: 1080px; object-fit: cover; }
+.b3-video {
+  position: absolute; left: calc(-1 * var(--px, 0px)); top: calc(-1 * var(--py, 0px));
+  width: calc(1920px + 2 * var(--px, 0px)); height: calc(1080px + 2 * var(--py, 0px));
+  opacity: 0; pointer-events: none;
+}
 .b3-textwrap { position: absolute; left: 82px; top: 308px; width: 1756px; z-index: 3; }
 .b3-text { display: flex; flex-direction: column; gap: 24px; align-items: center; text-align: center; }
 .b3-card-wrap { position: absolute; left: 728px; top: 1566px; width: 463.8px; height: 648.33px; z-index: 3; perspective: 1600px; }

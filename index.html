@@ -299,9 +299,11 @@
     <div class="b3-world" id="b3-bg">
       <div class="b3-l01 bgl"><img src="assets/d/b3-01.webp" alt="" data-d="6"></div>
     </div>
+    <!-- переход в блок 4: кадры видео, сменяются при скролле -->
+    <canvas class="b3-video" id="b3-video" aria-hidden="true"></canvas>
     <!-- ветки справа и слева стоят на месте -->
-    <img class="b3-l02 bgl" src="assets/d/b3-02.webp" alt="" data-d="14">
-    <img class="b3-l03 bgl" src="assets/d/b3-03.webp" alt="" data-d="26">
+    <img class="b3-l02 bgl b3-fade" src="assets/d/b3-02.webp" alt="" data-d="14">
+    <img class="b3-l03 bgl b3-fade" src="assets/d/b3-03.webp" alt="" data-d="26">
     <!-- заголовок стоит на месте и гаснет при скролле -->
     <div class="b3-textwrap" id="b3-textwrap">
       <div class="b3-text rv" style="--d:.15s">

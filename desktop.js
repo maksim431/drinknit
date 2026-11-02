@@ -714,8 +714,8 @@
      enter/leave: fade — растворение и элементы по очереди, clip — рамка наезжает (объекты стоят),
      under — сцена уже лежит под уезжающей рамкой, cover — сцена стоит, пока её закрывают, split — карточка Кати раскладывается на три */
   const SCENES = [
-    { id: 'time', a: 2, b: 5, enter: 'fade', leave: 'fade' },
-    { id: 'kids', a: 6, b: 6, enter: 'fade', leave: 'cover' },
+    { id: 'time', a: 2, b: 5, enter: 'fade', leave: 'video' },
+    { id: 'kids', a: 6, b: 6, enter: 'video', leave: 'cover' },
     { id: 'left', a: 7, b: 7, enter: 'clip', leave: 'clip' },
     { id: 'terms', a: 8, b: 8, enter: 'under', leave: 'fade' },
     { id: 'about', a: 9, b: 9, enter: 'fade', leave: 'split' },
@@ -733,6 +733,55 @@
   const b2els = $$('.b2-el').map(n => ({ n, d: parseFloat(n.style.getPropertyValue('--d')) || 0 }));
   const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]')];
   const left = $('#left');
+  /* ===== Видео-переход: кадры assets/d/trans/000…144.webp, грузятся, когда посетитель дошёл до блока 3 ===== */
+  const FRAMES = 145;
+  const frames = new Array(FRAMES);
+  const vcan = $('#b3-video'), vctx = vcan.getContext('2d');
+  const b3fades = $$('.b3-fade');
+  let framesRequested = false, lastFrame = -1;
+  const loadFrames = () => {
+    if (framesRequested) return;
+    framesRequested = true;
+    // сначала каждый 8-й кадр, потом остальные — переход работает сразу, а плавность догружается
+    const order = [];
+    for (const step of [8, 4, 2, 1]) for (let i = 0; i < FRAMES; i += step) if (!order.includes(i)) order.push(i);
+    if (!order.includes(FRAMES - 1)) order.splice(1, 0, FRAMES - 1);
+    let next = 0;
+    const pump = () => {
+      if (next >= order.length) return;
+      const i = order[next++];
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => { frames[i] = img; lastFrame = -1; pump(); };
+      img.onerror = pump;
+      img.src = `assets/d/trans/${String(i).padStart(3, '0')}.webp`;
+    };
+    for (let k = 0; k < 4; k++) pump();
+  };
+  // геометрия кадра: в начале — как фон блока 3 внизу спуска, в конце — как фон блока 4
+  const V0 = { x: -116.7, y: 80.2, w: 2162.2, h: 1216.3 }, V1 = { x: -11.8, y: -4.8, w: 1940.4, h: 1091.5 };   // подобрано по совпадению кадров с фонами
+  const drawFrame = t => {
+    let i = Math.round(t * (FRAMES - 1));
+    if (!frames[i]) {   // ближайший загруженный
+      let d = 1;
+      while (d < FRAMES && !frames[i - d] && !frames[i + d]) d++;
+      i = frames[i - d] ? i - d : i + d;
+      if (!frames[i]) return;
+    }
+    const W = Math.round(vcan.clientWidth * cdpr * s), H = Math.round(vcan.clientHeight * cdpr * s);
+    if (vcan.width !== W || vcan.height !== H) { vcan.width = W; vcan.height = H; lastFrame = -1; }
+    const key = i * 1000 + Math.round(t * 999);
+    if (key === lastFrame) return;
+    lastFrame = key;
+    const e = easeIO(t);
+    const r = { x: V0.x + (V1.x - V0.x) * e, y: V0.y + (V1.y - V0.y) * e, w: V0.w + (V1.w - V0.w) * e, h: V0.h + (V1.h - V0.h) * e };
+    // координаты кадра 1920 × 1080 → холст (с полями до краёв окна и растяжением фонов --k)
+    const px = tx / s, py = ty / s, k = Math.max((1920 + 2 * px) / 1920, (1080 + 2 * py) / 1080);
+    const sx = W / (1920 + 2 * px), sy = H / (1080 + 2 * py);
+    const X = x => (960 + (x - 960) * k + px) * sx, Y = y => (540 + (y - 540) * k + py) * sy;
+    vctx.drawImage(frames[i], X(r.x), Y(r.y), X(r.x + r.w) - X(r.x), Y(r.y + r.h) - Y(r.y));
+  };
+
   const b3bg = $('#b3-bg'), b3fg = $('#b3-fg'), b3text = $('#b3-textwrap'), b3card = $('#b3-card');
   const b8cards = $$('.b8-card');
   const b8fill = $('.b8-fill');
@@ -807,22 +856,25 @@
     // остальные сцены
     SCENES.forEach(sc => {
       const e = clamp(P - (sc.a - 1)), l = clamp(P - sc.b);
-      const visible = e > 0 && (sc.leave === 'cover' || sc.leave === 'split' || sc.leave === 'clip' ? l < 1 : l < .6);
+      const visible = e > 0 && (['cover', 'split', 'clip', 'video'].includes(sc.leave) ? l < 1 : l < .6);
       // невидимые сцены убираются из отрисовки целиком
       put(sc.el, 'display', visible ? '' : 'none');
       put(sc.el, 'visibility', visible ? 'visible' : 'hidden');
       if (!visible) return;
-      put(sc.el, 'opacity', String(sc.enter === 'fade' ? fmt(clamp(e / .5)) : 1));
+      // video: сцена проявляется только в самом конце видео-перехода, поверх последнего кадра
+      put(sc.el, 'opacity', String(sc.enter === 'fade' ? fmt(clamp(e / .5)) : sc.enter === 'video' ? fmt(clamp((e - .84) / .14)) : 1));
       const still = sc.enter === 'clip' || sc.enter === 'under';
+      const vid = sc.enter === 'video';
       sc.rv.forEach(({ n, d, keep }) => {
-        const pe = still ? 1 : clamp((e - .25 - Math.min(d, 1) * .3) / .4);
-        let pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .12) / .4) : 0;
+        const pe = still ? 1 : vid ? clamp((e - .86 - Math.min(d, 1) * .06) / .12) : clamp((e - .25 - Math.min(d, 1) * .3) / .4);
+        // video: элементы гаснут в начале перехода
+        let pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .12) / .4) : sc.leave === 'video' ? clamp((l - d * .05) / .16) : 0;
         if (keep) { n.style.opacity = P > 9 ? 0 : fmt(pe); n.style.transform = `translateY(${fmt((1 - pe) * 30)}px)`; n.style.filter = ''; return; }
         styleEl(n, pe * (1 - pl), (1 - pe) * 40 - pl * 40, (1 - pe + pl) * 8);
       });
       sc.st.forEach(({ n, d }) => {
-        const pe = still ? 1 : clamp((e - .3 - Math.min(d, .7) * .3) / .4);
-        const pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .1) / .4) : 0;
+        const pe = still ? 1 : vid ? clamp((e - .88 - Math.min(d, .7) * .08) / .1) : clamp((e - .3 - Math.min(d, .7) * .3) / .4);
+        const pl = sc.leave === 'fade' || sc.leave === 'split' ? clamp((l - d * .1) / .4) : sc.leave === 'video' ? clamp(l / .16) : 0;
         const sc1 = (.5 + .5 * easeBack(pe)) * (1 - .25 * pl);
         n.style.opacity = fmt(Math.min(1, pe * 1.4) * (1 - pl));
         n.style.transform = `scale(${fmt(sc1)}) rotate(${fmt((1 - pe) * -12)}deg)`;
@@ -840,6 +892,18 @@
     const ce = clamp((pan - .4) / .45);
     put(b3card, 'opacity', String(fmt(ce)));
     put(b3card, 'transform', `translateY(${fmt((1 - ce) * 50)}px) scale(${fmt(.94 + .06 * ce)})`);
+
+    // 5 → 6: переход из блока 3 в блок 4 по кадрам видео. Элементы блока 3 гаснут в начале,
+    // кадры сменяются вместе со скроллом, элементы блока 4 появляются у последнего кадра
+    const vt = clamp(P - 5);
+    if (P > 4.5) loadFrames();
+    const vOut = clamp(vt / .16);
+    b3fades.forEach(n => put(n, 'opacity', String(fmt(1 - vOut))));
+    put(b3text, 'visibility', vt > 0 ? 'hidden' : '');
+    put(b3card, 'visibility', vt >= .16 ? 'hidden' : '');
+    if (vt > 0) put(b3card, 'opacity', String(fmt(1 - vOut)));
+    put(vcan, 'opacity', String(fmt(clamp(vt / .06))));
+    if (vt > 0 && vt < 1) drawFrame(vt);
 
     // 3 → 4 → 5: блок стоит, карточка переворачивается по вертикали, угол — от скролла
     const q = clamp(P - 3, 0, 2);
