@@ -823,7 +823,9 @@
       if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
       // доезжаем только до экрана по направлению прокрутки — назад к экрану, с которого уходят, не тянем
       const P = toP(scrollY), target = scrollDir > 0 ? Math.ceil(P - 1e-4) : scrollDir < 0 ? Math.floor(P + 1e-4) : Math.round(P), d = Math.abs(P - target);
-      if (d > .003 && d < .16) { auto = true; scrollTo({ top: toY(target), behavior: reduce ? 'auto' : 'smooth' }); }
+      // у блока с наборами зона прилипания больше — 30 % с обеих сторон, у остальных 16 %
+      const zone = target === STOPS.sets ? .3 : .16;
+      if (d > .003 && d < zone) { auto = true; scrollTo({ top: toY(target), behavior: reduce ? 'auto' : 'smooth' }); }
     };
     settleT = setTimeout(settle, 160);
   }, { passive: true });
