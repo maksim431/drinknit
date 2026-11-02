@@ -69,10 +69,23 @@
       </nav>
       <a class="hd2-book" href="#book" data-nav tabindex="-1">Забронировать набор</a>
     </div>
-    <button class="hd-sound glass-dark js-sound" type="button" tabindex="-1" aria-label="Музыка играет" aria-pressed="true">
-      <img class="ic-on" src="assets/d/ic-sound-on.svg" width="24" height="24" alt=""><img class="ic-off" src="assets/d/ic-sound-off.svg" width="24" height="24" alt="">
-    </button>
+    <div class="hd2-right">
+      <button class="hd-sound glass-dark js-sound" type="button" tabindex="-1" aria-label="Музыка играет" aria-pressed="true">
+        <img class="ic-on" src="assets/d/ic-sound-on.svg" width="24" height="24" alt=""><img class="ic-off" src="assets/d/ic-sound-off.svg" width="24" height="24" alt="">
+      </button>
+      <!-- меню разделов: только на телефоне -->
+      <button class="hd-menu glass-dark" type="button" tabindex="-1" aria-label="Меню" aria-expanded="false" aria-controls="mnav">
+        <img src="assets/d/ic-menu.svg" width="20" height="20" alt="">
+      </button>
+    </div>
   </div>
+  <nav class="mnav glass-dark" id="mnav" aria-label="Разделы" hidden>
+    <a href="#sets" data-nav>Наборы</a>
+    <a href="#kids" data-nav>Для детей</a>
+    <a href="#terms" data-nav>Сроки и доставка</a>
+    <a href="#faq" data-nav>Частые вопросы</a>
+    <a class="mnav-book" href="#book" data-nav>Забронировать набор</a>
+  </nav>
 </header>
 
 

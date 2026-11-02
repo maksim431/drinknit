@@ -14,11 +14,13 @@
     prod: { x: -309, y: 146, w: 1033, h: 770 },        // коробка на экране наборов
     hero: { dx: 1, dy: -118.5, k: .8877 },             // на первом экране: (-250, 70, 917 × 685)
     mouth: { x: 209.8, y: 451.3 }, boxc: { x: 209.8, y: 490.7 }, gift: { x: 209.8, y: 473.4 },
-    b3pan: 701, b3origin: [195 + 157.5, 466 + 11.17 + 701],
+    // блок 3 (1633 px): экран спускается, пока карточка не встанет по центру (365,7 px), карточки листаются,
+    // затем свободный спуск к домику (ещё 335,3 px) и только потом видео
+    b3pan: 365.74, b3pan2: 335.26, b3origin: [195 + 157.5, 466 + 11.17 + 701],
     v0: { x: -147.56, y: 239.06, w: 1232.07, h: 692.77 }, vanchor: [150, 640], vcover: false,   // первый кадр = низ фона блока 3
     kidsBg: { x: -695, y: 223, w: 1270, h: 709 },
     flip: [195, 340],
-    b3cardTop: 599.5, b3cardStick: 104,                // карточка блока 3 едет с фоном и останавливается под шапкой
+    b3cardTop: 599.5,
     termsPan: 206, bookPan: 1008,                      // блоки выше экрана: экран спускается по ним
   } : {
     prod: { x: 122.97, y: -125, w: 1787, h: 1334 },
@@ -98,14 +100,14 @@
     hero: [[-81, 802, 180.41, 188.9, 149.19, 160.37, 12.52], [268, 127, 140.44, 140.23, 106.32, 105.9, 24.26], [259, 821, 192.93, 192.86, 137.14, 136.42, 40.74],
       [-40, 437, 161.17, 171.06, 121.35, 137.89, -19.99], [-20, 124.16, 189.68, 200.66, 146.93, 163.82, -17.65], [305, 509, 115.96, 115.96, 89.8, 89.8, 20.94]],
     kids: [[275, 367, 126.84, 131.49, 97.02, 104.75, 19.86], [124, 714, 240.66, 258.37, 207.5, 228.79, -8.98], [14.36, 788, 117.92, 126.85, 98.36, 109.74, 11.27]],
-    left: [[75.8, 86, 238.5, 238.5, 213.9, 213.9, 7.04], [-2.85, 719, 183.9, 184.7, 142.3, 143.6, 20.73], null, [-13, 204.04, 119.69, 126.96, 98.69, 108.24, -12.44],
+    left: [[75.8, 86, 238.5, 238.5, 213.9, 213.9, 7.04], [15, 719, 183.91, 184.67, 142.29, 143.6, 20.73], null, [-13, 204.04, 119.69, 126.96, 98.69, 108.24, -12.44],
       [214.04, 841, 139.66, 140.27, 123.11, 123.83, -8.28], null, [285, 214, 91.8, 106, 91.8, 106, 0]],
     terms: [[86, 852, 344.77, 397.4, 269.12, 341.81, 'rotate(-165.79deg) scaleY(-1)']],
     about: [[6.56, 221, 158.34, 144.04, 138.14, 120.11, -10.89], [-12, 221.29, 87.28, 97.12, 69.45, 82.9, 13.86], [10, 764.63, 104, 95, 104, 95, 0],
       [254, 229, 127.63, 119.65, 103.03, 89.58, 20.2], [220, 787, 137.75, 138.28, 118.39, 119.06, -10.29], [307.91, 824.8, 65, 92, 65, 92, 0],
       [316.46, 300.57, 79.56, 96.56, 75.15, 93.03, -2.78], [59.76, 720, 89.1, 95.39, 75.81, 83.57, 9.94]],
     book: [[217, 607, 288.92, 340.69, 220.43, 293.65, 15], [-61, 197, 233.66, 258.19, 178.61, 215.49, -16.95], [-80, 1052, 243.71, 270.38, 180.73, 223.74, 18.99],
-      [266.1, 1378.2, 219.2, 234.9, 180.4, 197.9, -12.58]],
+      [236.24, 1425.35, 219.25, 234.93, 191.33, 209.84, 8.18]],
     faq: [null, null],
   };
   for (const [set, list] of Object.entries(STICKERS)) {
@@ -749,7 +751,9 @@
   // На телефоне блоки «Сроки» и финальный выше экрана: на них прокрутка не переключает сцену, а спускает экран
   // по блоку (участки hold, P стоит на месте). Длина участка = высота спуска, палец и блок двигаются вместе
   const V_START = 5, V_SLOW = 1.5;
-  const SEGS = [{ p: V_START, len: V_SLOW, span: 1 }];
+  const SEGS = [];
+  if (L.b3pan2) SEGS.push({ p: V_START, len: L.b3pan2 / FH, span: 0 });   // спуск к домику перед видео
+  SEGS.push({ p: V_START, len: V_SLOW, span: 1 });
   if (L.termsPan) SEGS.push({ p: 8, len: L.termsPan / FH, span: 0 });
   if (L.bookPan) SEGS.push({ p: 10, len: L.bookPan / FH, span: 0 });
   const HOLD_TOTAL = SEGS.filter(g => !g.span).reduce((a, g) => a + g.len, 0);
@@ -787,7 +791,20 @@
     auto = true;                 // переход по меню проезжает блоки без стопора
     scrollTo({ top: toY(STOPS[id]), behavior: reduce ? 'auto' : 'smooth' });
   };
-  $$('[data-nav]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); goTo(a.getAttribute('href')); }));
+  // меню разделов на телефоне: открывается кнопкой в шапке, закрывается выбором раздела, тапом мимо или Esc
+  const menuBtn = $('.hd-menu'), mnav = $('#mnav');
+  const setMenu = open => {
+    if (!menuBtn) return;
+    header.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    mnav.hidden = !open;
+  };
+  if (menuBtn) {
+    menuBtn.addEventListener('click', e => { e.stopPropagation(); setMenu(!header.classList.contains('menu-open')); });
+    document.addEventListener('click', e => { if (!e.target.closest('#mnav, .hd-menu')) setMenu(false); });
+    addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+  }
+  $$('[data-nav]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); setMenu(false); goTo(a.getAttribute('href')); }));
   $$('[data-set-pick]').forEach(el => el.addEventListener('click', () => {
     const k = el.dataset.setPick;
     goTo('#sets');
@@ -1000,7 +1017,7 @@
   addEventListener('resize', sizeFooter);
   const render = P => {
     const dP = Math.abs(P - lastP);
-    const hsum = (holdF[8] || 0) + (holdF[10] || 0) * 7;
+    const hsum = (holdF[8] || 0) + (holdF[10] || 0) * 7 + (holdF[5] || 0) * 3;
     const moved = dP > 0 || hsum !== lastH;
     lastH = hsum;
     const up = Math.max(0, P - LAST) * innerHeight / s;
@@ -1088,7 +1105,7 @@
     // 2 → 3: свободный скролл по высокому блоку — фон и карточка едут ровно вместе со скроллом, без замедлений;
     // заголовок и обе ветки стоят на месте, заголовок постепенно гаснет, карточка появляется
     const pan = clamp(P - 2);
-    const panY = `translateY(${fmt(-L.b3pan * pan)}px)`;
+    const panY = `translateY(${fmt(-L.b3pan * pan - (L.b3pan2 || 0) * (holdF[5] || 0))}px)`;
     put(b3bg, 'transform', panY);
     put(b3fg, 'transform', panY);
     put(b3text, 'opacity', String(fmt(1 - clamp(pan / .55))));
