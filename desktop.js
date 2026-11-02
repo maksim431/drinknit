@@ -20,6 +20,22 @@
     L: { price: 2400, forWhom: 'Большой набор для самых близких, с козликом', hours: '11 часов вязания' },
   };
 
+  // Частые вопросы: [вопрос, ответ]. В квадратных скобках — заглушки, их нужно заменить
+  const FAQ = [
+    ['Какого размера игрушки?', 'Маленькие игрушки — около [N] см, средние — около [N] см. Например, «Зелёный воришка» из наборов M и L — 14 см.'],
+    ['Из чего они связаны?', 'Из хлопковой и акриловой пряжи [производитель]. Игрушки мягкие и после стирки держат форму.'],
+    ['Можно дарить маленьким детям?', 'Да. Глазки и мелкие детали держатся на безопасном креплении, пряжа гипоаллергенная. Игрушки подходят детям с [возраст].'],
+    ['Что связано вручную, а что куплено?', 'Барашка, варежку и «Зелёного воришку» вяжу я сама. Козлик в наборе L, крем для рук и открытка подобраны к набору.'],
+    ['Чем отличаются наборы S, M и L?', 'S, 900 ₽: две маленькие вязаные игрушки, крем и открытка в подарочном пакете. M, 1 700 ₽: плюс средняя игрушка, всё в коробке. L, 2 400 ₽: как M, плюс мягкий козлик.'],
+    ['Можно поменять состав или цвет?', 'Наборы собраны заранее, их состав не меняется. Каждая игрушка связана вручную, поэтому немного отличается от фото.'],
+    ['Что можно написать на открытке?', 'Любой текст. Пришлите его в сообщении, когда будете заказывать, и я подпишу открытку от руки.'],
+    ['Сколько делается набор?', 'От 1 до 3 дней с момента предоплаты, в зависимости от размера набора.'],
+    ['Как оплатить?', 'Предоплата 100 % за набор переводом на карту. Доставку оплачиваете отдельно, по тарифу службы.'],
+    ['Как получить набор?', 'Самовывоз в Нижнем Новгороде (район ТЦ «Фантастика»), Яндекс Доставка по городу или отправка по России: СДЭК, Яндекс, Ozon или Почта России.'],
+    ['До какого числа можно заказать?', 'До 25 декабря или пока не закончатся 10 наборов — что наступит раньше.'],
+    ['Можно вернуть набор?', 'Условия возврата описаны в документе «Условия заказа, оплаты, доставки и возврата» внизу страницы. [Нужен текст документа.]'],
+  ];
+
   // Тексты предметов: «Зелёный воришка» из макета, остальные черновики с прошлой версии сайта
   const NOTE_HAND = 'Каждая игрушка может немного отличаться от фото, потому что связана вручную.';
   const DETAILS = {
@@ -89,6 +105,10 @@
       ['sheet-cdp', 1539.94, 698, 201, 282, 201, 282, 0, 0, 0, 266.32, 189.81, 28],
       ['st-9', 1640.94, 352.05, 244.612, 296.848, 231.036, 285.997, -2.78, -62.86, -41.17, 225.72, 182.34, 34],
       ['st-10', 298.38, 576.36, 273.854, 293.352, 233, 257, 9.94, -62.14, -51.74, 224.28, 203.48, 26],
+    ],
+    faq: [
+      ['st-8', 40, 40, 298.913, 325.397, 198, 263, 18, -71.45, -41.17, 242.91, 182.34, 24, false],
+      ['st-9', 1640, 720, 285.861, 331.721, 237, 294, -8, -62.86, -41.17, 225.72, 182.34, 20, false],
     ],
     book: [
       ['st-8', 24, 0, 298.913, 325.397, 198, 263, 28.26, -71.45, -41.17, 242.91, 182.34, 24, false],
@@ -616,6 +636,35 @@
     toastT = setTimeout(() => toastEl.classList.remove('on'), 2600);
   };
   const NAMES = { telegram: 'Telegram', vk: 'ВК', max: 'MAX', vkGroup: 'группу ВК' };
+  $$('[data-doc]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); toast('Документ появится позже'); }));
+
+  /* ===== Частые вопросы: слева список, справа ответ ===== */
+  const faqList = $('#faq-list'), faqCard = $('#faq-card');
+  const showFaq = i => {
+    $$('button', faqList).forEach((b, j) => { b.setAttribute('aria-selected', String(j === i)); b.tabIndex = j === i ? 0 : -1; });
+    $('#faq-q').textContent = FAQ[i][0];
+    $('#faq-a').textContent = FAQ[i][1];
+    faqCard.setAttribute('aria-labelledby', `faq-t${i}`);
+    faqCard.classList.remove('swap'); void faqCard.offsetWidth; faqCard.classList.add('swap');
+  };
+  FAQ.forEach(([q], i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.id = `faq-t${i}`;
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-controls', 'faq-card');
+    b.textContent = q;
+    b.addEventListener('click', () => showFaq(i));
+    b.addEventListener('keydown', e => {
+      const d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault(); e.stopPropagation();
+      const n = (i + d + FAQ.length) % FAQ.length;
+      showFaq(n); faqList.children[n].focus();
+    });
+    faqList.appendChild(b);
+  });
+  showFaq(0);
   $$('[data-msg]').forEach(a => a.addEventListener('click', e => {
     const url = CONFIG.links[a.dataset.msg];
     e.preventDefault();
@@ -638,8 +687,8 @@
 
   /* ===== Скролл: каждая смена сцены — процесс, привязанный к положению скролла ===== */
   // P — положение в «экранах»: 0 первый экран, 1 наборы, 2 «сколько вяжу» (заголовок), 3–5 там же три карточки, 6 для детей, 7 таймер, 8 сроки, 9 обо мне, 10 финал
-  const LAST = 10;
-  const STOPS = { hero: 0, sets: 1, time: 2, kids: 6, left: 7, terms: 8, about: 9, book: 10 };
+  const LAST = 11;
+  const STOPS = { hero: 0, sets: 1, time: 2, kids: 6, left: 7, terms: 8, about: 9, book: 10, faq: 11 };
   let auto = false;          // прокрутку ведёт сам сайт (меню, доезжание)
   const goTo = hash => {
     const id = hash.slice(1);
@@ -721,7 +770,8 @@
     { id: 'left', a: 7, b: 7, enter: 'clip', leave: 'clip' },
     { id: 'terms', a: 8, b: 8, enter: 'under', leave: 'fade' },
     { id: 'about', a: 9, b: 9, enter: 'fade', leave: 'split' },
-    { id: 'book', a: 10, b: 10, enter: 'split', leave: 'none' },
+    { id: 'book', a: 10, b: 10, enter: 'split', leave: 'fade' },
+    { id: 'faq', a: 11, b: 11, enter: 'fade', leave: 'none' },
   ].map(sc => {
     const el = $(`#${sc.id}`);
     const num = v => parseFloat(v) || 0;
@@ -816,11 +866,25 @@
   const heroSec = $('#hero');
 
   let lastP = -1, heroBurst = false, mouseMoving = true;
+  // подвал: после последнего экрана сцена вопросов и подвал вместе едут вверх, как обычная страница
+  const faqSec = $('#faq'), footer = $('#footer'), trackFooter = $('#track-footer');
+  let footerP = 0;   // высота подвала в «экранах»
+  const sizeFooter = () => {
+    const h = footer.offsetHeight;            // в координатах кадра
+    footerP = h * s / innerHeight;
+    trackFooter.style.height = `${h * s}px`;
+  };
+  addEventListener('resize', sizeFooter);
   const render = P => {
     const dP = Math.abs(P - lastP);
     const moved = dP > 0;
+    const up = Math.max(0, P - LAST) * innerHeight / s;
+    put(faqSec, 'transform', up ? `translateY(${fmt(-up)}px)` : '');
+    put(footer, 'transform', up ? `translateY(${fmt(-up)}px)` : '');
+    const rawP = P;
+    P = Math.min(P, LAST);
     if (!moved && !(mouseMoving && P < 1)) return;   // ничего не изменилось — кадр пропускаем
-    lastP = P;
+    lastP = rawP;
     scene = Math.round(P);
     const scrolled = P > .05;
     if (scrolled !== header.classList.contains('scrolled')) {
@@ -962,7 +1026,7 @@
         put(el, 'translate', `${fmt(cx * d)}px ${fmt(cy * d)}px`);
       });
     }
-    render(clamp(scrollY / (innerHeight || 1), 0, LAST));
+    render(clamp(scrollY / (innerHeight || 1), 0, LAST + footerP));
     if (!document.hidden) drawFx(now);
     requestAnimationFrame(loop);
   };
@@ -983,6 +1047,7 @@
     renderPanel(current);
     addEventListener('resize', resize);
     resize();
+    sizeFooter();
     requestAnimationFrame(t => { last = t; loop(t); });
     if (reduce) { finish(); return; }
     html.classList.add('is-locked');

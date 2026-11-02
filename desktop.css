@@ -481,3 +481,50 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .skip:hover { background: rgba(255, 255, 255, .2); }
 .is-ui .skip { opacity: 0; pointer-events: none; }
+
+/* 9. Частые вопросы */
+.b9-title { position: absolute; left: 0; top: 140px; width: 1920px; text-align: center; line-height: 1.4; letter-spacing: 1.08px; }
+.faq-list { position: absolute; left: 330px; top: 250px; width: 600px; display: flex; flex-direction: column; gap: 8px; }
+.faq-list button {
+  display: flex; align-items: center; gap: 14px; width: 100%; min-height: 46px; padding: 11px 22px; border-radius: 100px; text-align: left;
+  background: rgba(255, 255, 255, .1); backdrop-filter: blur(17px); -webkit-backdrop-filter: blur(17px);
+  font: 500 17px/1.25 Manrope, sans-serif; color: var(--cream); transition: background .25s, color .25s;
+}
+.faq-list button::before {
+  content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: currentColor; opacity: .5;
+}
+.faq-list button:hover { background: rgba(255, 255, 255, .2); }
+.faq-list button[aria-selected="true"] { background: var(--cream); color: var(--deep); font-weight: 600; }
+.faq-list button[aria-selected="true"]::before { opacity: 1; background: #c3222f; }
+.faq-list button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
+.faq-side { position: absolute; left: 990px; top: 250px; width: 600px; display: flex; flex-direction: column; gap: 32px; }
+.faq-card {
+  min-height: 300px; padding: 40px 44px; border-radius: 40px; background: #ebe0c8; border: 3px solid #fff5e0; color: #000;
+  display: flex; flex-direction: column; gap: 22px; box-shadow: 0 18px 40px rgba(0, 0, 0, .3);
+}
+.faq-card.swap { animation: faqIn .35s ease; }
+@keyframes faqIn { from { opacity: 0; transform: translateY(10px); } }
+.faq-q { font: 700 26px/1.3 Comfortaa, sans-serif; color: var(--ink); text-wrap: balance; }
+.faq-a { font: 500 19px/1.5 Manrope, sans-serif; color: #12301f; }
+.faq-more { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.faq-more p { font: 500 16px/1.4 Manrope, sans-serif; opacity: .8; max-width: 300px; }
+
+/* Подвал */
+.footer {
+  position: absolute; left: calc(-1 * var(--px, 0px)); top: calc(1080px + var(--py, 0px)); width: calc(1920px + 2 * var(--px, 0px));
+  background: #011a0c; border-top: 1px solid rgba(255, 237, 200, .15); color: var(--cream); z-index: 60;
+  padding: 64px calc(120px + var(--px, 0px)) 40px;
+}
+.ft-in { display: grid; grid-template-columns: 1.1fr .9fr .9fr 1.4fr; gap: 56px; }
+.ft-col { display: flex; flex-direction: column; gap: 10px; font: 500 16px/1.45 Manrope, sans-serif; }
+.ft-col a { opacity: .85; width: fit-content; transition: opacity .2s; }
+.ft-col a:hover, .ft-docs a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+.ft-h { font: 700 18px/1.3 Comfortaa, sans-serif; text-transform: uppercase; letter-spacing: .7px; margin-bottom: 6px; }
+.ft-brand img { width: 160px; height: auto; }
+.ft-tag { font: 400 14px/1 Manrope, sans-serif; margin-top: -2px; }
+.ft-legal p { opacity: .85; }
+.ft-small { font: 400 13px/1.5 Manrope, sans-serif; opacity: .6; }
+.ft-bottom { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255, 237, 200, .12); display: flex; flex-direction: column; gap: 10px; }
+.ft-docs { display: flex; flex-wrap: wrap; gap: 8px 32px; font: 500 14px/1.4 Manrope, sans-serif; }
+.ft-docs a { opacity: .8; }
+.footer a:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
