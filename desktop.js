@@ -677,7 +677,7 @@
      Приглушённый эффект 40 %: фильтр срезает верхние частоты (как музыка из соседней комнаты).
      Играет всегда, пока не выключить кнопкой в шапке. Браузер разрешает звук только после первого
      действия посетителя (клик, клавиша, касание), поэтому до него музыка ждёт ===== */
-  const MUSIC = { src: 'assets/audio/winter-time.mp3', muffle: .4, volume: .3 };
+  const MUSIC = { src: 'assets/audio/winter-time.mp3', muffle: .4, volume: .1 };   // громкость 10 % от исходной
   const sounds = $$('.js-sound');
   let soundOn = true, actx = null, mgain = null, msrc = null, mbuf = null, mloading = null;
   const syncSound = () => sounds.forEach(b => {
@@ -797,11 +797,14 @@
     if (!auto && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
-        if (Math.abs(P - holdStop) > .001) { scrollTo({ top: toY(holdStop), behavior: 'instant' }); lastY = toY(holdStop); }
+        if (Math.abs(P - holdStop) > .006) { scrollTo({ top: toY(holdStop), behavior: 'instant' }); lastY = toY(holdStop); }
       } else {
         // первый экран, который скролл проскочил за это событие
-        const k = P > P0 ? Math.floor(P0 + 1e-4) + 1 : Math.ceil(P0 - 1e-4) - 1;
-        const crossed = P > P0 ? P >= k - 1e-4 : P <= k + 1e-4;   // дошёл до экрана или проскочил его
+        // допуск 0,01 экрана: позиция прокрутки округляется до пикселей, и экран может оказаться чуть дальше целого —
+        // без допуска стопор снова ловил тот же экран и не отпускал прокрутку
+        const EPS = .01;
+        const k = P > P0 ? Math.floor(P0 + EPS) + 1 : Math.ceil(P0 - EPS) - 1;
+        const crossed = P > P0 ? P >= k - EPS : P <= k + EPS;   // дошёл до экрана или проскочил его
         // большой скачок за одно событие — это полоса прокрутки или End/Home: стопор не мешает
         if (crossed && k >= 0 && k <= LAST && Math.abs(P - P0) < .5) {
           holdStop = k;
