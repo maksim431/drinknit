@@ -1011,6 +1011,9 @@
       // невидимые сцены убираются из отрисовки целиком
       put(sc.el, 'display', visible ? '' : 'none');
       put(sc.el, 'visibility', visible ? 'visible' : 'hidden');
+      // клики и наведение получает только сцена, которая сейчас главная на экране: следующая сцена в самом
+      // начале появления (даже с прозрачностью 0,1 %) больше не перекрывает кнопки и карточки текущей
+      put(sc.el, 'pointerEvents', visible && e >= .5 && l < .5 ? '' : 'none');
       if (!visible) return;
       // video: сцена проявляется только в самом конце видео-перехода, поверх последнего кадра
       put(sc.el, 'opacity', String(sc.enter === 'fade' ? fmt(clamp(e / .5)) : sc.enter === 'video' ? fmt(clamp((e - .84) / .14)) : 1));
