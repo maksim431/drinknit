@@ -159,6 +159,7 @@
     </div>
     <!-- переход в блок 4: кадры видео, сменяются при скролле -->
     <canvas class="b3-video" id="b3-video" aria-hidden="true" data-d="6"></canvas>
+    <div class="b3-vshade" id="b3-vshade" aria-hidden="true"></div>
     <!-- ветки справа и слева стоят на месте -->
     <img class="b3-l02 bgl b3-fade" src="assets/d/b3-02.webp" alt="" data-d="14">
     <img class="b3-l03 bgl b3-fade" src="assets/d/b3-03.webp" alt="" data-d="26">
@@ -166,7 +167,7 @@
     <div class="b3-textwrap" id="b3-textwrap">
       <div class="b3-text rv" style="--d:.15s">
         <h2 class="h2">Маленькую игрушку<br>я вяжу 2 часа, среднюю 7 часов</h2>
-        <p class="lead">Поэтому к Новому году<br>получится только 10 наборов, и все они будут немного разными</p>
+        <p class="lead">Поэтому к Новому году <br>получится только 10 наборов, и все они будут немного разными</p>
       </div>
     </div>
     <div class="b3-world" id="b3-fg">
@@ -183,10 +184,12 @@
   <section id="kids" class="scr scene b4"><div class="fr">
     <img class="b4-bg bgl" src="assets/d/b4-bg1.webp" alt="" data-d="8">
     <img class="b4-bg bgl" src="assets/d/b4-bg2.webp" alt="" data-d="16">
+    <div class="b4-shade" aria-hidden="true"></div>
     <h2 class="h2 b4-title rv" style="--d:.2s">Можно дарить детям:<br>глазки и мелкие детали держатся на безопасном креплении</h2>
     <div class="stickers" data-set="kids"></div>
-    <div class="b4-bubble rv" style="--d:.45s" data-d="12">
-      <img src="assets/d/b4-bubble.svg" alt="">
+    <div class="b4-bubble rv noblur" style="--d:.45s" data-d="12">
+      <img class="b4-bubble-d" src="assets/d/b4-bubble.svg" alt="">
+      <img class="b4-bubble-m" src="assets/d/m-kids-bubble.svg" alt="">
       <p>Пряжа гипоаллергенная: [какой хлопок и акрил, производитель].<br>Мелкие детали [пришиты или на безопасных замках], их не оторвать руками.<br>Подходит детям с [возраст].<br>Стирка: [ручная, 30°, как сушить].</p>
     </div>
   </div></section>
@@ -218,7 +221,8 @@
     <img class="b6-bg b6-bg2 bgl" src="assets/d/b5-bg2.webp" alt="" data-d="8">
     <div class="b6-bg b6-bg1 bgl" data-d="16"><img src="assets/d/b5-bg1.webp" alt=""></div>
     <h2 class="h2 b6-title rv" style="--d:.2s">Чтобы набор успел<br>к празднику,<br>напишите до 25.12</h2>
-    <div class="rv" style="--d:.4s"><img class="b6-bubble" src="assets/d/b5-bubble.svg" alt="" data-d="10">
+    <div class="b6-shade" aria-hidden="true"></div>
+    <div class="rv" style="--d:.4s"><img class="b6-bubble" src="assets/d/b5-bubble.svg" alt="" data-d="10"><img class="b6-bubble-m" src="assets/d/m-terms-bubble.svg" alt="">
     <ol class="b6-steps" data-d="10">
       <li>Напишите мне, какой набор хотите и какой текст написать на открытке.</li>
       <li>Я ставлю ваш набор в очередь. Вы вносите 100% предоплату за набор переводом на карту.</li>

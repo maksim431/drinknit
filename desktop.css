@@ -574,3 +574,6 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .ft-small { font: 400 13px/1.5 Manrope, sans-serif; opacity: .6; }
 .ft-bottom { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255, 237, 200, .12); display: flex; flex-direction: column; gap: 10px; }
 .footer a:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+
+/* элементы только для мобильного макета */
+.b3-vshade, .b4-shade, .b6-shade, .b6-bubble-m, .b4-bubble-m { display: none; }

@@ -9,23 +9,26 @@
   // Две раскладки одного лендинга: горизонтальный кадр 1920 × 1080 (компьютер, планшет в альбомной ориентации)
   // и вертикальный 600 × 1200 (телефон, вертикальный планшет). Анимации одни и те же, меняются только координаты
   const PORTRAIT = document.documentElement.classList.contains('is-p');
-  const FW = PORTRAIT ? 600 : 1920, FH = PORTRAIT ? 1200 : 1080, CX = FW / 2, CY = FH / 2;
-  const L = PORTRAIT ? {
-    prod: { x: -307, y: 200, w: 1167, h: 871 },        // коробка на экране наборов
-    hero: { dx: 0, dy: -120, k: 1.06 },                // коробка на первом экране относительно экрана наборов
-    mouth: { x: 300, y: 440 }, boxc: { x: 300, y: 500 }, gift: { x: 300, y: 470 },
-    b3pan: 817, b3origin: [300 + 141, 600 + 100 + 817],
-    v0: { x: -128.2, y: 307.8, w: 1585.8, h: 892 }, vanchor: [189, 843],
-    kidsBg: { x: -1145, y: -50, w: 2330, h: 1300 },
-    flip: [300, 700],
+  const FW = PORTRAIT ? 430 : 1920, FH = PORTRAIT ? 932 : 1080, CX = FW / 2, CY = FH / 2;
+  const L = PORTRAIT ? {                              // мобильный макет Figma, кадр 430 × 932
+    prod: { x: -309, y: 146, w: 1033, h: 770 },        // коробка на экране наборов
+    hero: { dx: 11, dy: -118.5, k: .8877 },            // на первом экране: (-240, 70, 917 × 685)
+    mouth: { x: 219.8, y: 451.3 }, boxc: { x: 219.8, y: 490.7 }, gift: { x: 219.8, y: 473.4 },
+    b3pan: 701, b3origin: [215 + 127.5, 466 + 11.17 + 701],
+    v0: { x: -117.56, y: 239.06, w: 1232.07, h: 692.77 }, vcover: false,   // первый кадр = низ фона блока 3
+    kidsBg: { x: -695, y: 223, w: 1270, h: 709 },
+    flip: [215, 340],
+    b3cardTop: 599.5, b3cardStick: 104,                // карточка блока 3 едет с фоном и останавливается под шапкой
+    termsPan: 206, bookPan: 1008,                      // блоки выше экрана: экран спускается по ним
   } : {
     prod: { x: 122.97, y: -125, w: 1787, h: 1334 },
     hero: { dx: -59.47, dy: -251.5, k: 1.1834 },
     mouth: { x: 960, y: 380 }, boxc: { x: 960, y: 470 }, gift: { x: 960, y: 430 },
     b3pan: 1316, b3origin: [960 + 15, 540 + 166 + 1316],
-    v0: { x: 0, y: 0, w: 1920, h: 1080 }, vanchor: [300, 820],
+    v0: { x: 0, y: 0, w: 1920, h: 1080 }, vanchor: [300, 820], vcover: true,
     kidsBg: { x: -236, y: -22, w: 2156, h: 1203 },
     flip: [960, 672],
+    termsPan: 0, bookPan: 0,
   };
   const PROD = L.prod;
   // координаты искр, заданные для кадра 1920 × 1080, в текущем кадре
@@ -90,13 +93,19 @@
 
   /* ===== Стикеры ===== */
   // вертикальный кадр: свои места и размер стикеров [left, top, масштаб]; null — стикер не показываем
+  // мобильный макет: [left, top, ширина и высота рамки, ширина и высота наклейки, поворот (или transform)]; null — стикер не показываем
   const STICKERS_P = {
-    hero: [[-36, 660, .55], [452, 96, .62], [470, 640, .6], [-6, 470, .62], [6, 92, .6], [470, 440, .6]],
-    kids: [[452, 250, .62], [-40, 960, .5], [400, 1010, .6]],
-    left: [[205, 50, .52], [-30, 980, .5], [-24, 250, .58], [-20, 1040, null], [470, 230, .55], [440, 1000, .55], [455, 640, null]],
-    terms: [[428, 1020, .44]],
-    about: [[-70, 1000, .45], [-50, 290, .45], [0, 0, null], [440, 1010, .45], [0, 0, null], [0, 0, null], [470, 300, .5], [-46, 680, .45]],
-    book: [[-24, 930, .55], [-40, 960, null], [452, 920, .55], [430, 990, null]],
+    hero: [[-62, 802, 180.41, 188.9, 149.19, 160.37, 12.52], [268, 127, 140.44, 140.23, 106.32, 105.9, 24.26], [299, 821, 192.93, 192.86, 137.14, 136.42, 40.74],
+      [-40, 437, 161.17, 171.06, 121.35, 137.89, -19.99], [0, 124.16, 189.68, 200.66, 146.93, 163.82, -17.65], [325, 509, 115.96, 115.96, 89.8, 89.8, 20.94]],
+    kids: [[315, 367, 126.84, 131.49, 97.02, 104.75, 19.86], [124, 714, 240.66, 258.37, 207.5, 228.79, -8.98], [14.36, 788, 117.92, 126.85, 98.36, 109.74, 11.27]],
+    left: [[103, 86, 238.5, 238.5, 213.9, 213.9, 7.04], [-21, 695, 248.17, 249.2, 192, 193.78, 20.73], null, [0, 124.74, 119.69, 126.96, 98.69, 108.24, -12.44],
+      [258.24, 764.2, 139.66, 140.27, 123.11, 123.83, -8.28], null, [314, 200, 116.1, 134, 116.1, 134, 0]],
+    terms: [[86, 852, 344.77, 397.4, 269.12, 341.81, 'rotate(-165.79deg) scaleY(-1)']],
+    about: [[6.56, 221, 158.34, 144.04, 138.14, 120.11, -10.89], [-12, 221.29, 87.28, 97.12, 69.45, 82.9, 13.86], [10, 781.63, 104, 95, 104, 95, 0],
+      [254, 229, 127.63, 119.65, 103.03, 89.58, 20.2], [270, 777, 137.75, 138.28, 118.39, 119.06, -10.29], [357.91, 814.8, 65, 92, 65, 92, 0],
+      [356.46, 300.57, 79.56, 96.56, 75.15, 93.03, -2.78], [59.76, 737, 89.1, 95.39, 75.81, 83.57, 9.94]],
+    book: [[247, 607, 288.92, 340.69, 220.43, 293.65, 15], [-61, 197, 233.66, 258.19, 178.61, 215.49, -16.95], [-80, 1052, 243.71, 270.38, 180.73, 223.74, 18.99],
+      [258.8, 1395.32, 262.41, 278.25, 216, 236.89, -12.58]],
     faq: [null, null],
   };
   for (const [set, list] of Object.entries(STICKERS)) {
@@ -104,15 +113,15 @@
     list.forEach(([src, l, t, w, h, iw, ih, rot, il, it, iwp, ihp, d, shadow = true], i) => {
       if (PORTRAIT) {
         const pp = STICKERS_P[set] && STICKERS_P[set][i];
-        if (!pp || pp[2] == null) return;
-        const k = pp[2];
-        [l, t, w, h, iw, ih] = [pp[0], pp[1], w * k, h * k, iw * k, ih * k];
+        if (!pp) return;
+        [l, t, w, h, iw, ih, rot] = pp;
       }
+      const tf = typeof rot === 'string' ? rot : `rotate(${rot}deg)`;
       const el = document.createElement('div');
       el.className = 'stk pop';
       el.style.cssText = `left:${l}px;top:${t}px;width:${w}px;height:${h}px;--d:${(set === 'hero' ? .5 : .55) + i * .09}s`;
       if (d) el.dataset.d = d;
-      el.innerHTML = `<div class="stk-r${shadow ? '' : ' ns'}" style="width:${iw}px;height:${ih}px;transform:rotate(${rot}deg)"><i><img src="assets/d/${src}.webp" alt="" style="left:${il}%;top:${it}%;width:${iwp}%;height:${ihp}%"></i></div>`;
+      el.innerHTML = `<div class="stk-r${shadow ? '' : ' ns'}" style="width:${iw}px;height:${ih}px;transform:${tf}"><i><img src="assets/d/${src}.webp" alt="" style="left:${il}%;top:${it}%;width:${iwp}%;height:${ihp}%"></i></div>`;
       host.appendChild(el);
     });
   }
@@ -737,9 +746,40 @@
   const STOPS = { hero: 0, sets: 1, time: 2, kids: 6, left: 7, terms: 8, about: 9, book: 10, faq: 11 };
   // прокрутка ↔ положение P в экранах. Видео-переход (P 5 → 6) занимает 1,5 экрана прокрутки:
   // за одно движение колеса пролистывается на 36 % меньше кадров, чем у обычного блока (два раза по 20 %)
+  // На телефоне блоки «Сроки» и финальный выше экрана: на них прокрутка не переключает сцену, а спускает экран
+  // по блоку (участки hold, P стоит на месте). Длина участка = высота спуска, палец и блок двигаются вместе
   const V_START = 5, V_SLOW = 1.5;
-  const toP = y => { const u = y / innerHeight; return u <= V_START ? u : u <= V_START + V_SLOW ? V_START + (u - V_START) / V_SLOW : u - (V_SLOW - 1); };
-  const toY = P => (P <= V_START ? P : P <= V_START + 1 ? V_START + (P - V_START) * V_SLOW : P + (V_SLOW - 1)) * innerHeight;
+  const SEGS = [{ p: V_START, len: V_SLOW, span: 1 }];
+  if (L.termsPan) SEGS.push({ p: 8, len: L.termsPan / FH, span: 0 });
+  if (L.bookPan) SEGS.push({ p: 10, len: L.bookPan / FH, span: 0 });
+  const HOLD_TOTAL = SEGS.filter(g => !g.span).reduce((a, g) => a + g.len, 0);
+  const holdF = {};                 // насколько пройден спуск по высокому блоку, 0…1
+  const toP = y => {
+    const u = y / innerHeight;
+    let off = 0;
+    for (const g of SEGS) holdF[g.p] = 0;
+    for (const g of SEGS) {
+      const st = g.p + off;
+      if (u < st) return u - off;
+      if (u <= st + g.len) {
+        const f = (u - st) / g.len;
+        if (!g.span) { holdF[g.p] = f; return g.p; }
+        return g.p + f * g.span;
+      }
+      if (!g.span) holdF[g.p] = 1;
+      off += g.len - g.span;
+    }
+    return u - off;
+  };
+  const toY = P => {
+    let off = 0;
+    for (const g of SEGS) {
+      if (P <= g.p) break;
+      if (g.span && P < g.p + g.span) return (g.p + off + (P - g.p) * g.len) * innerHeight;
+      off += g.len - g.span;
+    }
+    return (P + off) * innerHeight;
+  };
   let auto = false;          // прокрутку ведёт сам сайт (меню, доезжание)
   const goTo = hash => {
     const id = hash.slice(1);
@@ -896,12 +936,13 @@
     const ax = X(L.vanchor[0]), ay = Y(L.vanchor[1]);
     // в самом начале кадр точно совмещён с блоком 3, а непокрытый край закрывает фон блока 3 под холстом
     const fc = Math.max(1, ax / Math.max(1e-3, ax - x0), (W - ax) / Math.max(1e-3, x1 - ax), ay / Math.max(1e-3, ay - y0), (H - ay) / Math.max(1e-3, y1 - ay));
-    const f = 1 + (fc - 1) * clamp(t / .15);
+    const f = L.vcover ? 1 + (fc - 1) * clamp(t / .15) : 1;
     x0 = ax + (x0 - ax) * f; x1 = ax + (x1 - ax) * f; y0 = ay + (y0 - ay) * f; y1 = ay + (y1 - ay) * f;
     vctx.clearRect(0, 0, W, H);
     vctx.drawImage(frames[i], x0, y0, x1 - x0, y1 - y0);
   };
 
+  const vshade = PORTRAIT ? $('#b3-vshade') : null, termsFr = $('#terms .fr'), bookFr = $('#book .fr');
   const b3bg = $('#b3-bg'), b3fg = $('#b3-fg'), b3text = $('#b3-textwrap'), b3card = $('#b3-card');
   const b8cards = $$('.b8-card');
   const b8fill = $('.b8-fill');
@@ -931,25 +972,27 @@
     put(n, 'opacity', String(fmt(op)));
     put(n, 'transform', `translateY(${Math.round(ty * 10) / 10}px)`);
     // размытие только для небольших элементов: на больших фонах оно дорого и почти не заметно
-    put(n, 'filter', blur > .3 && !n.classList.contains('bgl') ? `blur(${Math.round(blur * 2) / 2}px)` : '');
+    put(n, 'filter', blur > .3 && !n.classList.contains('bgl') && !n.classList.contains('noblur') ? `blur(${Math.round(blur * 2) / 2}px)` : '');
   };
   const show = (n, on) => put(n, 'display', on ? '' : 'none');
   const heroContent = $('.hero-content');
   const heroSec = $('#hero');
 
-  let lastP = -1, heroBurst = false, mouseMoving = true;
+  let lastH = -1, lastP = -1, heroBurst = false, mouseMoving = true;
   // подвал: после последнего экрана сцена вопросов и подвал вместе едут вверх, как обычная страница
   const faqSec = $('#faq'), footer = $('#footer'), trackFooter = $('#track-footer');
   let footerP = 0;   // высота подвала в «экранах»
   const sizeFooter = () => {
     const h = footer.offsetHeight;            // в координатах кадра
     footerP = h * s / innerHeight;
-    trackFooter.style.height = `${h * s}px`;
+    trackFooter.style.height = `${h * s + HOLD_TOTAL * innerHeight}px`;
   };
   addEventListener('resize', sizeFooter);
   const render = P => {
     const dP = Math.abs(P - lastP);
-    const moved = dP > 0;
+    const hsum = (holdF[8] || 0) + (holdF[10] || 0) * 7;
+    const moved = dP > 0 || hsum !== lastH;
+    lastH = hsum;
     const up = Math.max(0, P - LAST) * innerHeight / s;
     put(faqSec, 'transform', up ? `translateY(${fmt(-up)}px)` : '');
     put(footer, 'transform', up ? `translateY(${fmt(-up)}px)` : '');
@@ -962,7 +1005,7 @@
     if (scrolled !== header.classList.contains('scrolled')) {
       header.classList.toggle('scrolled', scrolled);
       $$('.hd a, .hd button').forEach(n => { n.tabIndex = scrolled ? -1 : 0; });
-      $$('.hd2 a, .hd2 button').forEach(n => { n.tabIndex = scrolled ? 0 : -1; });
+      $$('.hd2 a, .hd2 button').forEach(n => { n.tabIndex = scrolled || PORTRAIT ? 0 : -1; });
     }
 
     // 0 → 1: элементы первого экрана растворяются, коробка едет на место, появляются элементы наборов
@@ -1041,7 +1084,8 @@
     put(b3text, 'opacity', String(fmt(1 - clamp(pan / .55))));
     const ce = clamp((pan - .4) / .45);
     put(b3card, 'opacity', String(fmt(ce)));
-    put(b3card, 'transform', `translateY(${fmt((1 - ce) * 50)}px) scale(${fmt(.94 + .06 * ce)})`);
+    const stick = L.b3cardStick ? Math.max(0, L.b3cardStick - (L.b3cardTop - L.b3pan * pan)) : 0;
+    put(b3card, 'transform', `translateY(${fmt((1 - ce) * 50 + stick)}px) scale(${fmt(.94 + .06 * ce)})`);
 
     // 5 → 6: переход из блока 3 в блок 4 по кадрам видео. Элементы блока 3 гаснут в начале,
     // кадры сменяются вместе со скроллом, элементы блока 4 появляются у последнего кадра
@@ -1054,6 +1098,17 @@
     if (vt > 0) put(b3card, 'opacity', String(fmt(1 - vOut)));
     put(vcan, 'opacity', String(fmt(clamp(vt / .015))));   // быстро: камера в видео начинает двигаться сразу
     if (vt > 0 && vt < 1) drawFrame(vt);
+    if (vshade) {
+      // затемнение над видео плавно меняет цвет и высоту от блока 3 к блоку 4
+      put(vshade, 'opacity', String(fmt(clamp(vt / .015))));
+      const c0 = [72, 84, 102], c1 = [84, 116, 144], e2 = easeIO(vt);
+      const col = c0.map((v, j) => Math.round(v + (c1[j] - v) * e2)).join(',');
+      const pyy = ty / s;   // затемнение уходит под верхний край окна, если экран выше кадра
+      put(vshade, 'background', `linear-gradient(180deg, rgb(${col}) ${fmt(pyy + 232 - 13 * e2)}px, rgba(${col},0) ${fmt(pyy + 530 - 150 * e2)}px)`);
+    }
+    // высокие блоки на телефоне: спуск экрана по блоку
+    if (L.termsPan) put(termsFr, 'transform', `translateY(${fmt(-L.termsPan * (holdF[8] || 0))}px)`);
+    if (L.bookPan) put(bookFr, 'transform', `translateY(${fmt(-L.bookPan * (holdF[10] || 0))}px)`);
 
     // 3 → 4 → 5: блок стоит, карточка переворачивается по вертикали, угол — от скролла
     const q = clamp(P - 3, 0, 2);
