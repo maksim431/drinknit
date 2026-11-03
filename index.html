@@ -26,7 +26,9 @@
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
   </script>
-  <style>html { background: #002510; }</style>
+  <style>html { background: #002510; }
+    /* телефон: до первой раскладки ничего не показываем (стили и скрипты грузятся позже разметки) */
+    html.is-p:not(.flow-ready) body { opacity: 0; }</style>
 </head>
 <body>
   <!-- ============ десктопная версия по новому макету ============ -->

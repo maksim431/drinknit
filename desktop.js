@@ -1662,6 +1662,8 @@
     resize();
     sizeFooter();
     requestAnimationFrame(t => { last = t; loop(t); });
+    // телефон: страница показывается только после первой раскладки, иначе на миг видны все блоки друг на друге
+    if (FLOW) requestAnimationFrame(() => requestAnimationFrame(() => html.classList.add('flow-ready')));
     if (reduce) { finish(); return; }
     html.classList.add('is-locked');
     scrollTo(0, 0);
