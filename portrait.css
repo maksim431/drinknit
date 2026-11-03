@@ -65,13 +65,13 @@ html.is-p .gift-hint-goat { left: 210px; top: 630px; scale: .55; transform-origi
 html.is-p .skip { right: 16px; bottom: 16px; }
 
 /* 2. Наборы */
-html.is-p #product, html.is-p #focus { left: -203.5px; top: 192.6px; width: 788.2px; height: 588.6px; }
-html.is-p .b2-bg { left: -298px; top: 0; width: 857px; height: 844px; object-fit: cover; }
+html.is-p #product, html.is-p #focus { left: -203.5px; top: 172.6px; width: 788.2px; height: 588.6px; }
+html.is-p .b2-bg { left: -298px; top: 0; width: 857px; height: 844px; object-fit: cover; filter: blur(.5px); }
 html.is-p .b2-topshade { display: block; position: absolute; z-index: 2; left: -19px; width: 467px; top: -120px; height: 330px; pointer-events: none; background: linear-gradient(180deg, #012611 120px, rgba(1, 38, 17, 0) 309.2px); }
 html.is-p .br-p { display: inline; }
 html.is-p .b2-title { left: 10px; top: 86px; width: 370px; line-height: 30.99px; }
 html.is-p .set-panel {
-  left: 10px; top: 622px; width: 370px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
+  left: 10px; top: 598px; width: 370px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
   border-radius: 24.9px; border-width: 1.383px; -webkit-backdrop-filter: blur(8.3px); backdrop-filter: blur(8.3px);
 }
 html.is-p .set-panel-title { display: none; }
@@ -79,7 +79,7 @@ html.is-p .set-tabs { gap: 3.46px; }
 html.is-p .set-tabs button { height: 37.35px; padding: 6.92px 15.9px; font-size: 14.53px; }
 html.is-p .set-desc { flex: 1 0 0; gap: 5.53px; font-size: 13.14px; }
 html.is-p .set-price { font-size: 40.12px; line-height: 40.12px; }
-html.is-p .hint { left: 104px; top: 220px; width: 286px; height: 217px; overflow: hidden; overflow: clip; pointer-events: none !important; }   /* подсказка не перехватывает тапы по открытке */
+html.is-p .hint { left: 104px; top: 190px; width: 286px; height: 217px; overflow: hidden; overflow: clip; pointer-events: none !important; }   /* подсказка не перехватывает тапы по открытке */
 html.is-p .hint-bubble { left: 35px; top: 26px; width: 175.27px; height: 75.43px; transform: scaleX(-1); }
 html.is-p .hint-goat { left: 171.65px; top: -21.92px; width: 207.77px; height: 216.85px; }
 html.is-p .hint-goat .stk-r { width: 144.27px !important; height: 167.81px !important; transform: rotate(150.82deg) scaleY(-1) !important; }
@@ -101,14 +101,18 @@ html.is-p .modal-close img { width: 40px; height: 40px; }
 html.is-p .arr, html.is-p .arr img { width: 50px; height: 50px; }
 
 /* 3. Сколько вяжу: экран спускается от заголовка к домику, карточка останавливается под шапкой */
-html.is-p .b3-world { width: 390px; height: 1633px; }
-html.is-p .b3-l01 { left: -157.5px; top: -11.17px; width: 1242.64px; height: 1644.17px; }
-html.is-p .b3-l02, html.is-p .b3-l03 { left: -232px; top: 0; width: 854.32px; height: 476.86px; }
+html.is-p .b3-world { width: 390px; height: 1885px; }
+html.is-p .b3-l01 { left: -158px; top: -102px; width: 1243px; height: 1987px; }
+html.is-p .b3-l01 img:not(.b3-l01m) { display: none; }
+html.is-p .b3-l01 .b3-l01m { display: block; position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
+html.is-p .b3-l02, html.is-p .b3-l03 { top: 0; width: 854.32px; height: 476.86px; }
+html.is-p .b3-l02 { left: -302px; }
+html.is-p .b3-l03 { left: -112px; }
 html.is-p .b3-textwrap { left: 10px; top: 281px; width: 370px; }
 html.is-p .b3-text { gap: 12.9px; }
 html.is-p .lead { font: 400 15.05px/21.82px Manrope, sans-serif; }
 html.is-p .lead br { display: none; }
-html.is-p .b3-card-wrap { left: 29px; top: 599.54px; scale: .717; transform-origin: 0 0; }
+html.is-p .b3-card-wrap { left: 29px; top: 919.54px; scale: .717; transform-origin: 0 0; }
 html.is-p .b3-card-wrap .stamp-cap { font-size: 18px; }
 html.is-p .b3-video { width: calc(390px + 2 * var(--px, 0px)); height: calc(844px + 2 * var(--py, 0px)); }   /* холст видео — по кадру телефона */
 /* затемнение над видео-переходом */
@@ -148,7 +152,7 @@ html.is-p #left .stickers-back { z-index: 12; }
 /* 6. Сроки (1305 px, свободный скролл) */
 html.is-p .b6 { background: linear-gradient(180deg, #346949 0%, #002510 100%); }
 html.is-p .b6-bg { display: none; }
-html.is-p .b6-bg-m { display: block; position: absolute; left: -567.4px; top: -108.9px; width: 1093.9px; height: 1028.6px; max-width: none; }
+html.is-p .b6-bg-m { display: block; position: absolute; left: -567.4px; top: -108.9px; width: 1093.9px; height: 1028.6px; max-width: none; clip-path: inset(108.9px 0 0 0); }
 html.is-p .b6-shade { display: block; position: absolute; left: -47px; top: 470px; width: 796px; height: 906px; background: linear-gradient(180deg, rgba(52, 105, 73, 0) 6.73%, #002510 23.38%); }
 html.is-p .b6-topshade { display: block; position: absolute; left: -47px; top: 0; width: 466px; height: 263px; background: linear-gradient(180deg, #002510 0%, rgba(0, 37, 16, 0) 93.27%); }
 html.is-p .b6-title { left: 16.6px; top: 126.4px; width: 300px; }
@@ -198,8 +202,8 @@ html.is-p #book .stickers { z-index: 16; }   /* стикеры поверх ка
 
 
 /* блок 3: затемнение сверху, под шапкой */
-html.is-p .b3-topshade { display: block; position: absolute; left: -40px; top: 0; width: 468px; height: 189px; pointer-events: none;
-  background: linear-gradient(180deg, rgba(4, 14, 7, .8) 0%, rgba(12, 26, 39, .8) 100%); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+html.is-p .b3-topshade { display: block; position: absolute; left: -40px; top: 0; width: 468px; height: 261px; pointer-events: none;
+  background: linear-gradient(180deg, #010a05 0%, rgba(12, 26, 39, 0) 100%); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
 /* первый экран: открытая коробка — своя картинка, набор на экране наборов едет вместе с блоком */
 html.is-p .hero-box { display: block; position: absolute; left: -203.5px; top: 192.6px; width: 788.2px; height: 588.6px; z-index: 5; transform-origin: 50% 50%; pointer-events: none; }
 html.is-p .hero-box .prod-inner img { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -209,3 +213,16 @@ html.is-p #terms, html.is-p #book { overflow: visible; clip-path: inset(-80px 0 
 html.is-p .idle-hint { bottom: calc(9px + env(safe-area-inset-bottom, 0px)); }
 /* подвал: телефона и почты в мобильном макете нет */
 html.is-p .ft-phone, html.is-p .ft-mail { display: none; }
+
+/* свободный скролл: таймер на одном уровне с остальными блоками, иначе он закрывал стикер на краю «Сроков» */
+html.is-p #left { z-index: 30; }
+/* стыки блоков: верх блока плавно переходит из цвета низа предыдущего */
+html.is-p #left .fr::before, html.is-p #about .fr::before, html.is-p #book .fr::before {
+  content: ''; position: absolute; left: -40px; width: 470px; top: 0; height: 260px; pointer-events: none;
+  background: linear-gradient(180deg, var(--join, #002510) 0%, rgba(0, 37, 16, 0) 100%);
+}
+html.is-p #left .fr::before { --join: #012711; }
+/* заголовки появляются слева направо (искры — в desktop.js) */
+html.is-p .tt { clip-path: inset(-30% 100% -30% -5%); transition: clip-path 1s cubic-bezier(.33, 1, .68, 1); }
+html.is-p .tt.tt-on { clip-path: inset(-30% -5% -30% -5%); }
+@media (prefers-reduced-motion: reduce) { html.is-p .tt { clip-path: none; transition: none; } }

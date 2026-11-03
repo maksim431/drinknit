@@ -598,7 +598,7 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 @keyframes chev { 0%, 60%, 100% { opacity: .3; } 25% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .idle-hint .ch { animation: none; } .idle-hint .ch2 { opacity: 1; } }
 /* только для телефона */
-.hero-box, .b3-topshade, .b6-bg-m, .b6-topshade { display: none; }
+.hero-box, .b3-topshade, .b6-bg-m, .b6-topshade, .b3-l01m { display: none; }
 .intro .hero-box .prod-inner { opacity: 0; transform: translateY(70px) scale(.78); filter: brightness(1.9) saturate(.6); }
 .intro.is-open .hero-box .prod-inner {
   opacity: 1; transform: none; filter: none;

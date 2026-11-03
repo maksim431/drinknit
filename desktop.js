@@ -20,7 +20,7 @@
   const FLOW = PORTRAIT;
   const FW = PORTRAIT ? 390 : 1920, FH = PORTRAIT ? 844 : 1080, CX = FW / 2, CY = FH / 2;
   const L = PORTRAIT ? {                              // мобильный макет Figma, кадр 390 × 844
-    prod: { x: -203.5, y: 192.6, w: 788.2, h: 588.6 }, // коробка на экране наборов
+    prod: { x: -203.5, y: 172.6, w: 788.2, h: 588.6 }, // коробка на экране наборов
     hero: { dx: 11.9, dy: -94.4, k: 1.1639 },          // на первом экране: (-256.2, 50, 917.4 × 685)
     mouth: { x: 203.8, y: 431.3 }, boxc: { x: 203.8, y: 470.7 }, gift: { x: 203.8, y: 453.4 },
     // блок 3 (1633 px): экран спускается, пока карточка не встанет по центру (409,7 px), карточки листаются,
@@ -29,7 +29,7 @@
     v0: { x: -147.56, y: 151.06, w: 1232.07, h: 692.77 }, vanchor: [150, 552], vcover: false,   // первый кадр = низ фона блока 3
     kidsBg: { x: -695, y: 135, w: 1270, h: 709 },
     flip: [195, 422],
-    b3cardTop: 599.5,
+    b3cardTop: 919.5,
     kidsPan: 0, termsPan: 0, bookPan: 0,               // свободный скролл: спусков по блокам нет
   } : {
     prod: { x: 122.97, y: -125, w: 1787, h: 1334 },
@@ -240,8 +240,8 @@
     L.hero.k = BASE.hero.k * hk;
     L.hero.dy = BASE.hero.dy + delta;
     // коробка на экране наборов: верх под заголовком, низ над панелью выбора; подсказка едет вместе с коробкой
-    const sTop = 240 - Math.min(60, cut * .75), pc = L.prod.y + L.prod.h / 2;   // видимый верх коробки 244 px над центром, низ 122 px под ним
-    L.setK = Math.max(.55, Math.min(1, (622 - 2 * cut - 12 - sTop) / 366));
+    const sTop = 220 - Math.min(60, cut * .75), pc = L.prod.y + L.prod.h / 2;   // видимый верх коробки 244 px над центром, низ 122 px под ним
+    L.setK = Math.max(.55, Math.min(1, (598 - 2 * cut - 12 - sTop) / 366));
     L.setDy = sTop + cut - pc + 244 * L.setK;
     L.mouth.y = BASE.mouth.y + delta; L.boxc.y = BASE.boxc.y + delta; L.gift.y = BASE.gift.y + delta;
     // стикеры на низком экране немного меньше
@@ -1403,7 +1403,7 @@
      Блоки стоят друг под другом в «документе» (координаты кадра 390 px), вся сцена сдвигается вместе со скроллом.
      Два места, где экран стоит: карточки блока 3 (по центру экрана, по одной на свайп) и видео-переход к блоку 4.
      Первый экран и наборы подогнаны под высоту экрана (обрезка CUT сверху и снизу), остальные блоки — во всю высоту */
-  const FLOW_SECS = [['hero', 844, 1], ['sets', 844, 1], ['time', 1633, 0], ['kids', 1096, 0], ['left', 844, 0],
+  const FLOW_SECS = [['hero', 844, 1], ['sets', 844, 1], ['time', 1885, 0], ['kids', 1096, 0], ['left', 844, 0],
     ['terms', 1305, 0], ['about', 844, 0], ['book', 1940, 0], ['faq', 844, 0]];
   const FL = { secs: [], vC: 0, vA: 0, vB: 0, D: 1, CL: 0, VL: 0, docFooter: 0 };
   const flowSec = id => FL.secs.find(o => o.id === id);
@@ -1437,7 +1437,7 @@
     FL.docFooter = c;
     const time = flowSec('time'), kids = flowSec('kids');
     FL.vC = time.top + L.b3cardTop + 232 - FH / 2;     // карточка по центру экрана
-    FL.vA = time.top + 1633 - (FH - CUT);              // низ блока 3 у низа экрана — начало видео
+    FL.vA = time.top + time.H - (FH - CUT);              // низ блока 3 у низа экрана — начало видео
     FL.vB = kids.top - CUT;                            // блок «Для детей» от верха экрана — конец видео
     FL.D = .45 * VH() / s; FL.CL = 2 * FL.D; FL.VL = V_SLOW * VH() / s;
     const viewMax = FL.docFooter + footer.offsetHeight + 2 * CUT - FH - EXTF;
@@ -1514,6 +1514,33 @@
     // набор — внутри блока наборов: едет вместе с ним, окно предмета открывается поверх
     $('#sets .fr').appendChild(product);
   }
+  const b3sticky = FLOW ? $$('.b3-l02, .b3-l03, .b3-topshade') : [];
+  // заголовки появляются слева направо с искрами, когда доходят до экрана; снова — если ушли вниз за экран
+  const titles = FLOW ? $$('.h2, .b5-left').map(n => { n.classList.add('tt'); return { n, on: false, t0: 0 }; }) : [];
+  function titleReveal() {
+    const vh = innerHeight, now = performance.now();
+    titles.forEach(o => {
+      const sec = o.n.closest('section');
+      if (sec && sec.style.display === 'none') { if (o.on) { o.on = false; o.n.classList.remove('tt-on'); } return; }
+      const r = o.n.getBoundingClientRect();
+      if (!o.on && r.top < vh * .86 && r.bottom > 0 && !html.classList.contains('is-locked')) {
+        o.on = true; o.t0 = now; o.n.classList.add('tt-on');
+        if (!reduce) sparkTitle(o);
+      } else if (o.on && r.top > vh) { o.on = false; o.n.classList.remove('tt-on'); }
+    });
+  }
+  // искры бегут по краю появления текста
+  function sparkTitle(o) {
+    const step = () => {
+      const t = (performance.now() - o.t0) / 1000;
+      if (!o.on || t > 1.05) return;
+      const r = o.n.getBoundingClientRect(), e = 1 - Math.pow(1 - Math.min(1, t), 3);
+      const x = (r.left + r.width * e - tx) / s;
+      for (let j = 0; j < 3; j++) mote(x + rand(-6, 6), (r.top + rand(0, r.height) - ty) / s, { vx: rand(-30, 50), vy: rand(-90, -20), size: rand(1.6, 3.6), max: rand(.5, 1.1) });
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
   const FLOW_GOALS = { sets: 'block_sets', time: 'block_time', kids: 'block_kids', left: 'block_left', terms: 'block_terms', about: 'block_about', book: 'block_book', faq: 'block_faq' };
   const kidsScene = SCENES.find(sc => sc.id === 'kids');
   function renderFlow() {
@@ -1553,6 +1580,9 @@
     // блок 3: текст гаснет по мере прокрутки к карточке, карточки листаются по одной
     const time = flowSec('time'), tStart = time.top - CUT;
     put(b3text, 'opacity', String(fmt(1 - clamp((view - tStart) / Math.max(1, (FL.vC - tStart) * .55)))));
+    const stick = `translateY(${fmt(Math.max(0, CUT - (time.top - (st.stage === 3 ? FL.vA : view))))}px)`;
+    b3sticky.forEach(n => put(n, 'transform', stick));
+    titleReveal();
     flipTo(st.stage === 0 ? 0 : st.stage === 1 ? (st.u < .5 ? 0 : st.u < 1.5 ? 1 : 2) : 2);
     if (view > FL.vC - FH) loadFrames();
     // видео-переход: кадры и затемнение стоят на экране, элементы блока 3 гаснут, блок 4 проявляется в конце
