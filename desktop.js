@@ -21,8 +21,8 @@
   const FW = PORTRAIT ? 390 : 1920, FH = PORTRAIT ? 844 : 1080, CX = FW / 2, CY = FH / 2;
   const L = PORTRAIT ? {                              // мобильный макет Figma, кадр 390 × 844
     // первый экран и наборы — кадры 390 × 790
-    prod: { x: -186, y: 133, w: 762.4, h: 569.4 },     // коробка на экране наборов
-    hero: { dx: -.2, dy: -88.2, k: 1.0239 },           // на первом экране: (-195.3, 38, 780.6 × 583)
+    prod: { x: -232.9, y: 300, w: 856.2, h: 639.4 },   // коробка на экране наборов (блок 1000 px, свободный скролл)
+    hero: { dx: -.2, dy: -290.2, k: .9117 },           // на первом экране: (-195.3, 38, 780.6 × 583)
     mouth: { x: 196.3, y: 388.3 }, boxc: { x: 196.3, y: 427.7 }, gift: { x: 196.3, y: 410.4 },
     // блок 3 (1633 px): экран спускается, пока карточка не встанет по центру (409,7 px), карточки листаются,
     // затем свободный спуск к домику (ещё 379,3 px) и только потом видео
@@ -193,7 +193,7 @@
   function measureCut() {
     cutTargets = [];
     // свободный скролл: подгоняются под высоту экрана только первый экран и наборы
-    const secs = (FLOW ? ['hero', 'sets'] : ['hero', 'sets', 'time', 'left', 'about', 'faq']).map(id => $(`#${id}`));
+    const secs = (FLOW ? ['hero'] : ['hero', 'sets', 'time', 'left', 'about', 'faq']).map(id => $(`#${id}`));
     const saved = secs.map(sec => [sec.style.display, sec.style.visibility]);
     secs.forEach(sec => { sec.style.display = ''; sec.style.visibility = 'hidden'; });
     const walk = (el, oy, list) => {
@@ -250,6 +250,7 @@
     const sTop = 179.7 - Math.min(40, hc * .6), pc = L.prod.y + L.prod.h / 2;
     L.setK = Math.max(.55, Math.min(1, (558 - 2 * hc + 86 - sTop) / 464.6));
     L.setDy = sTop + hc - pc + 238 * L.setK;
+    if (FLOW) { L.setK = 1; L.setDy = 0; }   // наборы на телефоне не подгоняются под экран
     L.mouth.y = BASE.mouth.y + delta; L.boxc.y = BASE.boxc.y + delta; L.gift.y = BASE.gift.y + delta;
     // стикеры на низком экране немного меньше
     const sk = fmt(1 - hc / FH * .6);
@@ -1410,7 +1411,7 @@
      Блоки стоят друг под другом в «документе» (координаты кадра 390 px), вся сцена сдвигается вместе со скроллом.
      Два места, где экран стоит: карточки блока 3 (по центру экрана, по одной на свайп) и видео-переход к блоку 4.
      Первый экран и наборы подогнаны под высоту экрана (обрезка CUT сверху и снизу), остальные блоки — во всю высоту */
-  const FLOW_SECS = [['hero', 790, 1], ['sets', 790, 1], ['time', 1885, 0], ['kids', 1096, 0], ['left', 844, 0],
+  const FLOW_SECS = [['hero', 790, 1], ['sets', 1000, 0], ['time', 1885, 0], ['kids', 1096, 0], ['left', 844, 0],
     ['terms', 1305, 0], ['about', 844, 0], ['book', 1940, 0], ['faq', 844, 0]];
   const FL = { secs: [], vC: 0, vA: 0, vB: 0, D: 1, CL: 0, VL: 0, docFooter: 0 };
   const flowSec = id => FL.secs.find(o => o.id === id);
@@ -1577,7 +1578,10 @@
     put(product, 'opacity', '1');
     put(product, 'transform', `translate(0px, ${fmt(L.setDy || 0)}px) scale(${fmt(L.setK || 1)})`);
     if (focusClone) focusClone.style.transform = product.style.transform;
-    const onSets = Math.abs(tS) < (FH - 2 * CUT) * .35;
+    // набор «включается», когда коробка на экране; фон наборов отстаёт от блока (параллакс)
+    const relS = CUT - tS;
+    const onSets = relS > -320 && relS < 640;
+    put(b2bg, 'transform', `translateY(${fmt(clamp(relS * .6, 0, 210))}px)`);
     if (onSets !== product.classList.contains('b2-on')) {
       product.classList.toggle('b2-on', onSets);
       b2.classList.toggle('b2-on', onSets);
