@@ -6,8 +6,9 @@
 html.is-p #stage { width: 390px; height: 844px; }
 html.is-p .scr { width: calc(390px + 2 * var(--px, 0px)); height: calc(844px + 2 * var(--py, 0px) + var(--ext, 0px)); }
 html.is-p .fr { width: 390px; height: 844px; }
-html.is-p .track > div { height: calc(var(--vh, 1vh) * 100); }
-html.is-p .track > .track-video { height: calc(var(--vh, 1vh) * 187.5); }
+/* свободный скролл: высоту прокрутки задаёт desktop.js (flowLayout) */
+html.is-p .track > div { display: none; }
+html.flow-lock { overflow: hidden; }
 html.is-p .h1, html.is-p .h2, html.is-p .b5-left { -webkit-text-stroke: 1.2px var(--cream); }
 html.is-p .h2 { font-size: 22.13px; line-height: 30.99px; letter-spacing: .996px; }
 html.is-p .btn { padding: 11.07px 20.75px; font-size: 13.14px; border-width: 1.383px; }
@@ -144,43 +145,46 @@ html.is-p .b5-cta p { font-size: 12.45px; }
 html.is-p #left .stickers { z-index: 14; }
 html.is-p #left .stickers-back { z-index: 12; }
 
-/* 6. Сроки (1138 px — экран спускается на 206 px) */
-html.is-p .b6-bg { left: -567px; top: 0; width: 1093px; height: 496px; }
-html.is-p .b6-shade { display: block; position: absolute; left: -47px; top: 301px; width: 796px; height: 837px; background: linear-gradient(180deg, rgba(58, 27, 11, 0) 6.73%, #3a1b0b 23.38%); }
-html.is-p .b6 { background: #3a1b0b; }
-html.is-p .b6-title { left: 16.6px; top: 456.4px; width: 300px; }
+/* 6. Сроки (1305 px, свободный скролл) */
+html.is-p .b6 { background: linear-gradient(180deg, #346949 0%, #002510 100%); }
+html.is-p .b6-bg { display: none; }
+html.is-p .b6-bg-m { display: block; position: absolute; left: -567.4px; top: -108.9px; width: 1093.9px; height: 1028.6px; max-width: none; }
+html.is-p .b6-shade { display: block; position: absolute; left: -47px; top: 470px; width: 796px; height: 906px; background: linear-gradient(180deg, rgba(52, 105, 73, 0) 6.73%, #002510 23.38%); }
+html.is-p .b6-topshade { display: block; position: absolute; left: -47px; top: 0; width: 466px; height: 263px; background: linear-gradient(180deg, #002510 0%, rgba(0, 37, 16, 0) 93.27%); }
+html.is-p .b6-title { left: 16.6px; top: 126.4px; width: 300px; }
 html.is-p .b6-bubble { display: none; }
-html.is-p .b6-bubble-m { display: block; position: absolute; left: 10px; top: 586px; width: 370px; height: 391px; max-width: none; z-index: 13; }
-html.is-p .b6-steps { left: 26px; top: 617px; width: 339px; padding-left: 17.98px; gap: 9.68px; font-size: 12.45px; line-height: 16.19px; }
-html.is-p .b6-btn { left: 28px; top: 866px; width: 333px; }
+html.is-p .b6-bubble-m { display: block; position: absolute; left: 10px; top: 655px; width: 370px; height: 391px; max-width: none; z-index: 13; }
+html.is-p .b6-steps { left: 26px; top: 686px; width: 339px; padding-left: 17.98px; gap: 9.68px; font-size: 12.45px; line-height: 16.19px; }
+html.is-p .b6-btn { left: 28px; top: 935px; width: 333px; }
 
 /* 7. Обо мне */
-html.is-p .b7-title { width: 390px; top: 96.94px; }
+html.is-p .b7-title { width: 390px; top: 55.94px; }
 html.is-p .b7-card-wrap { left: 35px; top: 248.5px; scale: .6917; transform-origin: 0 0; }
 html.is-p .stamp-about .stamp-cap { font-size: 17px; }
 
 /* 8. Финальный призыв (1940 px — карточки столбиком, экран спускается к кнопкам) */
 html.is-p .b8-cards { left: 49.88px; top: 354px; flex-direction: column; gap: 15.38px; scale: .8455; transform-origin: 0 0; }
-html.is-p .b8-cta { left: 10px; top: 144px; width: 370px; gap: 0; }
-html.is-p .b8-title { width: 100%; margin-bottom: 1459px; line-height: 30.99px; }
+html.is-p .b8-cta { left: 10px; top: 134px; width: 370px; gap: 0; }
+html.is-p .b8-title { width: 100%; margin-bottom: 1469px; line-height: 30.99px; }
 html.is-p .b8-btns { flex-direction: column; width: 100%; gap: 9.68px; }
 html.is-p .b8-btns .btn { width: 100%; }
 html.is-p .b8-cta .round { margin-top: 20.75px; padding: 12.45px; border-width: 1.383px; }
 html.is-p .b8-cta .round img { width: 16.6px; height: 16.6px; }
 
-/* 9. Частые вопросы (в мобильном макете не нарисованы) */
-html.is-p .b9-title { width: 390px; top: 96px; }
-html.is-p .faq-list { left: 10px; top: 146px; width: 370px; gap: 3px; }
-html.is-p .faq-list button { min-height: 28px; padding: 6px 14px; gap: 10px; font-size: 12.5px; }
+/* 9. Частые вопросы */
+html.is-p #faq { background: linear-gradient(180deg, #002510 0%, #346949 49.52%, #002510 100%); }
+html.is-p .b9-title { width: 390px; top: 56px; }
+html.is-p .faq-list { left: 10px; top: 126px; width: 370px; gap: 3px; }
+html.is-p .faq-list button { min-height: 36px; padding: 10px 14px; gap: 10px; font-size: 12.5px; line-height: 15.63px; }
 html.is-p .faq-list button::before { width: 6px; height: 6px; }
-html.is-p .faq-side { left: 10px; top: 526px; width: 370px; gap: 16px; }
-html.is-p .faq-card { min-height: 134px; padding: 18px 20px; gap: 10px; border-radius: 22px; border-width: 2px; }
-html.is-p .faq-q { font-size: 16px; }
-html.is-p .faq-a { font-size: 13.5px; line-height: 1.45; }
-html.is-p .faq-more p { font-size: 12.5px; max-width: 200px; }
+html.is-p .faq-side { left: 10px; top: 615px; width: 370px; gap: 16px; }
+html.is-p .faq-card { min-height: 134px; padding: 18px 20px; gap: 10px; border-radius: 22px; border-width: 2px; background: #ebe0c8; border-color: #fff5e0; }
+html.is-p .faq-q { font-size: 16px; line-height: 20.8px; }
+html.is-p .faq-a { font-size: 13.5px; line-height: 19.58px; }
+html.is-p .faq-more p { font-size: 12.5px; line-height: 17.5px; max-width: 200px; }
 
 /* Подвал */
-html.is-p .footer { top: calc(844px + var(--py, 0px) + var(--ext, 0px)); width: calc(390px + 2 * var(--px, 0px)); padding: 38.73px calc(19.37px + var(--px, 0px)) 30.43px; border-top-width: .69px; }
+html.is-p .footer { background: #002510; top: calc(844px + var(--py, 0px) + var(--ext, 0px)); width: calc(390px + 2 * var(--px, 0px)); padding: 38.73px calc(19.37px + var(--px, 0px)) 30.43px; border-top-width: .69px; }
 html.is-p .ft-in { grid-template-columns: 1fr 1fr; gap: 27.67px 19.37px; }
 html.is-p .ft-brand { grid-column: 1 / -1; gap: 8.3px; }
 html.is-p .ft-col { gap: 8.3px; font-size: 14.53px; line-height: 21.06px; }
@@ -192,5 +196,16 @@ html.is-p .ft-bottom { margin-top: 24.9px; padding-top: 16.6px; gap: 6.92px; }
 html.is-p #book .stickers { z-index: 16; }   /* стикеры поверх карточек наборов */
 
 
-/* подсказка «листайте дальше» на телефоне ниже (9 px от края), учитывая вырез экрана */
+
+/* блок 3: затемнение сверху, под шапкой */
+html.is-p .b3-topshade { display: block; position: absolute; left: -40px; top: 0; width: 468px; height: 189px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(4, 14, 7, .8) 0%, rgba(12, 26, 39, .8) 100%); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+/* первый экран: открытая коробка — своя картинка, набор на экране наборов едет вместе с блоком */
+html.is-p .hero-box { display: block; position: absolute; left: -203.5px; top: 192.6px; width: 788.2px; height: 588.6px; z-index: 5; transform-origin: 50% 50%; pointer-events: none; }
+html.is-p .hero-box .prod-inner img { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* стикеры у верхнего края «Сроков» и финального блока заходят на блок выше */
+html.is-p #terms, html.is-p #book { overflow: visible; clip-path: inset(-80px 0 0 0); }
+/* подсказка «листайте дальше» на телефоне: 9 px от низа */
 html.is-p .idle-hint { bottom: calc(9px + env(safe-area-inset-bottom, 0px)); }
+/* подвал: телефона и почты в мобильном макете нет */
+html.is-p .ft-phone, html.is-p .ft-mail { display: none; }

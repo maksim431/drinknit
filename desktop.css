@@ -583,17 +583,24 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 /* элементы только для мобильного макета */
 .b3-vshade, .b4-shade, .b4-shade2, .b6-shade, .b6-bubble-m, .b4-bubble-m { display: none; }
 
-/* Подсказка «листайте дальше»: закреплена внизу по центру, появляется через 4 с без прокрутки, при прокрутке пропадает */
+/* Подсказка «листайте дальше»: закреплена внизу по центру, появляется через 2 с без прокрутки, при прокрутке пропадает.
+   Три шеврона по очереди загораются сверху вниз */
 .idle-hint {
-  position: fixed; left: 50%; bottom: 16px; z-index: 90; width: 48px; height: 48px; padding: 0; border: 0; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: radial-gradient(circle, rgba(255, 237, 200, 0) 0%, rgba(255, 237, 200, .2) 100%);
-  -webkit-backdrop-filter: blur(11.7px); backdrop-filter: blur(11.7px);
-  opacity: 0; visibility: hidden; transform: translate(-50%, 12px); pointer-events: none;
+  position: fixed; left: 50%; bottom: 16px; z-index: 90; width: 42px; height: 42px; pointer-events: none;
+  opacity: 0; visibility: hidden; transform: translate(-50%, 10px);
   transition: opacity .35s ease, transform .45s cubic-bezier(.16, 1, .3, 1), visibility 0s linear .45s;
 }
-.idle-hint img { width: 22px; height: 22px; animation: idleJump 1.2s cubic-bezier(.45, 0, .55, 1) infinite; }
-.idle-hint.on { opacity: 1; visibility: visible; transform: translate(-50%, 0); pointer-events: auto; transition: opacity .35s ease, transform .45s cubic-bezier(.16, 1, .3, 1); }
-.idle-hint:hover { background: radial-gradient(circle, rgba(255, 237, 200, .08) 0%, rgba(255, 237, 200, .3) 100%); }
-@keyframes idleJump { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(4px); } }
-@media (prefers-reduced-motion: reduce) { .idle-hint img { animation: none; } }
+.idle-hint svg { display: block; width: 42px; height: 42px; overflow: visible; filter: drop-shadow(0 0 2.5px rgba(255, 237, 200, .9)); }
+.idle-hint .ch { fill: #ffedc8; opacity: .3; animation: chev 1.2s ease-in-out infinite; }
+.idle-hint .ch2 { animation-delay: .2s; }
+.idle-hint .ch3 { animation-delay: .4s; }
+.idle-hint.on { opacity: 1; visibility: visible; transform: translate(-50%, 0); transition: opacity .35s ease, transform .45s cubic-bezier(.16, 1, .3, 1); }
+@keyframes chev { 0%, 60%, 100% { opacity: .3; } 25% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .idle-hint .ch { animation: none; } .idle-hint .ch2 { opacity: 1; } }
+/* только для телефона */
+.hero-box, .b3-topshade, .b6-bg-m, .b6-topshade { display: none; }
+.intro .hero-box .prod-inner { opacity: 0; transform: translateY(70px) scale(.78); filter: brightness(1.9) saturate(.6); }
+.intro.is-open .hero-box .prod-inner {
+  opacity: 1; transform: none; filter: none;
+  transition: opacity .35s ease, transform 1.25s cubic-bezier(.34, 1.45, .5, 1), filter 1.4s ease;
+}

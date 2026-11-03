@@ -34,7 +34,7 @@
 
 
 <!-- подсказка «листайте дальше»: появляется, если посетитель не прокручивает страницу больше 4 секунд -->
-<button class="idle-hint" id="idle-hint" type="button" aria-label="Листать дальше" tabindex="-1"><img src="assets/d/ic-arrow-idle.svg" width="22" height="22" alt=""></button>
+<div class="idle-hint" id="idle-hint" aria-hidden="true"><svg viewBox="0 -1 42 44" width="42" height="42"><path class="ch ch1" d="M10.88 .38a1.31 1.31 0 0 1 1.86 0l7.82 7.83 7.82-7.83a1.31 1.31 0 0 1 1.86 1.86l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.86z"/><path class="ch ch2" d="M10.88 15.42a1.31 1.31 0 0 1 1.86 0l7.82 7.82 7.82-7.82a1.31 1.31 0 0 1 1.86 1.85l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.85z"/><path class="ch ch3" d="M10.88 31.38a1.31 1.31 0 0 1 1.86 0l7.82 7.83 7.82-7.83a1.31 1.31 0 0 1 1.86 1.86l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.86z"/></svg></div>
 <div class="vp" id="vp">
 <div id="stage">
 
@@ -180,6 +180,7 @@
     <img class="b3-l02 bgl b3-fade" src="assets/d/b3-02.webp" alt="" data-d="14">
     <img class="b3-l03 bgl b3-fade" src="assets/d/b3-03.webp" alt="" data-d="26">
     <!-- заголовок стоит на месте и гаснет при скролле -->
+    <div class="b3-topshade" aria-hidden="true"></div>
     <div class="b3-textwrap" id="b3-textwrap">
       <div class="b3-text rv" style="--d:.15s">
         <h2 class="h2">Маленькую игрушку<br>я вяжу 2 часа, среднюю 7 часов</h2>
@@ -237,6 +238,8 @@
   <section id="terms" class="scr scene b6"><div class="fr">
     <img class="b6-bg b6-bg2 bgl" src="assets/d/b5-bg2.webp" alt="" data-d="8">
     <div class="b6-bg b6-bg1 bgl" data-d="16"><img src="assets/d/b5-bg1.webp" alt=""></div>
+    <img class="b6-bg-m" src="assets/d/m-terms-bg.webp" alt="" loading="lazy">
+    <div class="b6-topshade" aria-hidden="true"></div>
     <h2 class="h2 b6-title rv" style="--d:.2s">Чтобы набор успел<br>к празднику,<br>напишите до 25.12</h2>
     <div class="b6-shade" aria-hidden="true"></div>
     <div class="rv" style="--d:.4s"><img class="b6-bubble" src="assets/d/b5-bubble.svg" alt="" data-d="10"><img class="b6-bubble-m" src="assets/d/m-terms-bubble.svg" alt="">
@@ -328,8 +331,8 @@
         <a href="#" data-msg="telegram">Telegram</a>
         <a href="#" data-msg="vk">ВКонтакте</a>
         <a href="#" data-msg="max">MAX</a>
-        <p>Телефон: [+7 ___ ___-__-__]</p>
-        <p>Почта: [email@example.ru]</p>
+        <p class="ft-phone">Телефон: [+7 ___ ___-__-__]</p>
+        <p class="ft-mail">Почта: [email@example.ru]</p>
       </div>
     </div>
     <div class="ft-bottom">

@@ -15,6 +15,9 @@
   // Две раскладки одного лендинга: горизонтальный кадр 1920 × 1080 (компьютер, планшет в альбомной ориентации)
   // и вертикальный 600 × 1200 (телефон, вертикальный планшет). Анимации одни и те же, меняются только координаты
   const PORTRAIT = document.documentElement.classList.contains('is-p');
+  // телефон: свободный скролл — блоки идут друг за другом, как обычная страница. На месте стоят только
+  // карточки блока 3 (листаются по одной на свайп) и видео-переход к блоку 4
+  const FLOW = PORTRAIT;
   const FW = PORTRAIT ? 390 : 1920, FH = PORTRAIT ? 844 : 1080, CX = FW / 2, CY = FH / 2;
   const L = PORTRAIT ? {                              // мобильный макет Figma, кадр 390 × 844
     prod: { x: -203.5, y: 192.6, w: 788.2, h: 588.6 }, // коробка на экране наборов
@@ -27,7 +30,7 @@
     kidsBg: { x: -695, y: 135, w: 1270, h: 709 },
     flip: [195, 422],
     b3cardTop: 599.5,
-    kidsPan: 252, termsPan: 294, bookPan: 1096,        // блоки выше экрана: экран спускается по ним
+    kidsPan: 0, termsPan: 0, bookPan: 0,               // свободный скролл: спусков по блокам нет
   } : {
     prod: { x: 122.97, y: -125, w: 1787, h: 1334 },
     hero: { dx: -59.47, dy: -251.5, k: 1.1834 },
@@ -106,20 +109,27 @@
     hero: [null, [273, 175, 140.45, 140.24, 106.32, 105.9, 24.26], null,
       [133.95, 93.01, 141.26, 155.04, 121.35, 137.89, 8.92], [-24, 126, 189.68, 200.66, 146.93, 163.82, -17.65], null],
     kids: [[275, 367, 126.84, 131.49, 97.02, 104.75, 19.86], [44, 810, 240.66, 258.37, 207.5, 228.79, -8.98], [166.33, 554.3, 155.27, 166.23, 126.61, 141.26, -13.07]],
-    left: [[85.79, 46, 238.5, 238.5, 213.9, 213.9, 7.04], [15, 661, 183.91, 184.67, 142.29, 143.6, 20.73], null, [-43.97, 113.61, 171.54, 181.95, 141.45, 155.13, -12.44],
-      [214, 703, 139.66, 140.27, 123.11, 123.83, -8.28], null, [285, 159.96, 130, 150.04, 130, 150.04, 0]],
-    terms: [[86, 852, 344.77, 397.4, 269.12, 341.81, 'rotate(-165.79deg) scaleY(-1)']],
-    about: [[6.56, 181, 158.34, 144.04, 138.14, 120.11, -10.89], [-12, 181.29, 87.28, 97.12, 69.45, 82.9, 13.86], [10, 684.63, 104, 95, 104, 95, 0],
-      [254, 169, 127.63, 119.65, 103.03, 89.58, 20.2], [220, 707, 137.75, 138.28, 118.39, 119.06, -10.29], [307.91, 744.8, 65, 92, 65, 92, 0],
-      [316.46, 240.57, 79.56, 96.56, 75.15, 93.03, -2.78], [59.76, 640, 89.1, 95.39, 75.81, 83.57, 9.94]],
+    left: [[85.79, 36, 238.5, 238.5, 213.9, 213.9, 7.04], [15, 661, 183.91, 184.67, 142.29, 143.6, 20.73], null, [-43.97, 113.61, 171.54, 181.95, 141.45, 155.13, -12.44],
+      null, null, [285, 159.96, 130, 150.04, 130, 150.04, 0]],
+    terms: [[86, 921, 344.77, 397.4, 269.12, 341.81, 'rotate(-165.79deg) scaleY(-1)']],
+    about: [[6.56, 181, 158.34, 144.04, 138.14, 120.11, -10.89], [-12, 181.29, 87.28, 97.12, 69.45, 82.9, 13.86], [30, 744.63, 104, 95, 104, 95, 0],
+      [254, 169, 127.63, 119.65, 103.03, 89.58, 20.2], null, null,
+      [316.46, 240.57, 79.56, 96.56, 75.15, 93.03, -2.78], [79.76, 700, 89.1, 95.39, 75.81, 83.57, 9.94]],
     book: [[217, 607, 288.92, 340.69, 220.43, 293.65, 15], [-61, 197, 233.66, 258.19, 178.61, 215.49, -16.95], [-80, 1052, 243.71, 270.38, 180.73, 223.74, 18.99],
       [236.24, 1425.35, 219.25, 234.93, 191.33, 209.84, 8.18]],
     faq: [null, null],
   };
-  for (const [set, list] of Object.entries(STICKERS)) {
+  // стикеры, которые есть только в мобильном макете: [картинка, left, top, рамка, наклейка, поворот, положение картинки]
+  const STICKERS_PX = {
+    terms: [['sheet-5pryb', 214, -39.72, 139.66, 140.27, 123.11, 123.83, -8.28, 0, -107.89, 280.05, 207.89]],
+    book: [['sheet-x79', 210, -60, 137.75, 138.28, 118.39, 119.06, -10.29, -147.76, -99.78, 269.06, 199.78],
+      ['sheet-cdp', 297.91, -22.2, 65, 92, 65, 92, 0, 0, 0, 266.32, 189.81]],
+  };
+  for (const [set, list0] of Object.entries(STICKERS)) {
     const host = $(`.stickers[data-set="${set}"]`);
-    list.forEach(([src, l, t, w, h, iw, ih, rot, il, it, iwp, ihp, d, shadow = true], i) => {
-      if (PORTRAIT) {
+    const list = PORTRAIT && STICKERS_PX[set] ? list0.concat(STICKERS_PX[set].map(x => x.concat([0, true, 'px']))) : list0;
+    list.forEach(([src, l, t, w, h, iw, ih, rot, il, it, iwp, ihp, d, shadow = true, px], i) => {
+      if (PORTRAIT && !px) {
         const pp = STICKERS_P[set] && STICKERS_P[set][i];
         if (!pp) return;
         [l, t, w, h, iw, ih, rot] = pp;
@@ -168,7 +178,7 @@
      сдвигаются вниз на CUT, нижней (ниже 572 px) — вверх на CUT, между ними — плавно. Коробка первого экрана
      уменьшается, чтобы поместиться между шапкой и текстом. Высокие блоки начинаются от верха экрана,
      спуск по ним длиннее на 2 × CUT */
-  let CUT = 0, cutTargets = null;
+  let CUT = 0, cutTargets = null, EXTF = 0;
   const BASE = PORTRAIT ? JSON.parse(JSON.stringify({ hero: L.hero, mouth: L.mouth, boxc: L.boxc, gift: L.gift, v0: L.v0,
     b3pan: L.b3pan, b3pan2: L.b3pan2, kidsPan: L.kidsPan, termsPan: L.termsPan, bookPan: L.bookPan })) : null;
   const FIXED = /(^|\s)(b\d-bg|b2-bg|dim|modal|b3-world|b3-video|b3-vshade|b4-shade|b6-shade|bgl)(\s|$)/;
@@ -180,7 +190,8 @@
     ['#faq .h2', 1], ['#faq .faq-list', 1], ['#faq .faq-side', 1]];
   function measureCut() {
     cutTargets = [];
-    const secs = ['hero', 'sets', 'time', 'left', 'about', 'faq'].map(id => $(`#${id}`));
+    // свободный скролл: подгоняются под высоту экрана только первый экран и наборы
+    const secs = (FLOW ? ['hero', 'sets'] : ['hero', 'sets', 'time', 'left', 'about', 'faq']).map(id => $(`#${id}`));
     const saved = secs.map(sec => [sec.style.display, sec.style.visibility]);
     secs.forEach(sec => { sec.style.display = ''; sec.style.visibility = 'hidden'; });
     const walk = (el, oy, list) => {
@@ -276,7 +287,8 @@
     vp.style.setProperty('--k', Math.max((FW + 2 * px) / FW, (FH + 2 * py) / FH).toFixed(4));
     // высота экрана прокрутки в пикселях: на телефоне 100vh не совпадает с видимой высотой окна
     if (vh !== lastVH || Math.abs(vw - lastVW) > 1) { lastVW = vw; lastVH = vh; html.style.setProperty('--vh', `${vh / 100}px`); }
-    vp.style.setProperty('--ext', `${Math.max(0, vhNow - vh) / s}px`);
+    EXTF = Math.max(0, vhNow - vh) / s;
+    vp.style.setProperty('--ext', `${EXTF}px`);
     // фоны растягиваются от центра кадра
     cdpr = Math.min(devicePixelRatio || 1, 1.25);
     if (PORTRAIT) applyCut(Math.max(0, (FH - vh / s) / 2));
@@ -657,6 +669,7 @@
 
   const openItem = (key, i) => {
     openData = ITEMS[key][i];
+    if (FLOW) flowOpenModal();
     track('item_open', { item: openData.id, set: key });
     photoIdx = 0;
     $('#modal-title').innerHTML = openData.title;
@@ -676,7 +689,7 @@
       b.tabIndex = -1;
       if (j !== i) b.remove(); else { b.classList.remove('lit', 'is-hover'); b.classList.add('is-focus'); }
     });
-    $('#stage').appendChild(focusClone);
+    (FLOW ? $('#sets .fr') : $('#stage')).appendChild(focusClone);
     dim.classList.add('on');
     modal.hidden = false;
     sparkleEdge(openData, 30, { vy: rand(-160, -60) });
@@ -686,6 +699,7 @@
   const closeItem = () => {
     if (modal.hidden) return;
     modal.hidden = true;
+    html.classList.remove('flow-lock');
     dim.classList.remove('on');
     focusClone?.remove();
     focusClone = null;
@@ -715,6 +729,21 @@
     cardIdx = i;
   };
   setCard(0);
+  // карточка переворачивается целиком за 0,7 с, когда посетитель дошёл до следующей (один свайп или шаг колеса);
+  // если нужно перелистнуть через одну, перевороты идут по очереди
+  let flipShown = 0, flipWant = 0, flipFrom = 0, flipDest = 0, flipT0 = 0, flipping = false;
+  const flipTo = ci => { flipWant = ci; };
+  const stepFlip = now => {
+    if (!flipping) {
+      if (flipWant === flipShown) return;
+      flipping = true; flipFrom = flipShown; flipDest = flipShown + Math.sign(flipWant - flipShown); flipT0 = now;
+    }
+    const t = reduce ? 1 : clamp((now - flipT0) / 700), tt = easeIO(t), dir = flipDest > flipFrom ? 1 : -1;
+    const r = v => Math.round(v * 100) / 100;
+    if (tt < .5) { setCard(flipFrom); flip.style.transform = `rotateX(${r(dir * tt * 180)}deg)`; }
+    else { setCard(flipDest); flip.style.transform = `rotateX(${r(dir * (tt - 1) * 180)}deg)`; }
+    if (t >= 1) { flipping = false; flipShown = flipDest; flip.style.transform = ''; }
+  };
 
   /* ===== Таймер ===== */
   const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
@@ -928,6 +957,7 @@
   const goTo = hash => {
     const id = hash.slice(1);
     if (!(id in STOPS) || html.classList.contains('is-locked')) return;
+    if (FLOW) { flowGoTo(id); return; }
     auto = true;                 // переход по меню проезжает блоки без стопора
     scrollTo({ top: toY(STOPS[id]), behavior: reduce ? 'auto' : 'smooth' });
   };
@@ -960,7 +990,7 @@
   // Стопор держит экран 0,3 с, колесо и инерция тачпада в это время не листают дальше,
   // потом прокрутка снова свободная
   const HOLD_MIN = 300, HOLD_MAX = 300, HOLD_GAP = 180;   // стопор держит экран 0,3 с
-  let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY;
+  let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY, lastDir = 1;
   let lastWheel = 0;
   // палец на экране: пока посетитель тянет страницу, ни стопор, ни доезжание её не двигают —
   // иначе на телефоне страница уезжала из-под пальца (особенно внутри видео-перехода)
@@ -984,7 +1014,9 @@
   const edgeY = (k, bottom) => toY(k) + (bottom ? holdPx(k) : 0);
   let holdY = 0;
   addEventListener('scroll', () => {
+    if (FLOW) { flowScroll(); return; }
     const P = toP(scrollY), P0 = toP(lastY), now = performance.now();
+    if (scrollY !== lastY) lastDir = Math.sign(scrollY - lastY);
     lastY = scrollY;
     if (!auto && !touching && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
@@ -1017,6 +1049,12 @@
       if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
       // доезжаем до ближайшего экрана в любую сторону, в том числе назад к тому, с которого уходят
       const P = toP(scrollY), target = Math.round(P), d = Math.abs(P - target);
+      // карточки блока 3: одно движение — одна карточка, доезжаем до следующей в сторону прокрутки
+      if (P > 3 && P < 5 && d > .003) {
+        auto = true;
+        scrollTo({ top: toY(lastDir > 0 ? Math.ceil(P) : Math.floor(P)), behavior: reduce ? 'auto' : 'smooth' });
+        return;
+      }
       // зона прилипания: у блока с наборами 30 %, у карточек блока 3 — на 30 % больше обычной (20,8 %), у остальных 16 %
       // внутри видео-перехода (P 5…6) зона узкая: видео прокручивается свободно и не отскакивает к началу
       const inVideo = P > V_START && P < V_START + 1;
@@ -1107,7 +1145,7 @@
     if (key === lastFrame) return;
     lastFrame = key;
     const e = easeIO(t);
-    const v1y = V1.y + (L.kidsPan ? CUT : 0);   // блок «Для детей» на телефоне начинается от верха экрана
+    const v1y = V1.y + (L.kidsPan || FLOW ? CUT : 0);   // блок «Для детей» на телефоне начинается от верха экрана
     let r = { x: V0.x + (V1.x - V0.x) * e, y: V0.y + (v1y - V0.y) * e, w: V0.w + (V1.w - V0.w) * e, h: V0.h + (V1.h - V0.h) * e };
     // координаты кадра 1920 × 1080 → холст (с полями до краёв окна и растяжением фонов --k)
     const px = tx / s, py = ty / s, k = Math.max((FW + 2 * px) / FW, (FH + 2 * py) / FH);
@@ -1169,6 +1207,7 @@
   const faqSec = $('#faq'), footer = $('#footer'), trackFooter = $('#track-footer');
   let footerP = 0;   // высота подвала в «экранах»
   const sizeFooter = () => {
+    if (FLOW) { flowLayout(); return; }
     const h = footer.offsetHeight;            // в координатах кадра
     footerP = h * s / VH();
     trackFooter.style.height = `${h * s + HOLD_TOTAL * VH()}px`;
@@ -1187,23 +1226,15 @@
     idleT = setTimeout(function check() {
       const atEnd = scrollY + VH() >= document.documentElement.scrollHeight - 4;
       if (html.classList.contains('is-locked') || !modal.hidden || atEnd || document.hidden) { idleFrom = performance.now(); idleT = setTimeout(check, 400); return; }
-      if (performance.now() - idleFrom < 4000) { idleT = setTimeout(check, 400); return; }
+      if (performance.now() - idleFrom < 2000) { idleT = setTimeout(check, 300); return; }
       idle.classList.add('on'); body.classList.add('idle');
-    }, 400);
+    }, 300);
   };
   const idleReset = () => { idleOff(); idleFrom = performance.now(); idleArm(); };
   addEventListener('scroll', idleReset, { passive: true });
   addEventListener('wheel', idleReset, { passive: true });
   addEventListener('touchmove', idleReset, { passive: true });
   addEventListener('keydown', e => { if (/Arrow|Page|Home|End|Space| /.test(e.key || e.code)) idleReset(); });
-  // клик — к следующему экрану (как прокрутка на один шаг)
-  idle.addEventListener('click', () => {
-    const P = toP(scrollY), k = Math.min(LAST, Math.floor(P + .02) + 1);
-    const h = holdPx(Math.floor(P + .02));
-    const y = h && scrollY < toY(Math.floor(P + .02)) + h - 4 ? toY(Math.floor(P + .02)) + h : toY(k);
-    idleReset(); auto = true;
-    scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
-  });
   idleArm();
 
   // до каких блоков дошёл посетитель (цели Метрики, по разу за визит)
@@ -1337,12 +1368,7 @@
     if (L.bookPan) put(bookFr, 'transform', `translateY(${fmt(CUT - L.bookPan * (holdF[10] || 0))}px)`);
 
     // 3 → 4 → 5: блок стоит, карточка переворачивается по вертикали, угол — от скролла
-    const q = clamp(P - 3, 0, 2);
-    let i = Math.min(2, Math.floor(q)), t = q - i;
-    if (i === 2) t = 0;
-    const tt = easeIO(t);
-    if (tt < .5) { setCard(i); flip.style.transform = `rotateX(${fmt(tt * 180)}deg)`; }
-    else { setCard(i + 1); flip.style.transform = `rotateX(${fmt((tt - 1) * 180)}deg)`; }
+    flipTo(P < 3.5 ? 0 : P < 4.5 ? 1 : 2);
 
     // 6 ↔ 7 ↔ 8: жёсткий параллакс — объекты таймера стоят, рамка наезжает снизу и уезжает вверх
     left.style.setProperty('--ct', `${fmt(clamp(7 - P) * 100)}%`);
@@ -1373,6 +1399,192 @@
     }
   };
 
+  /* ===== Телефон: свободный скролл =====
+     Блоки стоят друг под другом в «документе» (координаты кадра 390 px), вся сцена сдвигается вместе со скроллом.
+     Два места, где экран стоит: карточки блока 3 (по центру экрана, по одной на свайп) и видео-переход к блоку 4.
+     Первый экран и наборы подогнаны под высоту экрана (обрезка CUT сверху и снизу), остальные блоки — во всю высоту */
+  const FLOW_SECS = [['hero', 844, 1], ['sets', 844, 1], ['time', 1633, 0], ['kids', 1096, 0], ['left', 844, 0],
+    ['terms', 1305, 0], ['about', 844, 0], ['book', 1940, 0], ['faq', 844, 0]];
+  const FL = { secs: [], vC: 0, vA: 0, vB: 0, D: 1, CL: 0, VL: 0, docFooter: 0 };
+  const flowSec = id => FL.secs.find(o => o.id === id);
+  // прокрутка (в px кадра) → что видно: view — координата документа у верха экрана
+  function flowAt(f) {
+    const { vC, vA, vB, CL, VL, D } = FL;
+    if (f <= vC) return { view: f, u: 0, vt: 0, stage: 0 };
+    if (f <= vC + CL) return { view: vC, u: (f - vC) / D, vt: 0, stage: 1 };              // карточки
+    if (f <= vA + CL) return { view: f - CL, u: 2, vt: 0, stage: 2 };
+    if (f <= vA + CL + VL) return { view: vA, u: 2, vt: (f - vA - CL) / VL, stage: 3 };   // видео
+    return { view: vB + f - (vA + CL + VL), u: 2, vt: 1, stage: 4 };
+  }
+  function fFromView(v) {
+    if (v <= FL.vC) return v;
+    if (v <= FL.vA) return v + FL.CL;
+    return FL.vA + FL.CL + FL.VL + Math.max(0, v - FL.vB);
+  }
+  function flowLayout() {
+    if (!FLOW) return;
+    let c = 0;
+    FL.secs = FLOW_SECS.map(([id, H, cutSec]) => {
+      const el = $(`#${id}`), fr = $('.fr', el);
+      const r0 = cutSec ? CUT : 0, r1 = cutSec ? H - CUT : H;
+      el.style.top = `${r0}px`; el.style.height = `${r1 - r0}px`;
+      fr.style.top = `${-r0}px`; fr.style.height = `${H}px`;
+      // top — где начало кадра блока при view = 0 (в координатах сцены)
+      const o = { id, el, fr, H, r0, r1, top: CUT + c - r0 };
+      c += r1 - r0;
+      return o;
+    });
+    FL.docFooter = c;
+    const time = flowSec('time'), kids = flowSec('kids');
+    FL.vC = time.top + L.b3cardTop + 232 - FH / 2;     // карточка по центру экрана
+    FL.vA = time.top + 1633 - (FH - CUT);              // низ блока 3 у низа экрана — начало видео
+    FL.vB = kids.top - CUT;                            // блок «Для детей» от верха экрана — конец видео
+    FL.D = .45 * VH() / s; FL.CL = 2 * FL.D; FL.VL = V_SLOW * VH() / s;
+    const viewMax = FL.docFooter + footer.offsetHeight + 2 * CUT - FH - EXTF;
+    $('.track').style.height = `${Math.ceil(fFromView(viewMax) * s + innerHeight)}px`;
+    flowLast = -1;
+  }
+  function flowGoTo(id) {
+    const o = flowSec(id);
+    if (!o) return;
+    auto = true;
+    scrollTo({ top: fFromView(o.top + o.r0 - CUT) * s, behavior: reduce ? 'auto' : 'smooth' });
+  }
+  // окно предмета: наборы встают ровно на экран, пока окно открыто, страница не листается
+  function flowOpenModal() {
+    const o = flowSec('sets');
+    scrollTo({ top: fFromView(o.top + o.r0 - CUT) * s, behavior: 'instant' });
+    lastY = scrollY;
+    html.classList.add('flow-lock');
+    flowLast = -1;
+  }
+  // прилипание только у карточек: на каждой карточке стопор, между ними — доезжание в сторону свайпа
+  function flowScroll() {
+    const now = performance.now(), y = scrollY, y0 = lastY;
+    if (y !== y0) lastDir = Math.sign(y - y0);
+    lastY = y;
+    const stops = [FL.vC, FL.vC + FL.D, FL.vC + 2 * FL.D].map(v => Math.round(v * s));
+    if (!auto && !touching && !html.classList.contains('is-locked') && modal.hidden) {
+      if (now < holdUntil) {
+        if (Math.abs(y - holdY) > 2) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; }
+      } else {
+        const cross = y > y0 ? stops.find(v => v > y0 + 1 && v <= y + 1) : [...stops].reverse().find(v => v < y0 - 1 && v >= y - 1);
+        if (cross !== undefined && Math.abs(y - y0) < VH() * .6) {
+          holdStart = now; holdUntil = now + HOLD_MIN; holdY = cross;
+          scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY;
+        }
+      }
+    }
+    clearTimeout(settleT);
+    const settle = () => {
+      auto = false;
+      if (html.classList.contains('is-locked') || !modal.hidden) return;
+      if (touching) { settleT = setTimeout(settle, 200); return; }
+      if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
+      const yy = scrollY;
+      if (yy > stops[0] + 2 && yy < stops[2] - 2 && !stops.some(v => Math.abs(v - yy) <= 2)) {
+        const t = lastDir > 0 ? stops.find(v => v > yy) : [...stops].reverse().find(v => v < yy);
+        auto = true;
+        scrollTo({ top: t, behavior: reduce ? 'auto' : 'smooth' });
+      }
+    };
+    settleT = setTimeout(settle, 140);
+  }
+  // начальное состояние: все блоки видимы целиком, без появлений и параллаксов
+  let flowLast = -1, heroBox = null;
+  if (FLOW) {
+    body.classList.add('grp-a');
+    SCENES.forEach(sc => {
+      sc.el.style.visibility = 'visible'; sc.el.style.opacity = 1; sc.el.style.pointerEvents = '';
+      sc.rv.forEach(({ n }) => { n.style.opacity = 1; n.style.transform = ''; n.style.filter = ''; });
+      sc.st.forEach(({ n }) => { n.style.opacity = 1; n.style.transform = ''; });
+    });
+    b2els.forEach(({ n }) => { n.style.opacity = 1; n.style.transform = ''; n.style.filter = ''; n.style.pointerEvents = ''; });
+    heroFadeEls.forEach(el => { el.style.opacity = 1; });
+    left.style.setProperty('--ct', '0%'); left.style.setProperty('--cb', '0%');
+    katyaCopy.style.display = 'none';
+    b8fill.style.opacity = 1;
+    b8cards.forEach(c => { c.style.transform = 'none'; c.style.opacity = 1; });
+    [b3bg, b3fg].forEach(n => { n.style.transform = 'none'; });
+    // открытая коробка на первом экране — отдельная картинка: набор на экране наборов едет со своим блоком
+    heroBox = document.createElement('div');
+    heroBox.className = 'hero-box';
+    heroBox.innerHTML = '<div class="prod-inner"><img src="assets/d/sets/L-base.webp" alt="" draggable="false"></div>';
+    $('#hero .fr').insertBefore(heroBox, $('#hero .hero-fade'));
+    // набор — внутри блока наборов: едет вместе с ним, окно предмета открывается поверх
+    $('#sets .fr').appendChild(product);
+  }
+  const FLOW_GOALS = { sets: 'block_sets', time: 'block_time', kids: 'block_kids', left: 'block_left', terms: 'block_terms', about: 'block_about', book: 'block_book', faq: 'block_faq' };
+  const kidsScene = SCENES.find(sc => sc.id === 'kids');
+  function renderFlow() {
+    const f = scrollY / s;
+    if (f === flowLast && !(mouseMoving && f < 1)) return;
+    flowLast = f;
+    const st = flowAt(f), view = st.view, vt = st.vt;
+    const scrTop = CUT, scrBot = FH - CUT + EXTF;
+    scene = view < 60 ? 0 : 1;
+    const scrolled = view > 5;
+    if (scrolled !== header.classList.contains('scrolled')) header.classList.toggle('scrolled', scrolled);
+    // блоки
+    FL.secs.forEach(o => {
+      const v = o.id === 'kids' && st.stage === 3 ? FL.vB : view;
+      const tY = o.top - v;
+      let vis = tY + o.r1 > scrTop - 100 && tY + o.r0 < scrBot + 100;
+      if (o.id === 'kids' && st.stage === 3) vis = vt > .84;
+      put(o.el, 'transform', `translateY(${fmt(tY)}px)`);
+      put(o.el, 'display', vis ? '' : 'none');
+      if (FLOW_GOALS[o.id] && tY + o.r0 < FH / 2) track(FLOW_GOALS[o.id], null, true);
+    });
+    if (st.stage === 4) track('video_done', null, true);
+    // первый экран: коробка по раскладке под высоту экрана
+    if (heroBox) put(heroBox, 'transform', `translate(${fmt(L.hero.dx)}px, ${fmt(L.hero.dy)}px) scale(${fmt(L.hero.k)})`);
+    // набор едет вместе с блоком наборов
+    const so = flowSec('sets'), tS = so.top - view;
+    put(product, 'opacity', '1');
+    put(product, 'transform', `translate(0px, ${fmt(L.setDy || 0)}px) scale(${fmt(L.setK || 1)})`);
+    if (focusClone) focusClone.style.transform = product.style.transform;
+    const onSets = Math.abs(tS) < (FH - 2 * CUT) * .35;
+    if (onSets !== product.classList.contains('b2-on')) {
+      product.classList.toggle('b2-on', onSets);
+      b2.classList.toggle('b2-on', onSets);
+      if (onSets) ITEMS[current].forEach((it, i) => setTimeout(() => sparkleEdge(it, 14), i * 90));
+      else { setHover(null); closeItem(); ITEMS[current].forEach(it => it.el.classList.remove('lit')); }
+    }
+    // блок 3: текст гаснет по мере прокрутки к карточке, карточки листаются по одной
+    const time = flowSec('time'), tStart = time.top - CUT;
+    put(b3text, 'opacity', String(fmt(1 - clamp((view - tStart) / Math.max(1, (FL.vC - tStart) * .55)))));
+    flipTo(st.stage === 0 ? 0 : st.stage === 1 ? (st.u < .5 ? 0 : st.u < 1.5 ? 1 : 2) : 2);
+    if (view > FL.vC - FH) loadFrames();
+    // видео-переход: кадры и затемнение стоят на экране, элементы блока 3 гаснут, блок 4 проявляется в конце
+    const vOut = clamp(vt / .16);
+    b3fades.forEach(n => put(n, 'opacity', String(fmt(1 - vOut))));
+    put(b3text, 'visibility', vt > 0 ? 'hidden' : '');
+    put(b3card, 'opacity', String(fmt(1 - vOut)));
+    put(b3card, 'visibility', vt >= .16 ? 'hidden' : '');
+    const comp = `translateY(${fmt(FL.vA - time.top)}px)`;
+    put(vcan, 'transform', comp);
+    put(vcan, 'opacity', String(fmt(st.stage === 3 ? clamp(vt / .015) : 0)));
+    if (vt > 0 && vt < 1) drawFrame(vt);
+    if (vshade) {
+      put(vshade, 'transform', comp);
+      put(vshade, 'opacity', String(fmt(st.stage === 3 ? clamp(vt / .015) : 0)));
+      const c0 = [72, 84, 102], c1 = [84, 116, 144], e2 = easeIO(vt);
+      const col = c0.map((v, j) => Math.round(v + (c1[j] - v) * e2)).join(',');
+      const a0 = 153 - 2 * CUT, b0 = 442 - 2 * CUT;
+      put(vshade, 'background', `linear-gradient(180deg, rgb(${col}) ${fmt(Math.max(0, a0 + (144.5 - a0) * e2))}px, rgba(${col},0) ${fmt(b0 + (316.6 - b0) * e2)}px)`);
+    }
+    const ve = st.stage >= 4 ? 2 : st.stage === 3 ? vt : 0;
+    put(kidsScene.el, 'opacity', String(fmt(st.stage === 3 ? clamp((vt - .84) / .14) : 1)));
+    kidsScene.rv.forEach(({ n, d }) => { const pe = clamp((ve - .86 - Math.min(d, 1) * .06) / .12); styleEl(n, pe, (1 - pe) * 40, (1 - pe) * 8); });
+    kidsScene.st.forEach(({ n, d }) => {
+      const pe = clamp((ve - .88 - Math.min(d, .7) * .08) / .1);
+      n.style.opacity = fmt(Math.min(1, pe * 1.4));
+      n.style.transform = pe >= 1 ? '' : `scale(${fmt(.5 + .5 * easeBack(pe))}) rotate(${fmt((1 - pe) * -12)}deg)`;
+    });
+    // подвал после последнего блока
+    put(footer, 'transform', `translateY(${fmt(CUT + FL.docFooter - view - (FH - CUT + EXTF))}px)`);
+  }
+
   const depth = depthEls.map(el => ({ el, d: Number(el.dataset.d), sec: el.closest('section') })).filter(o => o.d);
   const loop = now => {
     const ddx = mx - cx, ddy = my - cy;
@@ -1387,7 +1599,10 @@
     }
     // ошибка в одном кадре не должна останавливать отрисовку: цикл продолжается в любом случае
     requestAnimationFrame(loop);
-    try { render(clamp(toP(scrollY), 0, LAST + footerP)); } catch (err) { console.error(err); }
+    try {
+      stepFlip(now);
+      if (FLOW) renderFlow(); else render(clamp(toP(scrollY), 0, LAST + footerP));
+    } catch (err) { console.error(err); }
     if (!document.hidden) drawFx(now);
   };
 
