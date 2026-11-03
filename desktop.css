@@ -158,7 +158,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .hd2 a:focus-visible, .hd2 button:focus-visible { outline: 3px solid var(--cream); outline-offset: 3px; }
 .hd2-right { display: flex; gap: 2px; }
 /* меню разделов есть только на телефоне */
-.hd-menu, .mnav, .br-p, .scroll-arrow, .b2-topshade { display: none; }
+.hd-menu, .mnav, .br-p, .b2-topshade { display: none; }
 
 /* 1. Первый экран */
 .hero-ray {
@@ -597,5 +597,3 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 .idle-hint:hover { background: radial-gradient(circle, rgba(255, 237, 200, .08) 0%, rgba(255, 237, 200, .3) 100%); }
 @keyframes idleJump { 0%, 100% { transform: translateY(-3px); } 50% { transform: translateY(4px); } }
 @media (prefers-reduced-motion: reduce) { .idle-hint img { animation: none; } }
-/* пока подсказка видна, стрелка первого экрана не дублирует её */
-body.idle .hero-arrow { opacity: 0 !important; }

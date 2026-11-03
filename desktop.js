@@ -9,8 +9,8 @@
   const PORTRAIT0 = document.documentElement.classList.contains('is-p');
   // масштаб набора внутри коробки и сдвиг (в % от размера коробки). На телефоне наборы S и M (пакет и коробка M
   // выше и левее, чем L) уменьшаем и сдвигаем, чтобы они целиком помещались между заголовком и панелью, как L
-  const SET_K = PORTRAIT0 ? { S: .7314, M: .783, L: 1 } : { S: .7314, M: 1, L: 1 };   // набор S в макете меньше
-  const SET_T = PORTRAIT0 ? { S: [-.2, -9.0], M: [5.25, -7.9], L: [0, 0] } : { S: [0, 0], M: [0, 0], L: [0, 0] };
+  const SET_K = PORTRAIT0 ? { S: .8179, M: .9673, L: 1 } : { S: .7314, M: 1, L: 1 };   // набор S в макете меньше
+  const SET_T = PORTRAIT0 ? { S: [.03, -5.815], M: [.01, .124], L: [0, 0] } : { S: [0, 0], M: [0, 0], L: [0, 0] };
 
   // Две раскладки одного лендинга: горизонтальный кадр 1920 × 1080 (компьютер, планшет в альбомной ориентации)
   // и вертикальный 600 × 1200 (телефон, вертикальный планшет). Анимации одни и те же, меняются только координаты
@@ -1045,7 +1045,7 @@
   });
   const b2bg = $('.b2-bg');
   const b2els = $$('.b2-el').map(n => ({ n, d: parseFloat(n.style.getPropertyValue('--d')) || 0 }));
-  const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]'), $('.hero-arrow')];
+  const heroFadeEls = [$('.hero-ray'), $('.hero-ellipse'), $('.hero-fade'), $('.hero-content'), $('.stickers[data-set="hero"]')];
   const left = $('#left');
   /* ===== Видео-переход: кадры assets/d/trans/000…144.webp, грузятся, когда посетитель дошёл до блока 3 ===== */
   const FRAMES = 145;
