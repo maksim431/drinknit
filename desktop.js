@@ -3,6 +3,8 @@
 
   /* ===== Данные: настройки, наборы, тексты и вопросы — в data.js ===== */
   const { CONFIG, SETS, FAQ, DETAILS, LAYERS, CARDS } = window.DRINKNIT;
+  // цели Яндекс Метрики (analytics.js); без счётчика вызовы ничего не делают
+  const track = (goal, params, once) => { if (window.DrinknitAnalytics) window.DrinknitAnalytics.track(goal, params, once); };
 
   const PORTRAIT0 = document.documentElement.classList.contains('is-p');
   // масштаб набора внутри коробки и сдвиг (в % от размера коробки). На телефоне наборы S и M (пакет и коробка M
@@ -593,6 +595,7 @@
   // смена набора: новый набор расходится волной от центра коробки, по фронту волны — искры
   const selectSet = key => {
     if (key === current || busy) return;
+    track('set_select', { set: key });
     const fromKey = current, from = groups[current], to = groups[key];
     busy = true;
     setHover(null);
@@ -654,6 +657,7 @@
 
   const openItem = (key, i) => {
     openData = ITEMS[key][i];
+    track('item_open', { item: openData.id, set: key });
     photoIdx = 0;
     $('#modal-title').innerHTML = openData.title;
     $('#modal-text').innerHTML = openData.text;
@@ -755,7 +759,7 @@
     b.setAttribute('role', 'tab');
     b.setAttribute('aria-controls', 'faq-card');
     b.textContent = q;
-    b.addEventListener('click', () => showFaq(i));
+    b.addEventListener('click', () => { showFaq(i); track('faq_open', { q: FAQ[i][0] }); });
     b.addEventListener('keydown', e => {
       const d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
       if (!d) return;
@@ -768,6 +772,8 @@
   showFaq(0);
   $$('[data-msg]').forEach(a => a.addEventListener('click', e => {
     const url = CONFIG.links[a.dataset.msg];
+    track('msg_' + a.dataset.msg); track('msg_any', { channel: a.dataset.msg });
+    if (a.closest('.set-panel')) track('want_set', { set: current });
     e.preventDefault();
     if (!url) { toast(`Ссылка на ${NAMES[a.dataset.msg]} появится позже`); return; }
     const text = a.dataset.text;
@@ -923,7 +929,11 @@
     document.addEventListener('click', e => { if (!e.target.closest('#mnav, .hd-menu')) setMenu(false); });
     addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
   }
-  $$('[data-nav]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); setMenu(false); goTo(a.getAttribute('href')); }));
+  $$('[data-nav]').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault(); setMenu(false);
+    if (a.getAttribute('href') === '#book') track('book_click', { from: (a.closest('section, header, footer') || {}).id || '' });
+    goTo(a.getAttribute('href'));
+  }));
   $$('[data-set-pick]').forEach(el => el.addEventListener('click', () => {
     const k = el.dataset.setPick;
     goTo('#sets');
@@ -1150,7 +1160,11 @@
   };
   addEventListener('resize', sizeFooter);
   sizeFooterRef = sizeFooter;
+  // до каких блоков дошёл посетитель (цели Метрики, по разу за визит)
+  const REACH = [[1, 'block_sets'], [2, 'block_time'], [6, 'video_done'], [6, 'block_kids'], [7, 'block_left'], [8, 'block_terms'], [9, 'block_about'], [10, 'block_book'], [11, 'block_faq']];
+  let reachI = 0;
   const render = P => {
+    while (reachI < REACH.length && P >= REACH[reachI][0] - .05) track(REACH[reachI++][1], null, true);
     const dP = Math.abs(P - lastP);
     const hsum = (holdF[8] || 0) + (holdF[10] || 0) * 7 + (holdF[5] || 0) * 3 + (holdF[6] || 0) * 13;
     const moved = dP > 0 || hsum !== lastH;
@@ -1357,6 +1371,7 @@
   };
   // клик по подарку запускает открытие и переход к лендингу
   const openGift = () => {
+    track('gift_open', null, true);
     if (!body.classList.contains('is-waiting')) return;
     body.classList.remove('is-waiting');
     body.classList.add('is-charging');

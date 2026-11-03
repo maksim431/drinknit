@@ -359,7 +359,16 @@
     (function () {
       document.body.appendChild(document.getElementById('tpl-desktop').content);
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
-      load('data.js', function () { load('desktop.js'); });
+      // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
+      load('content.js', function () {
+        load('texts.js', function () {
+          var C = window.DRINKNIT_CONTENT || {};
+          window.DrinknitTexts.apply(document.body, C.texts);
+          window.DrinknitTexts.applyMeta(C.meta);
+          load('analytics.js');
+          load('data.js', function () { load('desktop.js'); });
+        });
+      });
     })();
   </script>
 </body>
