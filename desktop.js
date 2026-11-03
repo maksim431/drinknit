@@ -835,22 +835,37 @@
     mgain.gain.linearRampToValueAtTime(0, t + .4);
   };
   syncSound();
-  const KICK = ['pointerdown', 'keydown', 'touchstart'];
+  // iOS: музыка играет и при беззвучном режиме (как видео), а не как звук интерфейса
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* нет поддержки */ }
+  // браузеры на телефоне разрешают звук только в момент, когда палец отпущен (touchend, click),
+  // а не при касании (touchstart, pointerdown). Слушаем и те, и другие и снимаем, только когда звук реально пошёл
+  const KICK = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
+  const unkick = () => KICK.forEach(ev => removeEventListener(ev, kick, true));
   const kick = e => {
     if (e.target.closest && e.target.closest('.js-sound')) return;   // кнопка звука решает сама
-    KICK.forEach(ev => removeEventListener(ev, kick, true));
-    if (soundOn && setupAudio()) playMusic();
+    if (!soundOn || !setupAudio()) return;
+    // iOS «разблокирует» звук только если в обработчике жеста что-то проиграть: короткая тишина
+    try {
+      const s = actx.createBufferSource();
+      s.buffer = actx.createBuffer(1, 1, 22050);
+      s.connect(actx.destination);
+      s.start(0);
+    } catch (err) { /* не важно */ }
+    const p = actx.resume();
+    playMusic();
+    const done = () => { if (actx.state === 'running') unkick(); };
+    if (p && p.then) p.then(done, () => {}); else done();
   };
   KICK.forEach(ev => addEventListener(ev, kick, true));
   // пробуем включить сразу при загрузке: браузер разрешит, если посетитель уже бывал на сайте
   // или разрешил звук для него; иначе музыка начнётся с первого клика или нажатия клавиши
   if (soundOn && setupAudio()) {
-    actx.resume().then(() => { if (actx.state === 'running') KICK.forEach(ev => removeEventListener(ev, kick, true)); }).catch(() => {});
+    actx.resume().then(() => { if (actx.state === 'running') unkick(); }).catch(() => {});
   }
   sounds.forEach(btn => btn.addEventListener('click', () => {
     soundOn = !soundOn;
     syncSound();
-    if (soundOn) { KICK.forEach(ev => removeEventListener(ev, kick, true)); if (setupAudio()) playMusic(); }
+    if (soundOn) { if (setupAudio()) { actx.resume(); playMusic(); } }
     else pauseMusic();
   }));
   // вкладка скрыта — музыка на паузе, вернулись — продолжается
