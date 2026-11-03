@@ -199,3 +199,6 @@ html.is-p .b3-arrow1 { top: 498px; }
 html.is-p .b3-arrow2 { top: 1119px; }
 @keyframes arrowDown { from { transform: translateY(-4px); } to { transform: translateY(8px); } }
 @media (prefers-reduced-motion: reduce) { html.is-p .scroll-arrow { animation: none; } }
+
+/* подсказка «листайте дальше» на телефоне ниже (9 px от края), учитывая вырез экрана */
+html.is-p .idle-hint { bottom: calc(9px + env(safe-area-inset-bottom, 0px)); }

@@ -1160,6 +1160,37 @@
   };
   addEventListener('resize', sizeFooter);
   sizeFooterRef = sizeFooter;
+  // подсказка «листайте дальше»: 4 с без прокрутки — появляется, прокрутка — пропадает.
+  // Не показываем, пока подарок не открыт, открыто окно предмета или страница уже в самом низу
+  const idle = $('#idle-hint');
+  let idleT = 0;
+  const idleOff = () => { idle.classList.remove('on'); body.classList.remove('idle'); };
+  // 4 с считаются от последней прокрутки или от момента, когда страница стала доступной (после интро, закрытия окна)
+  let idleFrom = performance.now();
+  const idleArm = () => {
+    clearTimeout(idleT);
+    idleT = setTimeout(function check() {
+      const atEnd = scrollY + VH() >= document.documentElement.scrollHeight - 4;
+      if (html.classList.contains('is-locked') || !modal.hidden || atEnd || document.hidden) { idleFrom = performance.now(); idleT = setTimeout(check, 400); return; }
+      if (performance.now() - idleFrom < 4000) { idleT = setTimeout(check, 400); return; }
+      idle.classList.add('on'); body.classList.add('idle');
+    }, 400);
+  };
+  const idleReset = () => { idleOff(); idleFrom = performance.now(); idleArm(); };
+  addEventListener('scroll', idleReset, { passive: true });
+  addEventListener('wheel', idleReset, { passive: true });
+  addEventListener('touchmove', idleReset, { passive: true });
+  addEventListener('keydown', e => { if (/Arrow|Page|Home|End|Space| /.test(e.key || e.code)) idleReset(); });
+  // клик — к следующему экрану (как прокрутка на один шаг)
+  idle.addEventListener('click', () => {
+    const P = toP(scrollY), k = Math.min(LAST, Math.floor(P + .02) + 1);
+    const h = holdPx(Math.floor(P + .02));
+    const y = h && scrollY < toY(Math.floor(P + .02)) + h - 4 ? toY(Math.floor(P + .02)) + h : toY(k);
+    idleReset(); auto = true;
+    scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
+  });
+  idleArm();
+
   // до каких блоков дошёл посетитель (цели Метрики, по разу за визит)
   const REACH = [[1, 'block_sets'], [2, 'block_time'], [6, 'video_done'], [6, 'block_kids'], [7, 'block_left'], [8, 'block_terms'], [9, 'block_about'], [10, 'block_book'], [11, 'block_faq']];
   let reachI = 0;
