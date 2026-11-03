@@ -20,9 +20,10 @@
   const FLOW = PORTRAIT;
   const FW = PORTRAIT ? 390 : 1920, FH = PORTRAIT ? 844 : 1080, CX = FW / 2, CY = FH / 2;
   const L = PORTRAIT ? {                              // мобильный макет Figma, кадр 390 × 844
-    prod: { x: -203.5, y: 172.6, w: 788.2, h: 588.6 }, // коробка на экране наборов
-    hero: { dx: 11.9, dy: -94.4, k: 1.1639 },          // на первом экране: (-256.2, 50, 917.4 × 685)
-    mouth: { x: 203.8, y: 431.3 }, boxc: { x: 203.8, y: 470.7 }, gift: { x: 203.8, y: 453.4 },
+    // первый экран и наборы — кадры 390 × 790
+    prod: { x: -186, y: 133, w: 762.4, h: 569.4 },     // коробка на экране наборов
+    hero: { dx: -.2, dy: -88.2, k: 1.0239 },           // на первом экране: (-195.3, 38, 780.6 × 583)
+    mouth: { x: 196.3, y: 388.3 }, boxc: { x: 196.3, y: 427.7 }, gift: { x: 196.3, y: 410.4 },
     // блок 3 (1633 px): экран спускается, пока карточка не встанет по центру (409,7 px), карточки листаются,
     // затем свободный спуск к домику (ещё 379,3 px) и только потом видео
     b3pan: 409.74, b3pan2: 379.26, b3origin: [195 + 157.5, 422 + 11.17 + 789],
@@ -106,8 +107,8 @@
   // вертикальный кадр: свои места и размер стикеров [left, top, масштаб]; null — стикер не показываем
   // мобильный макет: [left, top, ширина и высота рамки, ширина и высота наклейки, поворот (или transform)]; null — стикер не показываем
   const STICKERS_P = {
-    hero: [null, [273, 175, 140.45, 140.24, 106.32, 105.9, 24.26], null,
-      [133.95, 93.01, 141.26, 155.04, 121.35, 137.89, 8.92], [-24, 126, 189.68, 200.66, 146.93, 163.82, -17.65], null],
+    hero: [null, [297, 128, 102.05, 101.9, 77.25, 76.95, 24.26], null,
+      [157, 91, 104.53, 111.79, 80.91, 91.94, 17.24], [-5, 108, 126.47, 133.79, 97.96, 109.23, -17.65], null],
     kids: [[275, 367, 126.84, 131.49, 97.02, 104.75, 19.86], [44, 810, 240.66, 258.37, 207.5, 228.79, -8.98], [166.33, 554.3, 155.27, 166.23, 126.61, 141.26, -13.07]],
     left: [[85.79, 36, 238.5, 238.5, 213.9, 213.9, 7.04], [15, 661, 183.91, 184.67, 142.29, 143.6, 20.73], null, [-43.97, 113.61, 171.54, 181.95, 141.45, 155.13, -12.44],
       null, null, [285, 159.96, 130, 150.04, 130, 150.04, 0]],
@@ -178,7 +179,8 @@
      сдвигаются вниз на CUT, нижней (ниже 572 px) — вверх на CUT, между ними — плавно. Коробка первого экрана
      уменьшается, чтобы поместиться между шапкой и текстом. Высокие блоки начинаются от верха экрана,
      спуск по ним длиннее на 2 × CUT */
-  let CUT = 0, cutTargets = null, EXTF = 0;
+  let CUT = 0, HC = 0, cutTargets = null, EXTF = 0;
+  const H12 = 790;                 // высота первого экрана и наборов в мобильном макете
   const BASE = PORTRAIT ? JSON.parse(JSON.stringify({ hero: L.hero, mouth: L.mouth, boxc: L.boxc, gift: L.gift, v0: L.v0,
     b3pan: L.b3pan, b3pan2: L.b3pan2, kidsPan: L.kidsPan, termsPan: L.termsPan, bookPan: L.bookPan })) : null;
   const FIXED = /(^|\s)(b\d-bg|b2-bg|dim|modal|b3-world|b3-video|b3-vshade|b4-shade|b6-shade|bgl)(\s|$)/;
@@ -202,7 +204,7 @@
         if (BOXED.test(cls)) { cutTargets.push({ n, box: true }); return; }
         if (HOSTS.test(cls)) { walk(n, oy + n.offsetTop, list); return; }
         const t = oy + n.offsetTop, h = n.offsetHeight, c = t + h / 2;
-        list.push({ n, t, b: t + h, stk: cls.includes('stk'), k: Math.max(-1, Math.min(1, (CY - c) / 150)) });
+        list.push({ n, t, b: t + h, stk: cls.includes('stk'), k: Math.max(-1, Math.min(1, ((FLOW ? H12 / 2 : CY) - c) / 150)) });
       });
     };
     secs.forEach(sec => {
@@ -233,22 +235,27 @@
     if (cutTargets && cut === CUT) return;
     if (!cutTargets) measureCut();
     CUT = cut;
-    // коробка первого экрана: верх под шапкой, низ над плашкой «Свободно…»
-    const top = 110 - Math.min(30, cut * .5);                       // верх коробки на экране
-    const hk = Math.max(.6, Math.min(1, (527 - 2 * cut + 43 + Math.min(40, cut * .6) - top) / 460));   // низ коробки может уйти под затемнение
-    const delta = top + cut - (392.5 - 282.5 * hk);                // сдвиг центра коробки
+    // первый экран и наборы (кадр 790) обрезаются только если экран ниже 790
+    const hc = FLOW ? Math.max(0, (H12 - (FH - 2 * cut)) / 2) : cut;
+    HC = hc;
+    // коробка первого экрана: верх под шапкой, низ уходит под затемнение у плашки «Свободно…»
+    // видимая коробка: от 85,8 до 513,7 при центре картинки 329,5
+    const top = 85.8 - Math.min(20, hc * .4);
+    const hk = Math.max(.6, Math.min(1, (513.7 - 2 * hc + Math.min(40, hc * .6) - top) / 427.9));
+    const delta = top + hc + 243.7 * hk - 329.5;                   // сдвиг центра коробки
     L.hero.k = BASE.hero.k * hk;
     L.hero.dy = BASE.hero.dy + delta;
     // коробка на экране наборов: верх под заголовком, низ над панелью выбора; подсказка едет вместе с коробкой
-    const sTop = 220 - Math.min(60, cut * .75), pc = L.prod.y + L.prod.h / 2;   // видимый верх коробки 244 px над центром, низ 122 px под ним
-    L.setK = Math.max(.55, Math.min(1, (598 - 2 * cut - 12 - sTop) / 366));
-    L.setDy = sTop + cut - pc + 244 * L.setK;
+    // видимая коробка: 238 px над центром, 226,6 под ним; в макете низ на 86 px заходит под панель
+    const sTop = 179.7 - Math.min(40, hc * .6), pc = L.prod.y + L.prod.h / 2;
+    L.setK = Math.max(.55, Math.min(1, (558 - 2 * hc + 86 - sTop) / 464.6));
+    L.setDy = sTop + hc - pc + 238 * L.setK;
     L.mouth.y = BASE.mouth.y + delta; L.boxc.y = BASE.boxc.y + delta; L.gift.y = BASE.gift.y + delta;
     // стикеры на низком экране немного меньше
-    const sk = fmt(1 - cut / FH * .6);
+    const sk = fmt(1 - hc / FH * .6);
     cutTargets.forEach(({ n, k, box, stk }) => {
-      n.style.translate = box ? `0 ${fmt(delta)}px` : (k * cut ? `0 ${fmt(k * cut)}px` : '');
-      if (stk) n.style.scale = cut ? String(sk) : '';
+      n.style.translate = box ? `0 ${fmt(delta)}px` : (k * hc ? `0 ${fmt(k * hc)}px` : '');
+      if (stk) n.style.scale = hc ? String(sk) : '';
     });
     // копия карточки Кати на финальном экране стоит ровно там же, где карточка на экране «Обо мне»
     const kt = cutTargets.find(o => o.n === $('#about .b7-card-wrap'));
@@ -1403,7 +1410,7 @@
      Блоки стоят друг под другом в «документе» (координаты кадра 390 px), вся сцена сдвигается вместе со скроллом.
      Два места, где экран стоит: карточки блока 3 (по центру экрана, по одной на свайп) и видео-переход к блоку 4.
      Первый экран и наборы подогнаны под высоту экрана (обрезка CUT сверху и снизу), остальные блоки — во всю высоту */
-  const FLOW_SECS = [['hero', 844, 1], ['sets', 844, 1], ['time', 1885, 0], ['kids', 1096, 0], ['left', 844, 0],
+  const FLOW_SECS = [['hero', 790, 1], ['sets', 790, 1], ['time', 1885, 0], ['kids', 1096, 0], ['left', 844, 0],
     ['terms', 1305, 0], ['about', 844, 0], ['book', 1940, 0], ['faq', 844, 0]];
   const FL = { secs: [], vC: 0, vA: 0, vB: 0, D: 1, CL: 0, VL: 0, docFooter: 0 };
   const flowSec = id => FL.secs.find(o => o.id === id);
@@ -1426,7 +1433,7 @@
     let c = 0;
     FL.secs = FLOW_SECS.map(([id, H, cutSec]) => {
       const el = $(`#${id}`), fr = $('.fr', el);
-      const r0 = cutSec ? CUT : 0, r1 = cutSec ? H - CUT : H;
+      const r0 = cutSec ? HC : 0, r1 = cutSec ? H - HC : H;
       el.style.top = `${r0}px`; el.style.height = `${r1 - r0}px`;
       fr.style.top = `${-r0}px`; fr.style.height = `${H}px`;
       // top — где начало кадра блока при view = 0 (в координатах сцены)

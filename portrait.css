@@ -45,14 +45,14 @@ html.is-p .mnav a:active { background: rgba(255, 255, 255, .12); }
 html.is-p .mnav-book { margin-top: 6px; text-align: center; font-weight: 700; color: #022712 !important; background: linear-gradient(180deg, #ffedc8 0%, #b8a274 100%); border: 1.383px solid #bca372; }
 
 /* 1. Первый экран */
-html.is-p .closed { left: -85px; top: 177.6px; width: 577.7px; height: 577.7px; }
+html.is-p .closed { left: -49.4px; top: 177.7px; width: 491.6px; height: 491.6px; }
 html.is-p .gift-shadow { left: 45.93px; top: 494.64px; width: 337.14px; height: 75.52px; }
 html.is-p .hero-ellipse { left: 41.58px; top: 472.92px; width: 345.83px; height: 74.7px; }
-html.is-p .glow { left: 203.8px; top: 470.7px; width: 477px; height: 477px; margin: -238.5px 0 0 -238.5px; }
-html.is-p .rays { left: 203.8px; top: 457.7px; width: 824px; height: 824px; margin: -412px 0 0 -412px; }
+html.is-p .glow { left: 196.3px; top: 427.7px; width: 477px; height: 477px; margin: -238.5px 0 0 -238.5px; }
+html.is-p .rays { left: 196.3px; top: 414.7px; width: 824px; height: 824px; margin: -412px 0 0 -412px; }
 html.is-p .hero-ray { left: 214.5px; top: 322.25px; width: 659px; height: 659px; margin: -329.5px 0 0 -329.5px; }
-html.is-p .hero-fade { left: -19px; top: 495px; width: 467px; height: 349px; background: linear-gradient(180deg, rgba(1, 38, 17, 0) 9.92%, #012611 30.95%); }
-html.is-p .hero-content { left: 3px; top: 527px; width: 385px; height: 263px; justify-content: space-between; }
+html.is-p .hero-fade { left: -19px; top: 368px; width: 467px; height: 422px; background: linear-gradient(180deg, rgba(1, 38, 17, 0) 9.92%, #012611 30.95%); }
+html.is-p .hero-content { left: 3px; top: 457px; width: 385px; height: 272px; justify-content: space-between; }
 html.is-p .chip { gap: 6.92px; padding: 8.3px 15.22px; border-radius: 11.07px; font-size: 13.83px; }
 html.is-p .chip img { width: 16.6px; height: 16.6px; }
 html.is-p .h1 { width: 384.57px; font-size: 22px; line-height: 31.75px; letter-spacing: .747px; }
@@ -65,13 +65,14 @@ html.is-p .gift-hint-goat { left: 210px; top: 630px; scale: .55; transform-origi
 html.is-p .skip { right: 16px; bottom: 16px; }
 
 /* 2. Наборы */
-html.is-p #product, html.is-p #focus { left: -203.5px; top: 172.6px; width: 788.2px; height: 588.6px; }
-html.is-p .b2-bg { left: -298px; top: 0; width: 857px; height: 844px; object-fit: cover; filter: blur(.5px); }
+html.is-p #product, html.is-p #focus { left: -186px; top: 133px; width: 762.4px; height: 569.4px; }
+html.is-p .b2-bg { left: -271px; top: 0; width: 803px; height: 790px; object-fit: cover; filter: blur(1.5px); opacity: .5 !important; }
+html.is-p .b2 { background: linear-gradient(180deg, #346949 0%, #002510 100%); }
 html.is-p .b2-topshade { display: block; position: absolute; z-index: 2; left: -19px; width: 467px; top: -120px; height: 330px; pointer-events: none; background: linear-gradient(180deg, #012611 120px, rgba(1, 38, 17, 0) 309.2px); }
 html.is-p .br-p { display: inline; }
 html.is-p .b2-title { left: 10px; top: 86px; width: 370px; line-height: 30.99px; }
 html.is-p .set-panel {
-  left: 10px; top: 598px; width: 370px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
+  left: 10px; top: 558px; width: 370px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
   border-radius: 24.9px; border-width: 1.383px; -webkit-backdrop-filter: blur(8.3px); backdrop-filter: blur(8.3px);
 }
 html.is-p .set-panel-title { display: none; }
@@ -80,10 +81,10 @@ html.is-p .set-tabs button { height: 37.35px; padding: 6.92px 15.9px; font-size:
 html.is-p .set-desc { flex: 1 0 0; gap: 5.53px; font-size: 13.14px; }
 html.is-p .set-price { font-size: 40.12px; line-height: 40.12px; }
 html.is-p .hint { left: 104px; top: 190px; width: 286px; height: 217px; overflow: hidden; overflow: clip; pointer-events: none !important; }   /* подсказка не перехватывает тапы по открытке */
-html.is-p .hint-bubble { left: 35px; top: 26px; width: 175.27px; height: 75.43px; transform: scaleX(-1); }
-html.is-p .hint-goat { left: 171.65px; top: -21.92px; width: 207.77px; height: 216.85px; }
+html.is-p .hint-bubble { left: 55px; top: 6px; width: 175.27px; height: 75.43px; transform: scaleX(-1); }
+html.is-p .hint-goat { left: 191.65px; top: -41.92px; width: 207.77px; height: 216.85px; }
 html.is-p .hint-goat .stk-r { width: 144.27px !important; height: 167.81px !important; transform: rotate(150.82deg) scaleY(-1) !important; }
-html.is-p .hint-text { left: 52px; top: 40px; width: 144px; font-size: 10px; }
+html.is-p .hint-text { left: 72px; top: 20px; width: 144px; font-size: 10px; }
 /* наборы S и M помещаются между заголовком и панелью, как L (те же числа — SET_K и SET_T в desktop.js) */
 html.is-p .setg[data-set="S"] { transform: translate(.03%, -5.815%) scale(.8179); }
 html.is-p .setg[data-set="M"] { transform: translate(.01%, .124%) scale(.9673); }
@@ -203,9 +204,9 @@ html.is-p #book .stickers { z-index: 16; }   /* стикеры поверх ка
 
 /* блок 3: затемнение сверху, под шапкой */
 html.is-p .b3-topshade { display: block; position: absolute; left: -40px; top: 0; width: 468px; height: 261px; pointer-events: none;
-  background: linear-gradient(180deg, #010a05 0%, rgba(12, 26, 39, 0) 100%); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
+  background: linear-gradient(180deg, #01180a 0%, rgba(12, 26, 39, 0) 100%); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); }
 /* первый экран: открытая коробка — своя картинка, набор на экране наборов едет вместе с блоком */
-html.is-p .hero-box { display: block; position: absolute; left: -203.5px; top: 192.6px; width: 788.2px; height: 588.6px; z-index: 5; transform-origin: 50% 50%; pointer-events: none; }
+html.is-p .hero-box { display: block; position: absolute; left: -186px; top: 133px; width: 762.4px; height: 569.4px; z-index: 5; transform-origin: 50% 50%; pointer-events: none; }
 html.is-p .hero-box .prod-inner img { position: absolute; inset: 0; width: 100%; height: 100%; }
 /* стикеры у верхнего края «Сроков» и финального блока заходят на блок выше */
 html.is-p #terms, html.is-p #book { overflow: visible; clip-path: inset(-80px 0 0 0); }
