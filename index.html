@@ -28,11 +28,11 @@
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; if (rel === 'stylesheet') l.setAttribute('blocking', 'render'); document.head.appendChild(l); };
       // скрипты страницы — сразу и с высоким приоритетом, раньше картинок: на медленной сети страница не ждёт, пока догрузятся фото
       ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'imgsizes.js', 'desktop.js'].forEach(function (f) {
-        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105k'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
+        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105l'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
       });
-      add('stylesheet', 'desktop.css?v=20261105k');
+      add('stylesheet', 'desktop.css?v=20261105l');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261105k');
+      if (m) add('stylesheet', 'portrait.css?v=20261105l');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -413,12 +413,12 @@
       // Если какой-то файл не загрузился, остальные всё равно выполняются — страница не зависает
       var load = function (src) { var s = document.createElement('script'); s.src = src; s.async = false; s.setAttribute('fetchpriority', 'high'); document.body.appendChild(s); };
       load('content.js?t=' + Date.now());
-      load('texts.js?v=20261105k');
-      load('boot.js?v=20261105k');
-      load('analytics.js?v=20261105k');
-      load('data.js?v=20261105k');
-      load('imgsizes.js?v=20261105k');
-      load('desktop.js?v=20261105k');
+      load('texts.js?v=20261105l');
+      load('boot.js?v=20261105l');
+      load('analytics.js?v=20261105l');
+      load('data.js?v=20261105l');
+      load('imgsizes.js?v=20261105l');
+      load('desktop.js?v=20261105l');
       // последняя страховка: если сценарий так и не запустился за 30 с, показываем страницу как есть
       setTimeout(function () { document.documentElement.classList.add('flow-ready'); later(); }, 30000);
     })();

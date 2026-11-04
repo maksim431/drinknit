@@ -520,23 +520,29 @@
       const it = { id, key, i, box: [l, t, w, h], el: b, ...DETAILS[id] };
       // альфа-маска: клик и наведение точно по контуру, точки контура для искр
       const img = b.firstChild;
+      // маска считается в уменьшенном виде (до 160 px по большей стороне — координаты всё равно в долях предмета)
+      // и в свободное время браузера: при запуске страницы она не нужна, только при наведении и нажатии
       const read = () => {
+        if (it.alpha || !img.naturalWidth) return;
+        const k = Math.min(1, 160 / Math.max(img.naturalWidth, img.naturalHeight));
         const c = document.createElement('canvas');
-        c.width = img.naturalWidth; c.height = img.naturalHeight;
+        c.width = Math.max(1, Math.round(img.naturalWidth * k)); c.height = Math.max(1, Math.round(img.naturalHeight * k));
         const cg = c.getContext('2d', { willReadFrequently: true });
-        cg.drawImage(img, 0, 0);
+        cg.drawImage(img, 0, 0, c.width, c.height);
         let d;
         try { d = cg.getImageData(0, 0, c.width, c.height).data; } catch { return; }   // file:// — без маски, клик по рамке
         it.alpha = { w: c.width, h: c.height, d };
         const A = (x, y) => d[(y * c.width + x) * 4 + 3];
         it.edge = [];
-        for (let y = 3; y < c.height - 3; y += 4) {
-          for (let x = 3; x < c.width - 3; x += 4) {
-            if (A(x, y) > 128 && (A(x - 3, y) < 64 || A(x + 3, y) < 64 || A(x, y - 3) < 64 || A(x, y + 3) < 64)) it.edge.push([x / c.width, y / c.height]);
+        for (let y = 1; y < c.height - 1; y++) {
+          for (let x = 1; x < c.width - 1; x++) {
+            if (A(x, y) > 128 && (A(x - 1, y) < 64 || A(x + 1, y) < 64 || A(x, y - 1) < 64 || A(x, y + 1) < 64)) it.edge.push([x / c.width, y / c.height]);
           }
         }
       };
-      if (img.complete && img.naturalWidth) read(); else img.addEventListener('load', read, { once: true });
+      const later = () => (window.requestIdleCallback ? requestIdleCallback(read, { timeout: 4000 }) : setTimeout(read, 200));
+      if (img.complete && img.naturalWidth) later(); else img.addEventListener('load', later, { once: true });
+      it.read = read;
       return it;
     });
     groups[key] = g;
@@ -568,6 +574,7 @@
       const it = list[i], [l, t, w, h] = it.box;
       const u = (x - l) / w, v = (y - t) / h;
       if (u < 0 || u > 1 || v < 0 || v > 1) continue;
+      if (!it.alpha && it.read) it.read();
       const a = it.alpha;
       if (!a || a.d[(Math.floor(v * (a.h - 1)) * a.w + Math.floor(u * (a.w - 1))) * 4 + 3] > 90) return it;
     }
