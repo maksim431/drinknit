@@ -12,12 +12,14 @@ window.DRINKNIT_CONTENT = {
     "total": 10,
     "deadline": "2026-12-25T23:59:59+03:00",
     "links": {
-      "telegram": "",
-      "vk": "",
-      "max": "",
-      "vkGroup": ""
+      "telegram": "https://t.me/katarios03",
+      "vk": "https://vk.me/katarios03",
+      "max": "https://max.ru/u/f9LHodD0cOJ68dpZPqHIHnfoxibk21P4iBq4xQD7RTvRtXRJMANPcu7ANeM",
+      "vkGroup": "https://vk.ru/drinknit",
+      "avito": "https://www.avito.ru/user/b565417f38ad9a6312344935d20afac4/profile?src=sharing"
     },
-    "metrikaId": "29294558315068421"
+    "metrikaId": "29294558315068421",
+    "greeting": "Здравствуйте, я по поводу новогоднего набора"
   },
   "sets": {
     "S": {

@@ -452,7 +452,7 @@
     const off = $('#ym-off', body);
     if (off) off.onclick = () => { store.set(LS.ym, ''); renderSettings(); loadStats(); };
     const L = c.links, LB = base.links || {};
-    [['telegram', 'Telegram', 'https://t.me/username'], ['vk', 'ВКонтакте (личные сообщения)', 'https://vk.me/username'], ['max', 'MAX', 'https://max.ru/…'], ['vkGroup', 'Группа ВКонтакте', 'https://vk.com/group']]
+    [['telegram', 'Telegram', 'https://t.me/username'], ['vk', 'ВКонтакте (личные сообщения)', 'https://vk.me/username'], ['max', 'MAX', 'https://max.ru/…'], ['vkGroup', 'Группа ВКонтакте', 'https://vk.ru/group'], ['avito', 'Авито', 'https://www.avito.ru/…']]
       .forEach(([k, label, ph]) => {
         const f = field({ label, value: L[k] || '', def: LB[k] || '', multiline: false, type: 'url', onInput: v => { L[k] = v.trim(); } });
         f._inp.placeholder = ph;

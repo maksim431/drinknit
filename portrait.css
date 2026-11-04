@@ -176,8 +176,9 @@ html.is-p .b8-cta { left: 10px; top: 134px; width: 370px; gap: 0; }
 html.is-p .b8-title { width: 100%; margin-bottom: 1469px; line-height: 30.99px; }
 html.is-p .b8-btns { flex-direction: column; width: 100%; gap: 9.68px; }
 html.is-p .b8-btns .btn { width: 100%; }
-html.is-p .b8-cta .round { margin-top: 20.75px; padding: 12.45px; border-width: 1.383px; }
-html.is-p .b8-cta .round img { width: 16.6px; height: 16.6px; }
+html.is-p .b8-rounds { margin-top: 20.75px; gap: 12px; }
+html.is-p .b8-cta .round { margin-top: 0; padding: 16px; border-width: 1.383px; }
+html.is-p .b8-cta .round img { width: 24px; height: 24px; }
 
 /* 9. Частые вопросы */
 html.is-p #faq { background: linear-gradient(180deg, #002510 0%, #346949 49.52%, #002510 100%); }

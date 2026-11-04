@@ -609,7 +609,7 @@
     $('[data-set-price]').textContent = d.price;
     const btn = $('[data-set-btn]');
     btn.textContent = `Хочу набор ${key}`;
-    btn.dataset.text = `Здравствуйте! Хочу набор ${key}`;
+    btn.dataset.text = `${CONFIG.greeting || 'Здравствуйте, я по поводу новогоднего набора'}. Хочу набор ${key}`;
   };
 
   // смена набора: новый набор расходится волной от центра коробки, по фронту волны — искры
@@ -778,7 +778,7 @@
     clearTimeout(toastT);
     toastT = setTimeout(() => toastEl.classList.remove('on'), 2600);
   };
-  const NAMES = { telegram: 'Telegram', vk: 'ВК', max: 'MAX', vkGroup: 'группу ВК' };
+  const NAMES = { telegram: 'Telegram', vk: 'ВК', max: 'MAX', vkGroup: 'группу ВК', avito: 'Авито' };
 
   /* ===== Частые вопросы: слева список, справа ответ ===== */
   const faqList = $('#faq-list'), faqCard = $('#faq-card');
@@ -807,15 +807,38 @@
     faqList.appendChild(b);
   });
   showFaq(0);
+  // окно выбора мессенджера
+  const pickEl = $('#pick');
+  let pickText = '';
+  const openPick = text => { pickText = text; pickEl.hidden = false; requestAnimationFrame(() => pickEl.classList.add('on')); $('.pick-btns a', pickEl).focus(); };
+  const closePick = () => { pickEl.classList.remove('on'); setTimeout(() => { if (!pickEl.classList.contains('on')) pickEl.hidden = true; }, 250); };
+  pickEl.addEventListener('click', e => { if (e.target === pickEl || e.target.closest('.pick-close')) closePick(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !pickEl.hidden) closePick(); });
+  const copyText = text => { try { navigator.clipboard.writeText(text); return true; } catch (err) { return false; } };
+  // открыть диалог: в Telegram текст подставляется сам, во ВКонтакте и MAX — копируется, его остаётся вставить
+  const openChat = (ch, text) => {
+    const url = CONFIG.links[ch];
+    if (!url) { toast(`Ссылка на ${NAMES[ch]} появится позже`); return; }
+    if (ch === 'telegram' && text) { open(`${url}?text=${encodeURIComponent(text)}`, '_blank', 'noopener'); return; }
+    if ((ch === 'vk' || ch === 'max') && text && copyText(text)) toast('Текст сообщения скопирован — вставьте его в чат');
+    open(url, '_blank', 'noopener');
+  };
   $$('[data-msg]').forEach(a => a.addEventListener('click', e => {
-    const url = CONFIG.links[a.dataset.msg];
-    track('msg_' + a.dataset.msg); track('msg_any', { channel: a.dataset.msg });
-    if (a.closest('.set-panel')) track('want_set', { set: current });
+    const ch = a.dataset.msg;
     e.preventDefault();
-    if (!url) { toast(`Ссылка на ${NAMES[a.dataset.msg]} появится позже`); return; }
-    const text = a.dataset.text;
-    const full = text && a.dataset.msg === 'telegram' ? `${url}?text=${encodeURIComponent(text)}` : url;
-    open(full, '_blank', 'noopener');
+    if (a.closest('.set-panel')) track('want_set', { set: current });
+    const greet = CONFIG.greeting || 'Здравствуйте, я по поводу новогоднего набора';
+    if (ch === 'pick') {
+      if (a.closest('.mnav')) setMenu(false);
+      if (a.matches('.hd2-book, .mnav-book, .b6-btn') || /Забронировать/.test(a.textContent)) track('book_click', { from: (a.closest('section, header') || {}).id || '' });
+      openPick(a.dataset.text || greet);
+      return;
+    }
+    track('msg_' + ch);
+    if (ch === 'telegram' || ch === 'vk' || ch === 'max') track('msg_any', { channel: ch });
+    const inPick = a.hasAttribute('data-pick');
+    openChat(ch, inPick ? pickText : (ch === 'vkGroup' || ch === 'avito' ? '' : greet));
+    if (inPick) closePick();
   }));
 
   /* ===== Фоновая музыка: Vlad Gluschenko — Winter Time, по кругу без паузы на стыке.

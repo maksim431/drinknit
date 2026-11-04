@@ -19,9 +19,9 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104f');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104g');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104f');
+      if (m) add('stylesheet', 'portrait.css?v=20261104g');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -74,7 +74,7 @@
         <a href="#faq" data-nav tabindex="-1">Частые вопросы</a>
       </nav>
       <a class="hd2-book hd2-pick" href="#sets" data-nav tabindex="-1">Выбрать набор</a>
-      <a class="hd2-book hd2-bookm" href="#book" data-nav tabindex="-1">Забронировать набор</a>
+      <a class="hd2-book hd2-bookm" href="#" data-msg="pick" tabindex="-1">Забронировать набор</a>
     </div>
     <div class="hd2-right">
       <button class="hd-sound glass-dark js-sound" type="button" tabindex="-1" aria-label="Музыка играет" aria-pressed="true">
@@ -91,7 +91,7 @@
     <a href="#kids" data-nav>Для детей</a>
     <a href="#terms" data-nav>Сроки и доставка</a>
     <a href="#faq" data-nav>Частые вопросы</a>
-    <a class="mnav-book" href="#book" data-nav>Забронировать набор</a>
+    <a class="mnav-book" href="#" data-msg="pick">Забронировать набор</a>
   </nav>
 </header>
 
@@ -115,7 +115,7 @@
       <h1 class="h1 ui" style="--d:.3s">Новогодние наборы<br>с вязаными игрушками ручной работы</h1>
       <div class="row-btns ui" style="--d:.55s">
         <a class="btn btn-red" href="#sets" data-nav>Выбрать набор</a>
-        <a class="btn btn-glass" href="#" data-msg="telegram">Написать мне</a>
+        <a class="btn btn-glass" href="#" data-msg="pick">Написать мне</a>
       </div>
     </div>
     <div class="stickers" data-set="hero"></div>
@@ -139,7 +139,7 @@
       </div>
       <div class="set-buy">
         <p class="set-price"><span data-set-price></span> ₽</p>
-        <a class="btn btn-red" href="#" data-msg="telegram" data-set-btn></a>
+        <a class="btn btn-red" href="#" data-msg="pick" data-set-btn></a>
       </div>
     </div>
     <div class="hint b2-el" style="--d:.45">
@@ -233,7 +233,7 @@
           </div>
         </div>
         <div class="b5-cta rv" style="--d:.55s">
-          <a class="btn btn-red" href="#" data-msg="telegram">Забронировать набор</a>
+          <a class="btn btn-red" href="#" data-msg="pick">Забронировать набор</a>
           <p>Напишите, какой набор хотите и что подписать<br>на открытке. Остальное подскажу в переписке</p>
         </div>
       </div>
@@ -256,7 +256,7 @@
       <li>Получаете набор: самовывоз Нижний Новгород (район ТЦ Фантастика), Яндекс Доставка по городу или отправка по России (СДЭК / Яндекс / Озон / Почта). Доставку оплачиваете отдельно по тарифу службы.</li>
     </ol></div>
     <div class="stickers" data-set="terms"></div>
-    <a class="btn btn-red b6-btn rv" style="--d:.6s" href="#" data-msg="telegram" data-d="10">Забронировать набор</a>
+    <a class="btn btn-red b6-btn rv" style="--d:.6s" href="#" data-msg="pick" data-d="10">Забронировать набор</a>
   </div></section>
 
   <!-- 7. Обо мне -->
@@ -294,7 +294,10 @@
         <a class="btn btn-red" href="#" data-msg="vk">Написать в ВК</a>
         <a class="btn btn-red" href="#" data-msg="max">Написать в MAX</a>
       </div>
-      <a class="round glass-dark" href="#" data-msg="vkGroup" aria-label="Группа ВКонтакте"><img src="assets/d/ic-vk.svg" width="24" height="24" alt=""></a>
+      <div class="b8-rounds">
+        <a class="round glass-dark" href="#" data-msg="vkGroup" aria-label="Группа ВКонтакте"><img src="assets/d/ic-vk.svg" width="24" height="24" alt=""></a>
+        <a class="round glass-dark" href="#" data-msg="avito" aria-label="Мы на Авито"><img src="assets/d/ic-avito.svg" width="24" height="24" alt=""></a>
+      </div>
     </div>
     <div class="stickers" data-set="book"></div>
   </div></section>
@@ -310,7 +313,7 @@
       </div>
       <div class="faq-more">
         <p>Не нашли ответ? Спросите меня в переписке, отвечу сама.</p>
-        <a class="btn btn-red" href="#" data-msg="telegram">Задать вопрос</a>
+        <a class="btn btn-red" href="#" data-msg="pick">Задать вопрос</a>
       </div>
     </div>
     <div class="stickers" data-set="faq"></div>
@@ -360,6 +363,19 @@
 <canvas id="fx"></canvas>
 <button class="skip" type="button">Пропустить</button>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<!-- выбор мессенджера: открывается кнопками «Написать мне», «Хочу набор», «Забронировать набор», «Задать вопрос» -->
+<div class="pick" id="pick" role="dialog" aria-modal="true" aria-labelledby="pick-title" hidden>
+  <div class="pick-card">
+    <button class="pick-close" type="button" aria-label="Закрыть">×</button>
+    <p class="pick-title" id="pick-title">Где вам удобнее написать?</p>
+    <p class="pick-sub">Откроется диалог со мной. В Telegram текст сообщения уже будет набран, для ВКонтакте и MAX он скопируется — останется вставить</p>
+    <div class="pick-btns">
+      <a class="btn btn-red" href="#" data-msg="telegram" data-pick>Telegram</a>
+      <a class="btn btn-red" href="#" data-msg="vk" data-pick>ВКонтакте</a>
+      <a class="btn btn-red" href="#" data-msg="max" data-pick>MAX</a>
+    </div>
+  </div>
+</div>
   </template>
 
 
@@ -369,12 +385,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104f', function () {
+        load('texts.js?v=20261104g', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104f');
-          load('data.js?v=20261104f', function () { load('desktop.js?v=20261104f'); });
+          load('analytics.js?v=20261104g');
+          load('data.js?v=20261104g', function () { load('desktop.js?v=20261104g'); });
         });
       });
     })();
