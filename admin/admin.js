@@ -222,7 +222,7 @@
     }, () => JSON.stringify(content.cards) !== JSON.stringify(base.cards));
 
     // описания предметов (окно по клику на предмет)
-    const NAMES = { grinch: 'Зелёный воришка', lamb: 'Барашек', mitten: 'Варежка-подвеска', goat: 'Белый козлик', cream: 'Крем для рук', card: 'Открытка' };
+    const NAMES = { grinch: 'Зелёный воришка (набор M)', grinch2: 'Зелёный воришка v2 (набор L)', lamb: 'Барашек', mitten: 'Варежка-подвеска', goat: 'Белый козлик', cream: 'Крем для рук', card: 'Открытка' };
     addGroup('items', 'Описания предметов', sec => {
       Object.entries(content.details).forEach(([id, d]) => {
         const o = base.details[id];
@@ -282,7 +282,7 @@
   });
 
   /* ===== Фото предметов ===== */
-  const ITEM_NAMES = { grinch: 'Игрушка «Зелёный воришка»', lamb: 'Игрушка «Барашек»', mitten: 'Варежка-подвеска на ёлку', goat: 'Игрушка «Белый козлик»', cream: 'Крем для рук', card: 'Открытка с вашим текстом' };
+  const ITEM_NAMES = { grinch: 'Игрушка «Зелёный воришка» — набор M', grinch2: 'Игрушка «Зелёный воришка» v2 — набор L', lamb: 'Игрушка «Барашек»', mitten: 'Варежка-подвеска на ёлку', goat: 'Игрушка «Белый козлик»', cream: 'Крем для рук', card: 'Открытка с вашим текстом' };
   // фото → webp (или jpeg, если браузер не умеет webp), не больше 1600 px по длинной стороне
   const compress = file => new Promise((res, rej) => {
     const url = URL.createObjectURL(file), img = new Image();
