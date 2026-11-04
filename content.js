@@ -90,32 +90,50 @@ window.DRINKNIT_CONTENT = {
       "text": "Связан мной за 10 часов непрерывной работы.<br>Высота: 20 см.<br>Состав: хлопок и акрил, мелкие детали на безопасном креплении.",
       "note": "Каждая игрушка может немного отличаться от фото, потому что связана вручную.",
       "photos": [
-        "assets/items/grinch-photo.webp"
+        "assets/items/grinch-mw2hjuol0.webp",
+        "assets/items/grinch-mw2hjwkq1.webp",
+        "assets/items/grinch-mw2hjy5n2.webp",
+        "assets/items/grinch-mw2hjzid3.webp"
       ]
     },
     "grinch2": {
       "title": "Игрушка<br>«Зелёный воришка» детализированный",
       "text": "Связан мной за 16 часов непрерывной работы.<br>Высота: 22 см.<br>Состав: хлопок и акрил, мелкие детали на безопасном креплении, подходит для детей от 5 лет",
       "note": "Каждая игрушка может немного отличаться от фото, потому что связана вручную.",
-      "photos": []
+      "photos": [
+        "assets/items/grinch2-mw2hk1000.webp",
+        "assets/items/grinch2-mw2hk2ti1.webp",
+        "assets/items/grinch2-mw2hk4f22.webp",
+        "assets/items/grinch2-mw2hk5xo3.webp",
+        "assets/items/grinch2-mw2hk7k34.webp"
+      ]
     },
     "lamb": {
       "title": "Игрушка<br>«Козлик»",
       "text": "Связан мной за 3 часа непрерывной работы.<br>Высота: 7 см.<br>Состав: хлопок и акрил, мелкие детали на безопасном креплении.",
       "note": "Каждая игрушка может немного отличаться от фото, потому что связана вручную.",
-      "photos": []
+      "photos": [
+        "assets/items/lamb-mw2hk9b90.webp",
+        "assets/items/lamb-mw2hkan11.webp"
+      ]
     },
     "mitten": {
       "title": "Игрушка<br>«Варежка»",
       "text": "Связан мной за 3 часа непрерывной работы.<br>Высота: 7 см.<br>Состав: хлопок и акрил.<br>Можно повесить на ёлку или ключи.",
       "note": "Каждая игрушка может немного отличаться от фото, потому что связана вручную.",
-      "photos": []
+      "photos": [
+        "assets/items/mitten-mw2hkc0j0.webp",
+        "assets/items/mitten-mw2hkdhy1.webp"
+      ]
     },
     "goat": {
       "title": "Игрушка<br>«Козлик»",
       "text": "Мягкий козлик с красным шарфом.<br>Готовая игрушка, я подобрала её к набору.<br>Высота: 16 см.<br>Ширина 13 см.",
       "note": "",
-      "photos": []
+      "photos": [
+        "assets/items/goat-mw2hkf2a0.webp",
+        "assets/items/goat-mw2hkgld1.webp"
+      ]
     },
     "cream": {
       "title": "Крем для рук",
@@ -127,7 +145,11 @@ window.DRINKNIT_CONTENT = {
       "title": "Открытка<br>с вашим текстом",
       "text": "Подпишу открытку от руки: пришлите текст, когда будете заказывать набор.",
       "note": "",
-      "photos": []
+      "photos": [
+        "assets/items/card-mw2hkib10.webp",
+        "assets/items/card-mw2hkju51.webp",
+        "assets/items/card-mw2hklda2.webp"
+      ]
     }
   },
   "cards": [
