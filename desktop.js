@@ -49,49 +49,49 @@
   // Стикеры: [картинка, left, top, w, h, ширина, высота, поворот, img left%, top%, w%, h%, глубина параллакса, тень]
   const STICKERS = {
     hero: [
-      ['st-5', -20, 734, 330.38, 345.929, 273.205, 293.68, 12.52, -147.43, -40.89, 268.46, 186.47, 30],
-      ['st-4', 1602.94, 149, 232.594, 232, 196.026, 195.253, -12.1, -215.37, 0, 315.37, 236.41, 22],
-      ['st-3', 1622.94, 823, 239.152, 239.188, 169.632, 168.742, 46.63, -139.9, 0, 314.96, 236.41, 34],
-      ['st-2', 319.9, 609, 204.302, 216.841, 153.826, 174.793, -19.99, -67.9, 0, 305.73, 200.9, 18],
-      ['st-1', 91, 240, 266.09, 281.492, 206.117, 229.82, -17.65, 0, 0, 300, 200.9, 26],
+      ['stk/st-5-1', -20, 734, 330.38, 345.929, 273.205, 293.68, 12.52, -1.007, -1.036, 102.015, 102.08, 30],
+      ['stk/st-4-1', 1602.94, 149, 232.594, 232, 196.026, 195.253, -12.1, -1.05, 0, 101.05, 101.055, 22],
+      ['stk/st-3-1', 1622.94, 823, 239.152, 239.188, 169.632, 168.742, 46.63, -1.055, 0, 102.1, 101.055, 34],
+      ['stk/st-2-1', 319.9, 609, 204.302, 216.841, 153.826, 174.793, -19.99, -1.022, 0, 102.037, 101.011, 18],
+      ['stk/st-1-1', 91, 240, 266.09, 281.492, 206.117, 229.82, -17.65, 0, 0, 101, 101.011, 26],
       ['st-gift', 1448.98, 467, 269.796, 269.796, 218.656, 218.656, 15.75, 0, 0, 100, 100, 20],
     ],
     kids: [
-      ['sheet-ackw', 1488.85, 218.57, 207.227, 220.359, 185, 200, -6.75, 0, 0, 277.14, 191.66, 24],
-      ['sheet-5pryb', 65, 632, 542.483, 582.393, 467.731, 515.717, -8.98, 0, 0, 283.02, 191.66, 18],
-      ['sheet-5pryb', 1062.98, 782, 278.627, 298.438, 227.73, 254.074, 12.88, -107.33, 0, 308.48, 206.45, 30],
+      ['stk/sheet-ackw-1', 1488.85, 218.57, 207.227, 220.359, 185, 200, -6.75, 0, 0, 101.041, 100.964, 24],
+      ['stk/sheet-5pryb-1', 65, 632, 542.483, 582.393, 467.731, 515.717, -8.98, 0, 0, 100.944, 100.964, 18],
+      ['stk/sheet-5pryb-2', 1062.98, 782, 278.627, 298.438, 227.73, 254.074, 12.88, -1.033, 0, 102.055, 101.036, 30],
     ],
     left: [
       ['st-santaclock', 773.92, 58, 415.717, 415.717, 372.835, 372.835, 7.04, 0, 0, 100, 100, 0],
-      ['sheet-ackw', 200, 683, 394.445, 396.87, 334.671, 337.763, -11.32, 0, -105.03, 277.14, 205.03, 0],
-      ['sheet-ackw', 60, 427, 247.77, 250.092, 201.63, 204.912, 14.99, -100.7, -105.03, 279.07, 205.03, 0],
-      ['sheet-ackw', 221, 82, 412.159, 437.183, 339.858, 372.733, -12.44, -201.51, 0, 301.51, 205.27, 0],
-      ['sheet-5pryb', 1329.04, 142, 268.851, 269.676, 214.591, 215.843, 17.21, 0, -107.89, 280.05, 207.89, 0],
-      ['sheet-5pryb', 1367.04, 751, 241.388, 285.602, 231, 277, 2.18, -106.17, -92.07, 308.48, 192.07, 0],
-      ['sheet-k4', 1539.94, 332, 338, 390, 338, 390, 0, -245.82, -123.72, 345.82, 223.72, 0],
+      ['stk/sheet-ackw-2', 200, 683, 394.445, 396.87, 334.671, 337.763, -11.32, 0, -1.028, 101.041, 101.028, 0],
+      ['stk/sheet-ackw-3', 60, 427, 247.77, 250.092, 201.63, 204.912, 14.99, -1.049, -1.028, 102.093, 101.028, 0],
+      ['stk/sheet-ackw-4', 221, 82, 412.159, 437.183, 339.858, 372.733, -12.44, -1.006, 0, 101.006, 101.031, 0],
+      ['stk/sheet-5pryb-3', 1329.04, 142, 268.851, 269.676, 214.591, 215.843, 17.21, 0, -1.045, 101.051, 101.045, 0],
+      ['stk/sheet-5pryb-4', 1367.04, 751, 241.388, 285.602, 231, 277, 2.18, -1.03, -0.965, 102.055, 100.965, 0],
+      ['stk/sheet-k4-1', 1539.94, 332, 338, 390, 338, 390, 0, -1.008, -0.999, 101.008, 100.999, 0],
     ],
     terms: [
-      ['sheet-8nimtu', 116, 700, 371, 472, 371, 472, 0, 0, 0, 294.25, 231.67, 26],
+      ['stk/sheet-8nimtu-1', 116, 700, 371, 472, 371, 472, 0, 0, 0, 101.005, 101.016, 26],
     ],
     about: [
-      ['sheet-x79', 97, 116, 487.045, 442.63, 425, 369, -10.89, 0, 0, 230.33, 197.79, 22],
-      ['st-11', 39.95, 116.89, 268.331, 298.588, 213.501, 254.872, 13.86, -71.45, -51.74, 242.91, 203.48, 32],
-      ['sheet-x79', 144, 715, 320, 292, 320, 292, 0, -23.92, -102.03, 246.41, 202.03, 18],
-      ['sheet-x79', 1326.04, 132, 392.379, 367.856, 316.757, 275.414, 20.2, -117.37, 0, 230.33, 197.79, 24],
-      ['sheet-x79', 1271.08, 582, 423.501, 425.112, 364, 366, -10.29, -147.76, -99.78, 269.06, 199.78, 16],
-      ['sheet-cdp', 1539.94, 698, 201, 282, 201, 282, 0, 0, 0, 266.32, 189.81, 28],
-      ['st-9', 1640.94, 352.05, 244.612, 296.848, 231.036, 285.997, -2.78, -62.86, -41.17, 225.72, 182.34, 34],
-      ['st-10', 298.38, 576.36, 273.854, 293.352, 233, 257, 9.94, -62.14, -51.74, 224.28, 203.48, 26],
+      ['stk/sheet-x79-1', 97, 116, 487.045, 442.63, 425, 369, -10.89, 0, 0, 100.961, 100.992, 22],
+      ['stk/st-11-1', 39.95, 116.89, 268.331, 298.588, 213.501, 254.872, 13.86, -0.997, -0.969, 102.003, 101.939, 32],
+      ['stk/sheet-x79-2', 144, 715, 320, 292, 320, 292, 0, -1.024, -1.015, 102.055, 101.015, 18],
+      ['stk/sheet-x79-3', 1326.04, 132, 392.379, 367.856, 316.757, 275.414, 20.2, -0.957, 0, 101.921, 100.992, 24],
+      ['stk/sheet-x79-4', 1271.08, 582, 423.501, 425.112, 364, 366, -10.29, -1.01, -1.005, 102.019, 101.005, 16],
+      ['stk/sheet-cdp-1', 1539.94, 698, 201, 282, 201, 282, 0, 0, 0, 101.04, 101.022, 28],
+      ['stk/st-9-1', 1640.94, 352.05, 244.612, 296.848, 231.036, 285.997, -2.78, -1.029, -1.016, 102.059, 102.032, 34],
+      ['stk/st-10-1', 298.38, 576.36, 273.854, 293.352, 233, 257, 9.94, -1.032, -0.969, 102.065, 101.939, 26],
     ],
     faq: [
-      ['st-8', 40, 40, 298.913, 325.397, 198, 263, 18, -71.45, -41.17, 242.91, 182.34, 24, false],
-      ['st-9', 1640, 720, 285.861, 331.721, 237, 294, -8, -62.86, -41.17, 225.72, 182.34, 20, false],
+      ['stk/st-8-1', 40, 40, 298.913, 325.397, 198, 263, 18, -0.997, -1.016, 102.003, 102.032, 24, false],
+      ['stk/st-9-1', 1640, 720, 285.861, 331.721, 237, 294, -8, -1.029, -1.016, 102.059, 102.032, 20, false],
     ],
     book: [
-      ['st-8', 24, 0, 298.913, 325.397, 198, 263, 28.26, -71.45, -41.17, 242.91, 182.34, 24, false],
-      ['sheet-8nimtu', 24, 570, 446.26, 493.109, 341.117, 411.554, -16.95, -102.06, -2.44, 302.06, 250.37, 30, false],
-      ['st-9', 1626.94, 42, 285.861, 331.721, 237, 294, 10.33, -62.86, -41.17, 225.72, 182.34, 20, false],
-      ['sheet-ackw', 1546.94, 626, 313, 343, 313, 343, 0, -201.51, 0, 301.51, 205.27, 28, false],
+      ['stk/st-8-1', 24, 0, 298.913, 325.397, 198, 263, 28.26, -0.997, -1.016, 102.003, 102.032, 24, false],
+      ['stk/sheet-8nimtu-2', 24, 570, 446.26, 493.109, 341.117, 411.554, -16.95, -1.029, -0.973, 102.063, 101.957, 30, false],
+      ['stk/st-9-1', 1626.94, 42, 285.861, 331.721, 237, 294, 10.33, -1.029, -1.016, 102.059, 102.032, 20, false],
+      ['stk/sheet-ackw-4', 1546.94, 626, 313, 343, 313, 343, 0, -1.006, 0, 101.006, 101.031, 28, false],
     ],
   };
 
@@ -122,9 +122,9 @@
   };
   // стикеры, которые есть только в мобильном макете: [картинка, left, top, рамка, наклейка, поворот, положение картинки]
   const STICKERS_PX = {
-    terms: [['sheet-5pryb', 214, -39.72, 139.66, 140.27, 123.11, 123.83, -8.28, 0, -107.89, 280.05, 207.89]],
-    book: [['sheet-x79', 210, -60, 137.75, 138.28, 118.39, 119.06, -10.29, -147.76, -99.78, 269.06, 199.78],
-      ['sheet-cdp', 297.91, -22.2, 65, 92, 65, 92, 0, 0, 0, 266.32, 189.81]],
+    terms: [['stk/sheet-5pryb-3', 214, -39.72, 139.66, 140.27, 123.11, 123.83, -8.28, 0, -1.045, 101.051, 101.045]],
+    book: [['stk/sheet-x79-4', 210, -60, 137.75, 138.28, 118.39, 119.06, -10.29, -1.01, -1.005, 102.019, 101.005],
+      ['stk/sheet-cdp-1', 297.91, -22.2, 65, 92, 65, 92, 0, 0, 0, 101.04, 101.022]],
   };
   for (const [set, list0] of Object.entries(STICKERS)) {
     const host = $(`.stickers[data-set="${set}"]`);
@@ -651,6 +651,28 @@
   /* ===== Модальное окно предмета ===== */
   const modal = $('#modal');
   const dim = $('#dim');
+  // телефон: окно предмета — поверх всей страницы на весь видимый экран, в пикселях экрана
+  if (FLOW) { document.body.append(dim, modal); dim.classList.add('dim-fix'); modal.classList.add('modal-fix'); }
+  const PH_R = 332 / 529;   // пропорции фото в окне (мобильный макет)
+  const fitModal = () => {
+    if (!FLOW || modal.hidden) return;
+    const vv = window.visualViewport, W = html.clientWidth, H = vv ? vv.height : innerHeight;
+    const k = Math.min(W / FW, H / 560);
+    const mh = H / k - 20;
+    modal.style.setProperty('--ms', k);
+    modal.style.left = `${(W - 370 * k) / 2}px`;
+    modal.style.top = `${(vv ? vv.offsetTop : 0) + 10 * k}px`;
+    modal.style.height = `${mh}px`;
+    // фото сохраняет пропорции, текст под ним забирает остаток и прокручивается, если не помещается
+    const ph = $('.modal-photo', modal);
+    const pH = Math.max(120, Math.min(332 / PH_R, mh - 38 - 14 - 150));
+    ph.style.height = `${pH}px`;
+    ph.style.width = `${pH * PH_R}px`;
+  };
+  if (FLOW) {
+    addEventListener('resize', fitModal);
+    if (window.visualViewport) visualViewport.addEventListener('resize', fitModal);
+  }
   let focusClone = null;
   let photoIdx = 0;
   let openData = null;
@@ -677,6 +699,7 @@
     renderPhoto();
     setHover(null);
     // выбранный предмет остаётся подсвеченным поверх затемнения
+    if (!FLOW) {
     focusClone = product.cloneNode(true);
     focusClone.id = 'focus';
     focusClone.removeAttribute('aria-label');
@@ -686,9 +709,12 @@
       b.tabIndex = -1;
       if (j !== i) b.remove(); else { b.classList.remove('lit', 'is-hover'); b.classList.add('is-focus'); }
     });
-    (FLOW ? $('#sets .fr') : $('#stage')).appendChild(focusClone);
+    $('#stage').appendChild(focusClone);
+    }
     dim.classList.add('on');
     modal.hidden = false;
+    fitModal();
+    $('.modal-info', modal).scrollTop = 0;
     sparkleEdge(openData, 30, { vy: rand(-160, -60) });
     $('#modal-close').focus();
   };
@@ -700,6 +726,13 @@
     dim.classList.remove('on');
     focusClone?.remove();
     focusClone = null;
+    // телефон: после закрытия экран всегда у низа блока наборов
+    if (FLOW) {
+      const o = flowSec('sets');
+      scrollTo({ top: Math.round(fFromView(o.top + o.H - (FH - CUT + EXTF)) * s), behavior: 'instant' });
+      lastY = scrollY;
+      flowLast = -1;
+    }
   };
   $('#modal-close').addEventListener('click', closeItem);
   dim.addEventListener('click', closeItem);
@@ -1124,6 +1157,9 @@
   /* ===== Видео-переход: кадры assets/d/trans/000…144.webp, грузятся, когда посетитель дошёл до блока 3 ===== */
   const FRAMES = 145;
   const frames = new Array(FRAMES);
+  const CAN_BMP = typeof createImageBitmap === 'function' && typeof fetch === 'function';
+  const bmps = new Map(), bmpWait = new Set(), BMP_R = 10;
+  let vWant = 0, vT = 0, vDrawn = -99;
   const vcan = $('#b3-video'), vctx = vcan.getContext('2d');
   const b3fades = $$('.b3-fade');
   let framesRequested = false, lastFrame = -1;
@@ -1138,11 +1174,16 @@
     const pump = () => {
       if (next >= order.length) return;
       const i = order[next++];
+      const url = `assets/d/trans/${String(i).padStart(3, '0')}.webp`;
+      if (CAN_BMP) {
+        fetch(url).then(r => (r.ok ? r.blob() : Promise.reject())).then(bl => { frames[i] = bl; warm(vWant); pump(); }, pump);
+        return;
+      }
       const img = new Image();
       img.decoding = 'async';
       img.onload = () => { frames[i] = img; lastFrame = -1; pump(); };
       img.onerror = pump;
-      img.src = `assets/d/trans/${String(i).padStart(3, '0')}.webp`;
+      img.src = url;
     };
     for (let k = 0; k < 4; k++) pump();
   };
@@ -1152,12 +1193,26 @@
   const V0 = L.v0, V1 = { x: KB.x + .1040 * KB.w, y: KB.y + .0143 * KB.h, w: .9000 * KB.w, h: .9073 * KB.h };
   const drawFrame = t => {
     let i = Math.round(t * (FRAMES - 1));
-    if (!frames[i]) {   // ближайший загруженный
-      let d = 1;
-      while (d < FRAMES && !frames[i - d] && !frames[i + d]) d++;
-      i = frames[i - d] ? i - d : i + d;
-      if (!frames[i]) return;
+    vT = t; vWant = i;
+    let src;
+    if (CAN_BMP) {
+      // рисуем только уже распакованный кадр (ближайший к нужному): распаковка не тормозит прокрутку
+      warm(i);
+      let d = 0;
+      while (d <= BMP_R + 2 && !bmps.has(i - d) && !bmps.has(i + d)) d++;
+      i = bmps.has(i - d) ? i - d : i + d;
+      src = bmps.get(i);
+      if (!src) return;
+    } else {
+      if (!frames[i]) {   // ближайший загруженный
+        let d = 1;
+        while (d < FRAMES && !frames[i - d] && !frames[i + d]) d++;
+        i = frames[i - d] ? i - d : i + d;
+        if (!frames[i]) return;
+      }
+      src = frames[i];
     }
+    vDrawn = i;
     // на телефоне видео показывает треть кадра 1280 × 720 — холст в полном разрешении экрана, чтобы не размывать дважды
     const vd = PORTRAIT ? Math.min(devicePixelRatio || 1, 2.5) : cdpr;
     const W = Math.round(vcan.clientWidth * vd * s), H = Math.round(vcan.clientHeight * vd * s);
@@ -1181,8 +1236,30 @@
     x0 = ax + (x0 - ax) * f; x1 = ax + (x1 - ax) * f; y0 = ay + (y0 - ay) * f; y1 = ay + (y1 - ay) * f;
     vctx.clearRect(0, 0, W, H);
     vctx.imageSmoothingQuality = 'high';
-    vctx.drawImage(frames[i], x0, y0, x1 - x0, y1 - y0);
+    vctx.drawImage(src, x0, y0, x1 - x0, y1 - y0);
   };
+  // до и после видео держим распакованными крайние кадры: видео начинается без задержки в обе стороны
+  const preWarm = t => { if (!framesRequested) return; const e = t >= 1 ? FRAMES - 1 : 0; if (vWant !== e) { vWant = e; vT = 0; warm(e); } };
+  // распакованные кадры: окно ±BMP_R вокруг текущего, по 3 одновременно, дальние освобождаются
+  function warm(c) {
+    if (!CAN_BMP) return;
+    for (const [j, bm] of bmps) if (Math.abs(j - c) > BMP_R + 4) { bm.close && bm.close(); bmps.delete(j); }
+    for (let d = 0; d <= BMP_R && bmpWait.size < 3; d++) {
+      for (const j of d ? [c + d, c - d] : [c]) {
+        if (j < 0 || j >= FRAMES || bmps.has(j) || bmpWait.has(j) || !frames[j] || bmpWait.size >= 3) continue;
+        bmpWait.add(j);
+        createImageBitmap(frames[j]).then(bm => {
+          bmpWait.delete(j);
+          if (Math.abs(j - vWant) > BMP_R + 4) { bm.close && bm.close(); } else {
+            bmps.set(j, bm);
+            // пришёл кадр ближе к нужному, чем нарисованный — перерисовываем
+            if (vT > 0 && vT < 1 && Math.abs(j - vWant) < Math.abs(vDrawn - vWant)) { lastFrame = -1; drawFrame(vT); }
+          }
+          warm(vWant);
+        }, () => { bmpWait.delete(j); });
+      }
+    }
+  }
 
   const vshade = PORTRAIT ? $('#b3-vshade') : null, termsFr = $('#terms .fr'), bookFr = $('#book .fr'), kidsFr = $('#kids .fr');
   const b3bg = $('#b3-bg'), b3fg = $('#b3-fg'), b3text = $('#b3-textwrap'), b3card = $('#b3-card');
@@ -1206,6 +1283,7 @@
   };
 
   const fmt = v => Math.round(v * 1000) / 1000;
+  const preDecode = el => $$('img', el).forEach(i => { if (i.decode) i.decode().catch(() => {}); });
   // запись в стиль только если значение изменилось: без лишних пересчётов страницы
   const put = (n, prop, v) => {
     const c = n._st || (n._st = {});
@@ -1326,6 +1404,7 @@
     // остальные сцены
     SCENES.forEach(sc => {
       const e = clamp(P - (sc.a - 1)), l = clamp(P - sc.b);
+      if (!sc.pre && P > sc.a - 2.2) { sc.pre = true; preDecode(sc.el); }
       const visible = e > 0 && (['cover', 'split', 'clip', 'video'].includes(sc.leave) ? l < 1 : l < .6);
       // невидимые сцены убираются из отрисовки целиком
       put(sc.el, 'display', visible ? '' : 'none');
@@ -1377,7 +1456,7 @@
     put(b3card, 'visibility', vt >= .16 ? 'hidden' : '');
     if (vt > 0) put(b3card, 'opacity', String(fmt(1 - vOut)));
     put(vcan, 'opacity', String(fmt(clamp(vt / .015))));   // быстро: камера в видео начинает двигаться сразу
-    if (vt > 0 && vt < 1) drawFrame(vt);
+    if (vt > 0 && vt < 1) drawFrame(vt); else preWarm(vt);
     if (vshade) {
       // затемнение над видео плавно меняет цвет и высоту от блока 3 к блоку 4
       put(vshade, 'opacity', String(fmt(clamp(vt / .015))));
@@ -1477,9 +1556,6 @@
   }
   // окно предмета: наборы встают ровно на экран, пока окно открыто, страница не листается
   function flowOpenModal() {
-    const o = flowSec('sets');
-    scrollTo({ top: fFromView(o.top + o.r0 - CUT) * s, behavior: 'instant' });
-    lastY = scrollY;
     html.classList.add('flow-lock');
     flowLast = -1;
   }
@@ -1585,6 +1661,8 @@
       if (o.id === 'kids' && st.stage === 3) vis = vt > .84;
       put(o.el, 'transform', `translateY(${fmt(tY)}px)`);
       put(o.el, 'display', vis ? '' : 'none');
+      // картинки блока распаковываются заранее, за полтора экрана: при появлении прокрутка не дёргается
+      if (!o.pre && tY + o.r0 < scrBot + FH * 1.5) { o.pre = true; preDecode(o.el); }
       if (FLOW_GOALS[o.id] && tY + o.r0 < FH / 2) track(FLOW_GOALS[o.id], null, true);
     });
     if (st.stage === 4) track('video_done', null, true);
@@ -1624,7 +1702,7 @@
     const comp = `translateY(${fmt(FL.vA - time.top)}px)`;
     put(vcan, 'transform', comp);
     put(vcan, 'opacity', String(fmt(st.stage === 3 ? clamp(vt / .015) : 0)));
-    if (vt > 0 && vt < 1) drawFrame(vt);
+    if (vt > 0 && vt < 1) drawFrame(vt); else preWarm(vt);
     if (vshade) {
       put(vshade, 'transform', comp);
       put(vshade, 'opacity', String(fmt(st.stage === 3 ? clamp(vt / .015) : 0)));

@@ -19,9 +19,9 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104o');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104q');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104o');
+      if (m) add('stylesheet', 'portrait.css?v=20261104q');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -105,7 +105,7 @@
     <div class="gift-hint" aria-hidden="true">
       <img class="gift-hint-bubble" src="assets/d/hint-bubble.svg" alt="">
       <p class="gift-hint-text">Нажми на подарок</p>
-      <div class="gift-hint-goat"><div class="stk-r" style="width:303.299px;height:334.416px;transform:rotate(-171.02deg) scaleY(-1)"><i><img src="assets/d/sheet-5pryb.webp" alt="" style="left:0;top:0;width:283.02%;height:191.66%"></i></div></div>
+      <div class="gift-hint-goat"><div class="stk-r" style="width:303.299px;height:334.416px;transform:rotate(-171.02deg) scaleY(-1)"><i><img src="assets/d/stk/sheet-5pryb-1.webp" alt="" style="left:0%;top:0%;width:100.944%;height:100.964%"></i></div></div>
     </div>
     <img class="hero-ray" src="assets/d/hero-ray.svg" alt="">
     <img class="hero-ellipse" src="assets/d/hero-ellipse.svg" alt="">
@@ -144,7 +144,7 @@
     </div>
     <div class="hint b2-el" style="--d:.45">
       <img class="hint-bubble" src="assets/d/bubble.svg" alt="">
-      <div class="hint-goat"><div class="stk-r" style="width:286.17px;height:332.861px;transform:rotate(-165.17deg) scaleY(-1)"><i><img src="assets/d/st-goatbox.webp" alt="" style="left:0;top:-11.43%;width:269.47%;height:231.67%"></i></div></div>
+      <div class="hint-goat"><div class="stk-r" style="width:286.17px;height:332.861px;transform:rotate(-165.17deg) scaleY(-1)"><i><img src="assets/d/stk/st-goatbox-1.webp" alt="" style="left:0%;top:-1.023%;width:101.051%;height:102.034%"></i></div></div>
       <p class="hint-text">Кликните на предмет,<br>чтобы узнать подробнее</p>
     </div>
     <div class="dim bgl" id="dim"></div>
@@ -385,12 +385,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104o', function () {
+        load('texts.js?v=20261104q', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104o');
-          load('data.js?v=20261104o', function () { load('desktop.js?v=20261104o'); });
+          load('analytics.js?v=20261104q');
+          load('data.js?v=20261104q', function () { load('desktop.js?v=20261104q'); });
         });
       });
     })();
