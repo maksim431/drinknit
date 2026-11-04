@@ -589,17 +589,7 @@
     if (it) openItem(it.key, it.i);
   });
 
-  // бегущая подсветка: предметы загораются по очереди, с искрами по контуру
-  let litIdx = -1;
-  setInterval(() => {
-    if (!product.classList.contains('b2-on') || busy || !modal.hidden || document.hidden) return;
-    const list = ITEMS[current];
-    list.forEach(it => it.el.classList.remove('lit'));
-    litIdx = (litIdx + 1) % list.length;
-    const it = list[litIdx];
-    it.el.classList.add('lit');
-    sparkleEdge(it, 16);
-  }, 1100);
+  // бегущая подсветка предметов по очереди отключена: предметы подсвечиваются только при наведении
 
   const renderPanel = key => {
     const d = SETS[key];
