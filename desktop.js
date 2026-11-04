@@ -1257,8 +1257,8 @@
     clearTimeout(idleT);
     idleT = setTimeout(function check() {
       const atEnd = scrollY + VH() >= document.documentElement.scrollHeight - 4;
-      if (html.classList.contains('is-locked') || !modal.hidden || atEnd || document.hidden) { idleFrom = performance.now(); idleT = setTimeout(check, 400); return; }
-      if (performance.now() - idleFrom < 2000) { idleT = setTimeout(check, 300); return; }
+      if (!body.classList.contains('is-done') || html.classList.contains('is-locked') || !modal.hidden || atEnd || document.hidden) { idleOff(); idleFrom = performance.now(); idleT = setTimeout(check, 400); return; }
+      if (scrollY > 4 && performance.now() - idleFrom < 2000) { idleT = setTimeout(check, 300); return; }
       idle.classList.add('on'); body.classList.add('idle');
     }, 300);
   };
@@ -1701,13 +1701,14 @@
   const openGift = () => {
     track('gift_open', null, true);
     if (!body.classList.contains('is-waiting')) return;
+    // экран как будто прокручивается вниз: подсказка уезжает вверх, подарок падает на своё место, потом открывается
     body.classList.remove('is-waiting');
-    body.classList.add('is-charging');
-    dustUntil = performance.now() + 1500;
-    at(1700, () => { body.classList.add('is-open'); openBurst(); });
-    at(2300, () => body.classList.add('is-frame'));
-    at(2800, () => body.classList.add('is-ui'));
-    at(4500, finish);
+    body.classList.add('is-drop');
+    at(750, () => { body.classList.add('is-charging'); dustUntil = performance.now() + 1500; });
+    at(2450, () => { body.classList.add('is-open'); openBurst(); });
+    at(3050, () => body.classList.add('is-frame'));
+    at(3550, () => body.classList.add('is-ui'));
+    at(5250, finish);
   };
   $('#gift').addEventListener('click', openGift);
   // стикеры вылетают из центра коробки, по очереди

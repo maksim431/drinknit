@@ -72,13 +72,13 @@ html.is-p .b2-topshade { display: block; position: absolute; z-index: 2; left: -
 html.is-p .br-p { display: inline; }
 html.is-p .b2-title { left: 10px; top: 126px; width: 370px; line-height: 30.99px; }
 html.is-p .set-panel {
-  left: 10px; top: 768px; width: 370px; height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
+  left: 10px; top: auto; bottom: 20px; width: 370px; height: auto; min-height: 212px; gap: 16px; padding: 16.6px 16.6px 17.98px;
   border-radius: 24.9px; border-width: 1.383px; -webkit-backdrop-filter: blur(8.3px); backdrop-filter: blur(8.3px);
 }
 html.is-p .set-panel-title { display: none; }
 html.is-p .set-tabs { gap: 3.46px; }
 html.is-p .set-tabs button { height: 37.35px; padding: 6.92px 15.9px; font-size: 14.53px; }
-html.is-p .set-desc { flex: 1 0 0; gap: 5.53px; font-size: 13.14px; }
+html.is-p .set-desc { flex: 1 0 auto; gap: 5.53px; font-size: 13.14px; }
 html.is-p .set-price { font-size: 40.12px; line-height: 40.12px; }
 html.is-p .hint { left: 104px; top: 259px; width: 286px; height: 217px; overflow: hidden; overflow: clip; pointer-events: none !important; }   /* подсказка не перехватывает тапы по открытке */
 html.is-p .hint-bubble { left: 55px; top: 6px; width: 175.27px; height: 75.43px; transform: scaleX(-1); }
@@ -215,7 +215,8 @@ html.is-p .hero-box .prod-inner img { position: absolute; inset: 0; width: 100%;
 /* стикеры у верхнего края «Сроков» и финального блока заходят на блок выше */
 html.is-p #terms, html.is-p #book { overflow: visible; clip-path: inset(-80px 0 0 0); }
 /* подсказка «листайте дальше» на телефоне: 9 px от низа */
-html.is-p .idle-hint { bottom: calc(9px + env(safe-area-inset-bottom, 0px)); }
+html.is-p .idle-hint { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+html.is-p .closed { --lift: 90px; }
 /* подвал: телефона и почты в мобильном макете нет */
 html.is-p .ft-phone, html.is-p .ft-mail { display: none; }
 
