@@ -216,7 +216,6 @@ html.is-p .hero-box .prod-inner img { position: absolute; inset: 0; width: 100%;
 html.is-p #terms, html.is-p #book { overflow: visible; clip-path: inset(-80px 0 0 0); }
 /* подсказка «листайте дальше» на телефоне: 9 px от низа */
 html.is-p .idle-hint { bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
-html.is-p .closed { --lift: 90px; }
 /* подвал: телефона и почты в мобильном макете нет */
 html.is-p .ft-phone, html.is-p .ft-mail { display: none; }
 

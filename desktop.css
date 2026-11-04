@@ -629,11 +629,5 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 .pick-close img { width: 40px; height: 40px; margin: -1px; display: block; }
 .pick-close:hover img { filter: brightness(1.08); }
 
-/* Открытие подарка: в ожидании подарок висит выше, после клика падает на место; подсказка уезжает вверх за экран */
-.closed { --lift: 120px; transition: translate .75s cubic-bezier(.55, 0, .85, .4); }
-.intro.is-waiting .closed { translate: 0 calc(-1 * var(--lift)); }
-.is-drop .closed { animation: none; }
-.intro.is-drop:not(.is-done) .gift-hint { opacity: 1; transform: translateY(-120vh); transition: transform .85s cubic-bezier(.6, 0, .4, 1); }
-.intro.is-drop:not(.is-done) .skip { opacity: 0; pointer-events: none; }
 /* Safari: фильтр тени и 3D-контекст вместе ломают переворот карточки — оставляем плоскую карточку с перспективой у родителя */
 .stamp { transform-style: flat; -webkit-transform-style: flat; will-change: transform; }
