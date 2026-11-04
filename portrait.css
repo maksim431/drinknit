@@ -119,19 +119,22 @@ html.is-p .b3-video { width: calc(390px + 2 * var(--px, 0px)); height: calc(844p
 /* затемнение над видео-переходом */
 html.is-p .b3-vshade { display: block; position: absolute; left: calc(-1 * var(--px, 0px)); right: calc(-1 * var(--px, 0px)); top: calc(-1 * var(--py, 0px)); height: 460px; opacity: 0; pointer-events: none; }
 
-/* 4. Для детей (1096 px — экран спускается на 252 px) */
+/* 4. Для детей (1210 px, свободный скролл) */
 html.is-p .b4 { background: #012711; }
 html.is-p .b4-bg { left: -695px; top: 135px; width: 1270px; height: 709px; }
 html.is-p .b4-shade {
   display: block; position: absolute; left: -40px; right: -40px; top: -60px; height: 502px;
   background: linear-gradient(180deg, #547490 204.5px, rgba(84, 116, 144, 0) 376.6px);
 }
-html.is-p .b4-shade2 { display: block; position: absolute; left: -40px; width: 470px; top: 707px; height: 389px; background: linear-gradient(180deg, rgba(51, 103, 71, 0) 0%, #012711 32.21%); }
+html.is-p .b4-shade2 { display: block; position: absolute; left: -40px; width: 470px; top: 707px; height: 389px; background: linear-gradient(180deg, rgba(51, 103, 71, 0) 0%, #336747 35.58%, #012711 100%); }
 html.is-p .b4-title { left: 10px; top: 107px; width: 370px; }
-html.is-p .b4-bubble { left: 12.45px; top: 719.5px; width: 390.1px; height: 186.75px; opacity: .94; }
+html.is-p .b4-bubble { left: 12px; top: 720px; width: 391px; height: 323px; opacity: .94; }
 html.is-p .b4-bubble-d { display: none; }
-html.is-p .b4-bubble-m { display: block; position: absolute; left: -1.75px; top: -2.07px; width: 367px; height: 182px; max-width: none; transform: scaleX(-1); }
-html.is-p .b4-bubble p { left: 27.67px; top: 24.96px; width: 337.53px; font-size: 12.45px; line-height: 17.43px; }
+html.is-p .b4-bubble-m { display: block; position: absolute; left: -1px; top: -3px; width: 367px; height: 332px; max-width: none; transform: scaleX(-1); }
+html.is-p .b4-bubble p { left: 23px; top: 35px; width: 326px; font-size: 12.45px; line-height: 17.43px; }
+html.is-p .b4-btn { left: 16px; top: 202px; width: 326px; height: 48px; padding: 0 20.75px; font-size: 14px; }
+html.is-p .hd2-pick { display: none; }
+html.is-p .hd2-bookm { display: flex; }
 
 /* 5. Таймер */
 html.is-p .pin { width: 390px; height: 844px; }

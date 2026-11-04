@@ -19,9 +19,9 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104e');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104f');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104e');
+      if (m) add('stylesheet', 'portrait.css?v=20261104f');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -50,10 +50,10 @@
       <span>Вещи ручной работы</span>
     </a>
     <nav class="hd-nav glass-dark ui" style="--d:.1s">
-      <a href="#sets" data-nav>Наборы</a>
-      <a href="#kids" data-nav>Для детей</a>
+      <a href="#sets" data-nav>Выбрать набор</a>
+      <a href="#kids" data-nav>Можно ли детям?</a>
       <a href="#terms" data-nav>Сроки</a>
-      <a href="#book" data-nav>Забронировать набор</a>
+      <a href="#faq" data-nav>Частые вопросы</a>
     </nav>
     <div class="hd-right ui" style="--d:.08s">
       <button class="hd-sound glass-dark js-sound" type="button" aria-label="Музыка играет" aria-pressed="true">
@@ -69,11 +69,12 @@
     </a>
     <div class="hd2-mid">
       <nav class="hd2-nav glass-dark">
-        <a href="#sets" data-nav tabindex="-1">Наборы</a>
-        <a href="#kids" data-nav tabindex="-1">Для детей</a>
+        <a href="#kids" data-nav tabindex="-1">Можно ли детям?</a>
         <a href="#terms" data-nav tabindex="-1">Сроки</a>
+        <a href="#faq" data-nav tabindex="-1">Частые вопросы</a>
       </nav>
-      <a class="hd2-book" href="#book" data-nav tabindex="-1">Забронировать набор</a>
+      <a class="hd2-book hd2-pick" href="#sets" data-nav tabindex="-1">Выбрать набор</a>
+      <a class="hd2-book hd2-bookm" href="#book" data-nav tabindex="-1">Забронировать набор</a>
     </div>
     <div class="hd2-right">
       <button class="hd-sound glass-dark js-sound" type="button" tabindex="-1" aria-label="Музыка играет" aria-pressed="true">
@@ -210,8 +211,9 @@
     <h2 class="h2 b4-title rv" style="--d:.2s">Можно дарить детям:<br>глазки и мелкие детали держатся на безопасном креплении</h2>
     <div class="stickers" data-set="kids"></div>
     <div class="b4-bubble rv noblur" style="--d:.45s" data-d="12">
-      <img class="b4-bubble-d" src="assets/d/b4-bubble.svg" alt="">
-      <img class="b4-bubble-m" src="assets/d/m-kids-bubble.svg" alt="">
+      <img class="b4-bubble-d" src="assets/d/b4-bubble.svg?v=2" alt="">
+      <img class="b4-bubble-m" src="assets/d/m-kids-bubble.svg?v=2" alt="">
+      <button class="btn btn-red b4-btn" type="button" data-set-pick="M">Посмотреть набор M</button>
       <p>Пряжа гипоаллергенная: [какой хлопок и акрил, производитель].<br>Мелкие детали [пришиты или на безопасных замках], их не оторвать руками.<br>Подходит детям с [возраст].<br>Стирка: [ручная, 30°, как сушить].</p>
     </div>
   </div></section>
@@ -367,12 +369,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104e', function () {
+        load('texts.js?v=20261104f', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104e');
-          load('data.js?v=20261104e', function () { load('desktop.js?v=20261104e'); });
+          load('analytics.js?v=20261104f');
+          load('data.js?v=20261104f', function () { load('desktop.js?v=20261104f'); });
         });
       });
     })();
