@@ -183,10 +183,10 @@ html.is-p .b8-cta .round img { width: 24px; height: 24px; }
 /* 9. Частые вопросы */
 html.is-p #faq { background: linear-gradient(180deg, #002510 0%, #346949 49.52%, #002510 100%); }
 html.is-p .b9-title { width: 390px; top: 56px; }
-html.is-p .faq-list { left: 10px; top: 126px; width: 370px; gap: 3px; }
+html.is-p .faq-list { position: static; width: 370px; gap: 3px; margin-bottom: 8px; }   /* внутри .faq-side, между ответом и «Не нашли ответ?» */
 html.is-p .faq-list button { min-height: 36px; padding: 10px 14px; gap: 10px; font-size: 12.5px; line-height: 15.63px; }
 html.is-p .faq-list button::before { width: 6px; height: 6px; }
-html.is-p .faq-side { left: 10px; top: 576px; width: 370px; gap: 16px; }
+html.is-p .faq-side { left: 10px; top: 126px; width: 370px; gap: 16px; }
 html.is-p .faq-card { min-height: 134px; padding: 18px 20px; gap: 10px; border-radius: 22px; border-width: 2px; background: #ebe0c8; border-color: #fff5e0; }
 html.is-p .faq-q { font-size: 16px; line-height: 20.8px; }
 html.is-p .faq-a { font-size: 13.5px; line-height: 19.58px; }

@@ -837,6 +837,21 @@
     faqList.appendChild(b);
   });
   showFaq(0);
+  if (PORTRAIT) {
+    // мобильный макет: карточка ответа над списком вопросов, «Не нашли ответ?» внизу
+    $('.faq-side').insertBefore(faqList, $('.faq-more'));
+    // высота карточки — по самому длинному ответу, чтобы список не прыгал под пальцем при переключении
+    const fitFaqCard = () => {
+      const cur = $$('button', faqList).findIndex(b => b.getAttribute('aria-selected') === 'true');
+      faqCard.style.minHeight = '';
+      let h = 0;
+      FAQ.forEach(([q, a]) => { $('#faq-q').textContent = q; $('#faq-a').textContent = a; h = Math.max(h, faqCard.offsetHeight); });
+      faqCard.style.minHeight = `${h}px`;
+      $('#faq-q').textContent = FAQ[Math.max(0, cur)][0]; $('#faq-a').textContent = FAQ[Math.max(0, cur)][1];
+    };
+    fitFaqCard();
+    if (document.fonts) document.fonts.ready.then(fitFaqCard);
+  }
   // окно выбора мессенджера
   const pickEl = $('#pick');
   let pickText = '';
@@ -1821,6 +1836,7 @@
     put(b3text, 'opacity', String(fmt(1 - clamp((view - tStart) / Math.max(1, (FL.vC - tStart) * .55)))));
     const stick = `translateY(${fmt(Math.max(0, CUT - (time.top - (st.stage === 3 ? FL.vA : view))))}px)`;
     b3sticky.forEach(n => put(n, 'transform', stick));
+    put(b3text, 'transform', stick);   // текст стоит на экране, пока не погаснет
     titleReveal();
     const rawCard = st.stage === 0 ? 0 : st.stage === 1 ? (st.u < .5 ? 0 : st.u < 1.5 ? 1 : 2) : 2;
     // далеко от карточек (переход по меню, быстрый пролёт) — карточка по положению; рядом — по одной за движение
