@@ -650,3 +650,6 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 /* Плавность прокрутки: всё, что двигается или гаснет от скролла, — в отдельных слоях видеокарты,
    чтобы при каждом кадре не перерисовывалась вся сцена */
 #b3-card, #b3-textwrap, #b3-video, #b3-vshade, .jn { will-change: transform, opacity; }
+
+/* стикер на стыке подпрыгивает только на первом экране */
+.is-done .jn.still .jn-b { animation: none; }
