@@ -19,17 +19,17 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104d');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104e');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104d');
+      if (m) add('stylesheet', 'portrait.css?v=20261104e');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
   </script>
   <style>html { background: #002510; }
-    /* телефон: до первой раскладки ничего не показываем (стили и скрипты грузятся позже разметки) */
+    /* до первой раскладки ничего не показываем (стили и скрипты грузятся позже разметки) */
     /* страховка: через 2,5 с страница показывается в любом случае */
-    html.is-p:not(.flow-ready) body { opacity: 0; animation: bootShow 0s linear 2.5s forwards; }
+    html:not(.flow-ready) body { opacity: 0; animation: bootShow 0s linear 2.5s forwards; }
     @keyframes bootShow { to { opacity: 1; } }</style>
 </head>
 <body>
@@ -367,12 +367,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104d', function () {
+        load('texts.js?v=20261104e', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104d');
-          load('data.js?v=20261104d', function () { load('desktop.js?v=20261104d'); });
+          load('analytics.js?v=20261104e');
+          load('data.js?v=20261104e', function () { load('desktop.js?v=20261104e'); });
         });
       });
     })();
