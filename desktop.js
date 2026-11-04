@@ -1,5 +1,6 @@
 (() => {
   'use strict';
+  if (window.__drinknitStep) window.__drinknitStep('desktop.js начал выполняться');
 
   /* ===== Данные: настройки, наборы, тексты и вопросы — в data.js ===== */
   const { CONFIG, SETS, FAQ, DETAILS, LAYERS, CARDS } = window.DRINKNIT;
@@ -1908,6 +1909,9 @@
     clearTimeout(restT); restT = setTimeout(releaseRest, 2500);
   };
   const start = () => {
+    if (window.__drinknitStep) __drinknitStep('старт');
+    const fail = document.getElementById('boot-fail');
+    if (fail) fail.remove();   // сценарий всё-таки запустился (медленное устройство) — убираем сообщение о сбое
     body.classList.add('intro');
     renderPanel(current);
     addEventListener('resize', resize);
@@ -1953,6 +1957,7 @@
   const introImgs = [$('.closed img'), $('.base', groups.L)];
   // старт — когда готовы подарок и шрифты, но не позже чем через 3,5 с: медленная сеть или зависший
   // запрос шрифтов (бывает в Safari) не должны держать страницу
+  if (window.__drinknitStep) __drinknitStep('desktop.js выполнен, ждём подарок и шрифты');
   let started = false;
   const go = () => { if (started) return; started = true; start(); };
   const wait = ms => new Promise(r => setTimeout(r, ms));

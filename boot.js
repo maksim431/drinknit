@@ -1,5 +1,6 @@
 // Тексты из админки (content.js) → на страницу. Выполняется после content.js и texts.js, до data.js и desktop.js
 (function () {
+  if (window.__drinknitStep) window.__drinknitStep('boot.js');
   try {
     var C = window.DRINKNIT_CONTENT || {};
     if (window.DrinknitTexts) {
