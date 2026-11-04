@@ -1043,14 +1043,17 @@
   // стопор на каждом блоке: если скролл проскакивает экран, страница останавливается на нём.
   // Стопор держит экран 0,3 с, колесо и инерция тачпада в это время не листают дальше,
   // потом прокрутка снова свободная
-  const HOLD_MIN = 300, HOLD_MAX = 300, HOLD_GAP = 180;   // стопор держит экран 0,3 с
+  // стопор держит экран 0,3 с и отпускает только после паузы 0,1 с в прокрутке (микростопер):
+  // инерция тачпада и телефона не перелистывает сразу вторую карточку
+  const HOLD_MIN = 300, HOLD_QUIET = 100;
   let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY, lastDir = 1;
   let lastWheel = 0;
   // палец на экране: пока посетитель тянет страницу, ни стопор, ни доезжание её не двигают —
   // иначе на телефоне страница уезжала из-под пальца (особенно внутри видео-перехода)
   let touching = false;
-  addEventListener('touchstart', () => { touching = true; auto = false; clearTimeout(settleT); }, { passive: true });
-  const touchEnd = e => { if (!e.touches || !e.touches.length) { touching = false; lastY = scrollY; } };
+  let holdTouch = false;   // стопор пойман во время текущего касания — держит карточку, пока палец на экране
+  addEventListener('touchstart', () => { touching = true; auto = false; clearTimeout(settleT); holdUntil = 0; holdTouch = false; }, { passive: true });
+  const touchEnd = e => { if (!e.touches || !e.touches.length) { touching = false; lastY = scrollY; if (holdTouch) holdUntil = Math.max(holdUntil, performance.now() + HOLD_QUIET); } };
   addEventListener('touchend', touchEnd, { passive: true });
   addEventListener('touchcancel', touchEnd, { passive: true });
   addEventListener('wheel', e => {
@@ -1059,7 +1062,7 @@
     auto = false;                // посетитель крутит колесо — доезжание и переход по меню отменяются
     if (now < holdUntil && !e.ctrlKey) {
       e.preventDefault();
-      holdUntil = Math.min(holdStart + HOLD_MAX, Math.max(holdUntil, now + HOLD_GAP));
+      holdUntil = Math.max(holdUntil, now + HOLD_QUIET);
     }
   }, { passive: false });
   // у высокого блока (участок спуска) два края: верх — toY(k), низ — после спуска. Сверху страница встаёт на верх,
@@ -1075,7 +1078,7 @@
     if (!auto && !touching && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
-        if (Math.abs(scrollY - holdY) > VH() * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; }
+        if (Math.abs(scrollY - holdY) > VH() * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; holdUntil = Math.max(holdUntil, now + HOLD_QUIET); }
       } else {
         // первый экран, который скролл проскочил за это событие
         // допуск 0,01 экрана: позиция прокрутки округляется до пикселей, и экран может оказаться чуть дальше целого —
@@ -1563,18 +1566,21 @@
     flowLast = -1;
   }
   // прилипание только у карточек: на каждой карточке стопор, между ними — доезжание в сторону свайпа
+  // участок карточек блока 3 (между первой и последней остановкой) — только там стопор ловит и под пальцем
+  const inCards = (a, b) => { const lo = Math.min(a, b), hi = Math.max(a, b); return hi >= Math.round(FL.vC * s) - 2 && lo <= Math.round((FL.vC + 2 * FL.D) * s) + 2; };
   function flowScroll() {
     const now = performance.now(), y = scrollY, y0 = lastY;
     if (y !== y0) lastDir = Math.sign(y - y0);
     lastY = y;
     const stops = [FL.vC, FL.vC + FL.D, FL.vC + 2 * FL.D].map(v => Math.round(v * s));
-    if (!auto && !touching && !html.classList.contains('is-locked') && modal.hidden) {
-      if (now < holdUntil) {
-        if (Math.abs(y - holdY) > 2) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; }
+    if (!auto && (!touching || holdTouch || inCards(y0, y)) && !html.classList.contains('is-locked') && modal.hidden) {
+      if (now < holdUntil || (touching && holdTouch)) {
+        // держим карточку: инерция и палец не листают дальше, пока прокрутка не затихнет на 0,1 с
+        if (Math.abs(y - holdY) > 2) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; holdUntil = Math.max(holdUntil, now + HOLD_QUIET); }
       } else {
         const cross = y > y0 ? stops.find(v => v > y0 + 1 && v <= y + 1) : [...stops].reverse().find(v => v < y0 - 1 && v >= y - 1);
         if (cross !== undefined && Math.abs(y - y0) < VH() * .6) {
-          holdStart = now; holdUntil = now + HOLD_MIN; holdY = cross;
+          holdStart = now; holdUntil = now + HOLD_MIN; holdY = cross; holdTouch = touching;
           scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY;
         }
       }
