@@ -640,7 +640,6 @@
       from.style.webkitMaskImage = from.style.maskImage = '';
       from.style.zIndex = to.style.zIndex = '';
       busy = false;
-      litIdx = -1;
       ITEMS[key].forEach((it, i) => setTimeout(() => sparkleEdge(it, 14), i * 90));
     };
     requestAnimationFrame(step);
