@@ -964,6 +964,7 @@
   // за одно движение колеса пролистывается на 36 % меньше кадров, чем у обычного блока (два раза по 20 %)
   // На телефоне блоки «Сроки» и финальный выше экрана: на них прокрутка не переключает сцену, а спускает экран
   // по блоку (участки hold, P стоит на месте). Длина участка = высота спуска, палец и блок двигаются вместе
+  const CARD_LEN = .2;
   const V_START = 5, V_SLOW = 1.875;   // ещё на 20 % медленнее: 1,5 / 0,8
   // длина спуска в экранах: высота спуска делится на видимую высоту кадра — палец и блок двигаются вместе
   const SEGS = [];
@@ -971,6 +972,8 @@
   const buildSegs = () => {
     const vis = FH - 2 * CUT;
     SEGS.length = 0;
+    // карточки блока 3 (P 3 → 4 → 5): на одну карточку — 0,2 экрана прокрутки вместо целого
+    SEGS.push({ p: 3, len: CARD_LEN, span: 1 }, { p: 4, len: CARD_LEN, span: 1 });
     if (L.b3pan2) SEGS.push({ p: V_START, len: L.b3pan2 / vis, span: 0 });   // спуск к домику перед видео
     SEGS.push({ p: V_START, len: V_SLOW, span: 1 });
     if (L.kidsPan) SEGS.push({ p: 6, len: L.kidsPan / vis, span: 0 });
@@ -1045,7 +1048,8 @@
   // потом прокрутка снова свободная
   // стопор держит экран 0,3 с и отпускает только после паузы 0,1 с в прокрутке (микростопер):
   // инерция тачпада и телефона не перелистывает сразу вторую карточку
-  const HOLD_MIN = 300, HOLD_QUIET = 100;
+  const HOLD_MIN = 300, HOLD_MAX = 300, HOLD_GAP = 180, HOLD_QUIET = 100;
+  const cardStop = k => k >= 3 && k <= 5;   // остановки карточек блока 3 (десктоп)
   let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY, lastDir = 1;
   let lastWheel = 0;
   // палец на экране: пока посетитель тянет страницу, ни стопор, ни доезжание её не двигают —
@@ -1062,7 +1066,8 @@
     auto = false;                // посетитель крутит колесо — доезжание и переход по меню отменяются
     if (now < holdUntil && !e.ctrlKey) {
       e.preventDefault();
-      holdUntil = Math.max(holdUntil, now + HOLD_QUIET);
+      holdUntil = FLOW || cardStop(holdStop) ? Math.max(holdUntil, now + HOLD_QUIET)
+        : Math.min(holdStart + HOLD_MAX, Math.max(holdUntil, now + HOLD_GAP));
     }
   }, { passive: false });
   // у высокого блока (участок спуска) два края: верх — toY(k), низ — после спуска. Сверху страница встаёт на верх,
@@ -1072,13 +1077,13 @@
   let holdY = 0;
   addEventListener('scroll', () => {
     if (FLOW) { flowScroll(); return; }
-    const P = toP(scrollY), P0 = toP(lastY), now = performance.now();
+    const yPrev = lastY, P = toP(scrollY), P0 = toP(lastY), now = performance.now();
     if (scrollY !== lastY) lastDir = Math.sign(scrollY - lastY);
     lastY = scrollY;
     if (!auto && !touching && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
-        if (Math.abs(scrollY - holdY) > VH() * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; holdUntil = Math.max(holdUntil, now + HOLD_QUIET); }
+        if (Math.abs(scrollY - holdY) > VH() * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; if (cardStop(holdStop)) holdUntil = Math.max(holdUntil, now + HOLD_QUIET); }
       } else {
         // первый экран, который скролл проскочил за это событие
         // допуск 0,01 экрана: позиция прокрутки округляется до пикселей, и экран может оказаться чуть дальше целого —
@@ -1087,7 +1092,7 @@
         const k = P > P0 ? Math.floor(P0 + EPS) + 1 : Math.ceil(P0 - EPS) - 1;
         const crossed = P > P0 ? P >= k - EPS : P <= k + EPS;   // дошёл до экрана или проскочил его
         // большой скачок за одно событие — это полоса прокрутки или End/Home: стопор не мешает
-        if (crossed && k >= 0 && k <= LAST && Math.abs(P - P0) < .5) {
+        if (crossed && k >= 0 && k <= LAST && Math.abs(scrollY - yPrev) < VH() * .5) {
           holdStop = k;
           holdStart = now;
           holdUntil = now + HOLD_MIN;
@@ -1549,7 +1554,8 @@
     FL.vC = time.top + L.b3cardTop + 232 - FH / 2;     // карточка по центру экрана
     FL.vA = time.top + time.H - (FH - CUT);              // низ блока 3 у низа экрана — начало видео
     FL.vB = kids.top - CUT;                            // блок «Для детей» от верха экрана — конец видео
-    FL.D = .45 * VH() / s; FL.CL = 2 * FL.D; FL.VL = V_SLOW * VH() / s;
+    // на одну карточку — 0,09 экрана прокрутки (было 0,45): переворот срабатывает почти сразу
+    FL.D = .09 * VH() / s; FL.CL = 2 * FL.D; FL.VL = V_SLOW * VH() / s;
     const viewMax = FL.docFooter + footer.offsetHeight + 2 * CUT - FH - EXTF;
     $('.track').style.height = `${Math.ceil(fFromView(viewMax) * s + innerHeight)}px`;
     flowLast = -1;
