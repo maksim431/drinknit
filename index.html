@@ -19,9 +19,9 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104b');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104c');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104b');
+      if (m) add('stylesheet', 'portrait.css?v=20261104c');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -281,7 +281,7 @@
         <p class="b8-name">Набор M</p><p class="b8-price"><span data-price="M"></span> ₽</p>
       </div></div>
       <div class="b8-card" data-card="2"><div class="b8-card-in" data-set-pick="L">
-        <div class="stamp-win"><img class="w-bg" src="assets/d/card-bg.webp" alt=""><img class="w-prod" style="width:476.786px;height:356px;top:-15px" src="assets/d/card-L.webp" alt="Набор L"></div>
+        <div class="stamp-win"><img class="w-bg" src="assets/d/card-bg.webp" alt=""><img class="w-prod" style="width:476.786px;height:356px;top:-15px" src="assets/d/card-L.webp?v=2" alt="Набор L"></div>
         <p class="b8-name">Набор L</p><p class="b8-price"><span data-price="L"></span> ₽</p>
       </div></div>
     </div>
@@ -367,12 +367,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104b', function () {
+        load('texts.js?v=20261104c', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104b');
-          load('data.js?v=20261104b', function () { load('desktop.js?v=20261104b'); });
+          load('analytics.js?v=20261104c');
+          load('data.js?v=20261104c', function () { load('desktop.js?v=20261104c'); });
         });
       });
     })();
