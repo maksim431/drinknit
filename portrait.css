@@ -81,10 +81,10 @@ html.is-p .set-tabs button { height: 37.35px; padding: 6.92px 15.9px; font-size:
 html.is-p .set-desc { flex: 1 0 auto; gap: 5.53px; font-size: 13.14px; }
 html.is-p .set-price { font-size: 40.12px; line-height: 40.12px; }
 html.is-p .hint { left: 104px; top: 259px; width: 286px; height: 217px; overflow: hidden; overflow: clip; pointer-events: none !important; }   /* подсказка не перехватывает тапы по открытке */
-html.is-p .hint-bubble { left: 55px; top: 6px; width: 175.27px; height: 75.43px; transform: scaleX(-1); }
+html.is-p .hint-bubble { left: 31px; top: 6px; width: 199px; height: 75px; transform: scaleX(-1); }
 html.is-p .hint-goat { left: 191.65px; top: -41.92px; width: 207.77px; height: 216.85px; }
 html.is-p .hint-goat .stk-r { width: 144.27px !important; height: 167.81px !important; transform: rotate(150.82deg) scaleY(-1) !important; }
-html.is-p .hint-text { left: 72px; top: 20px; width: 144px; font-size: 10px; }
+html.is-p .hint-text { left: 42px; top: 19px; width: 172px; font-size: 12px; }
 /* наборы S и M помещаются между заголовком и панелью, как L (те же числа — SET_K и SET_T в desktop.js) */
 html.is-p .setg[data-set="S"] { transform: translate(.03%, -5.815%) scale(.8179); }
 html.is-p .setg[data-set="M"] { transform: translate(.01%, .124%) scale(.9673); }
@@ -95,7 +95,7 @@ html.is-p .modal-img img { width: 100%; height: 100%; }
 html.is-p .modal-info { flex: none; justify-content: flex-start; gap: 12px; }   /* текст сразу под названием, фото забирает остальную высоту */
 html.is-p .modal-title { font-size: 21px; }
 html.is-p .modal-text { font-size: 15px; line-height: 1.45; }
-html.is-p .modal-note { font-size: 11.5px; }
+html.is-p .modal-note { font-size: 12px; }
 html.is-p .modal-bottom { gap: 12px; margin-top: 12px; }
 html.is-p .modal-close { right: 14px; top: 14px; width: 38px; height: 38px; z-index: 2; }
 html.is-p .modal-close img { width: 40px; height: 40px; }
@@ -200,7 +200,7 @@ html.is-p .ft-col { gap: 8.3px; font-size: 14.53px; line-height: 21.06px; }
 html.is-p .ft-h { font-size: 15.22px; line-height: 19.78px; letter-spacing: .484px; margin-bottom: 4.15px; }
 html.is-p .ft-brand img { width: 138.33px; }
 html.is-p .ft-tag { font-size: 12.45px; }
-html.is-p .ft-small { font-size: 11.07px; line-height: 16.6px; }
+html.is-p .ft-small { font-size: 12px; line-height: 16.6px; }
 html.is-p .ft-bottom { margin-top: 24.9px; padding-top: 16.6px; gap: 6.92px; }
 html.is-p #book .stickers { z-index: 16; }   /* стикеры поверх карточек наборов */
 
