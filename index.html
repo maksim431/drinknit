@@ -10,7 +10,8 @@
   <meta property="og:description" content="Свяжу, упакую и подпишу открытку вашим текстом. До Нового года успею сделать только 10.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- шрифты не блокируют страницу: если Google Fonts отвечает медленно или не отвечает, сайт всё равно запускается -->
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <!-- десктоп и мобильная версия: разные стили и скрипты, переключение по ширине и ориентации окна -->
   <script>
     (function () {
@@ -19,18 +20,28 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104z');
+      // скрипты страницы — сразу и с высоким приоритетом, раньше картинок: на медленной сети страница не ждёт, пока догрузятся фото
+      ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'desktop.js'].forEach(function (f) {
+        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105c'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
+      });
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261105c');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104z');
+      if (m) add('stylesheet', 'portrait.css?v=20261105c');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
   </script>
   <style>html { background: #002510; }
-    /* до первой раскладки ничего не показываем (стили и скрипты грузятся позже разметки) */
-    /* страховка: через 2,5 с страница показывается в любом случае */
-    html:not(.flow-ready) body { opacity: 0; animation: bootShow 0s linear 2.5s forwards; }
-    @keyframes bootShow { to { opacity: 1; } }</style>
+    /* до первой раскладки страница скрыта: неразложенные блоки (вопросы поверх всего) не видны никогда.
+       Если загрузка идёт дольше секунды — на зелёном фоне крутится индикатор */
+    html:not(.flow-ready) body { opacity: 0; }
+    html:not(.flow-ready)::after {
+      content: ''; position: fixed; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
+      border: 3px solid rgba(255, 237, 200, .2); border-top-color: #ffedc8; opacity: 0;
+      animation: bootSpin .9s linear infinite, bootIn .3s ease 1s forwards;
+    }
+    @keyframes bootSpin { to { transform: rotate(360deg); } }
+    @keyframes bootIn { to { opacity: 1; } }</style>
 </head>
 <body>
   <!-- ============ десктопная версия по новому макету ============ -->
@@ -381,18 +392,27 @@
 
   <script>
     (function () {
-      document.body.appendChild(document.getElementById('tpl-desktop').content);
-      var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
-      // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
-      load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104z', function () {
-          var C = window.DRINKNIT_CONTENT || {};
-          window.DrinknitTexts.apply(document.body, C.texts);
-          window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104z');
-          load('data.js?v=20261104z', function () { load('desktop.js?v=20261104z'); });
-        });
+      var tpl = document.getElementById('tpl-desktop').content;
+      // картинки дальних блоков не качаются, пока не запустился сценарий: на медленной сети канал сначала
+      // отдаётся скриптам и первому экрану. Сценарий включает их сразу после старта (пока подарок ждёт нажатия)
+      var later = function () { [].forEach.call(document.querySelectorAll('img[data-src]'), function (im) { im.src = im.getAttribute('data-src'); im.removeAttribute('data-src'); }); };
+      window.__drinknitImgs = later;
+      [].forEach.call(tpl.querySelectorAll('img[src]'), function (im) {
+        if (!im.closest('#hero, #header, #idle-hint')) { im.setAttribute('data-src', im.getAttribute('src')); im.removeAttribute('src'); }
       });
+      document.body.appendChild(tpl);
+      // скрипты грузятся параллельно, а выполняются строго по порядку (async = false):
+      // содержимое из админки → тексты на странице → данные → сценарий страницы.
+      // Если какой-то файл не загрузился, остальные всё равно выполняются — страница не зависает
+      var load = function (src) { var s = document.createElement('script'); s.src = src; s.async = false; s.setAttribute('fetchpriority', 'high'); document.body.appendChild(s); };
+      load('content.js?t=' + Date.now());
+      load('texts.js?v=20261105c');
+      load('boot.js?v=20261105c');
+      load('analytics.js?v=20261105c');
+      load('data.js?v=20261105c');
+      load('desktop.js?v=20261105c');
+      // последняя страховка: если сценарий так и не запустился за 30 с, показываем страницу как есть
+      setTimeout(function () { document.documentElement.classList.add('flow-ready'); later(); }, 30000);
     })();
   </script>
 </body>

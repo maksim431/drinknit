@@ -35,7 +35,15 @@
     (function (m, e, t, r, i, k, a) {
       m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
       m[i].l = 1 * new Date();
-      k = e.createElement(t); a = e.getElementsByTagName(t)[0]; k.async = 1; k.src = r; a.parentNode.insertBefore(k, a);
+      // сам скрипт Метрики грузится после показа первого экрана: на медленной сети он не отнимает канал у страницы.
+      // До этого вызовы ym копятся в очереди и отправляются, когда скрипт загрузится
+      const add = () => { k = e.createElement(t); a = e.getElementsByTagName(t)[0]; k.async = 1; k.src = r; a.parentNode.insertBefore(k, a); };
+      const html = e.documentElement;
+      if (html.classList.contains('flow-ready')) add();
+      else {
+        const mo = new MutationObserver(() => { if (html.classList.contains('flow-ready')) { mo.disconnect(); add(); } });
+        mo.observe(html, { attributes: true, attributeFilter: ['class'] });
+      }
     })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
     window.ym(id, 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
   }

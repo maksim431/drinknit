@@ -1849,7 +1849,11 @@
     sizeFooter();
     requestAnimationFrame(t => { last = t; loop(t); });
     // страница показывается только после первой раскладки, иначе на миг видны все блоки друг на друге
-    requestAnimationFrame(() => requestAnimationFrame(() => html.classList.add('flow-ready')));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      html.classList.add('flow-ready');
+      // картинки остальных блоков начинают грузиться сразу после показа первого экрана
+      if (window.__drinknitImgs) window.__drinknitImgs();
+    }));
     if (reduce) { finish(); return; }
     html.classList.add('is-locked');
     scrollTo(0, 0);
@@ -1881,7 +1885,16 @@
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   const introImgs = [$('.closed img'), $('.base', groups.L)];
-  Promise.all(introImgs.map(img => (img.decode ? img.decode() : Promise.resolve()).catch(() => {})))
-    .then(() => (document.fonts ? document.fonts.ready : null))
-    .then(start, start);
+  // старт — когда готовы подарок и шрифты, но не позже чем через 3,5 с: медленная сеть или зависший
+  // запрос шрифтов (бывает в Safari) не должны держать страницу
+  let started = false;
+  const go = () => { if (started) return; started = true; start(); };
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  // ждём только закрытый подарок (первый экран); набор внутри нужен после нажатия и догружается сам
+  const giftImg = introImgs[0];
+  if (introImgs[1] && introImgs[1].decode) introImgs[1].decode().catch(() => {});
+  (giftImg && giftImg.decode ? giftImg.decode() : Promise.resolve()).catch(() => {})
+    .then(() => (document.fonts ? Promise.race([document.fonts.ready, wait(1500)]) : null))
+    .then(go, go);
+  setTimeout(go, 3500);
 })();
