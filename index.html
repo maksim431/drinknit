@@ -7,6 +7,11 @@
   <meta name="description" content="Новогодние наборы с вязаными игрушками ручной работы. Свяжу, упакую и подпишу открытку вашим текстом. Три набора: 900, 1 700 и 2 400 ₽.">
   <meta name="theme-color" content="#0b3a20">
   <meta property="og:title" content="Drinknit — новогодние наборы с вязаными игрушками">
+  <link rel="icon" href="assets/d/logo.svg" type="image/svg+xml">
+  <!-- узор снега (11 КБ) — сразу: на телефоне слой снега самый большой на первом экране -->
+  <link rel="preload" as="image" href="assets/d/snow-glow.webp" fetchpriority="high">
+  <!-- подарок первого экрана — главный элемент экрана: качается первым и нужного размера -->
+  <link rel="preload" as="image" href="assets/box-closed.webp" imagesrcset="assets/box-closed.h.webp 1024w, assets/box-closed.webp 2048w" imagesizes="(max-aspect-ratio: 1/1) 127vw, 70vw" fetchpriority="high">
   <meta property="og:description" content="Свяжу, упакую и подпишу открытку вашим текстом. До Нового года успею сделать только 10.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,12 +27,12 @@
       // стили страницы блокируют первую отрисовку (blocking=render): без них раскладка «прыгала» (сдвиг макета в PageSpeed)
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; if (rel === 'stylesheet') l.setAttribute('blocking', 'render'); document.head.appendChild(l); };
       // скрипты страницы — сразу и с высоким приоритетом, раньше картинок: на медленной сети страница не ждёт, пока догрузятся фото
-      ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'desktop.js'].forEach(function (f) {
-        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105h'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
+      ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'imgsizes.js', 'desktop.js'].forEach(function (f) {
+        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105k'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
       });
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261105h');
+      add('stylesheet', 'desktop.css?v=20261105k');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261105h');
+      if (m) add('stylesheet', 'portrait.css?v=20261105k');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -114,7 +119,7 @@
     <div class="glow" aria-hidden="true"></div>
     <div class="rays" aria-hidden="true"></div>
     <img class="gift-shadow" src="assets/d/gift-shadow.svg" alt="" aria-hidden="true">
-    <div class="closed"><img src="assets/box-closed.webp" alt=""><button class="gift-hit" id="gift" type="button" aria-label="Открыть подарок"></button></div>
+    <div class="closed"><img src="assets/box-closed.webp" srcset="assets/box-closed.h.webp 1024w, assets/box-closed.webp 2048w" sizes="(max-aspect-ratio: 1/1) 127vw, 70vw" fetchpriority="high" alt=""><button class="gift-hit" id="gift" type="button" aria-label="Открыть подарок"></button></div>
     <div class="gift-hint" aria-hidden="true">
       <img class="gift-hint-bubble" src="assets/d/hint-bubble.svg" alt="">
       <p class="gift-hint-text">Нажми на подарок</p>
@@ -408,11 +413,12 @@
       // Если какой-то файл не загрузился, остальные всё равно выполняются — страница не зависает
       var load = function (src) { var s = document.createElement('script'); s.src = src; s.async = false; s.setAttribute('fetchpriority', 'high'); document.body.appendChild(s); };
       load('content.js?t=' + Date.now());
-      load('texts.js?v=20261105h');
-      load('boot.js?v=20261105h');
-      load('analytics.js?v=20261105h');
-      load('data.js?v=20261105h');
-      load('desktop.js?v=20261105h');
+      load('texts.js?v=20261105k');
+      load('boot.js?v=20261105k');
+      load('analytics.js?v=20261105k');
+      load('data.js?v=20261105k');
+      load('imgsizes.js?v=20261105k');
+      load('desktop.js?v=20261105k');
       // последняя страховка: если сценарий так и не запустился за 30 с, показываем страницу как есть
       setTimeout(function () { document.documentElement.classList.add('flow-ready'); later(); }, 30000);
     })();

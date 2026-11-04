@@ -140,7 +140,7 @@
       el.className = 'stk pop';
       el.style.cssText = `left:${l}px;top:${t}px;width:${w}px;height:${h}px;--d:${(set === 'hero' ? .5 : .55) + i * .09}s`;
       if (d) el.dataset.d = d;
-      el.innerHTML = `<div class="stk-r${shadow ? '' : ' ns'}" style="width:${iw}px;height:${ih}px;transform:${tf}"><i><img src="assets/d/${src}.webp" alt="" style="left:${il}%;top:${it}%;width:${iwp}%;height:${ihp}%"></i></div>`;
+      el.innerHTML = `<div class="stk-r${shadow ? '' : ' ns'}" style="width:${iw}px;height:${ih}px;transform:${tf}"><i><img data-src="assets/d/${src}.webp" alt="" style="left:${il}%;top:${it}%;width:${iwp}%;height:${ihp}%"></i></div>`;
       host.appendChild(el);
     });
   }
@@ -288,6 +288,7 @@
     const px = tx / s, py = ty / s;
     vp.style.setProperty('--s', s);
     html.style.setProperty('--s', s);
+    upgradeImgs();
     vp.style.setProperty('--tx', `${tx}px`);
     vp.style.setProperty('--ty', `${ty}px`);
     vp.style.setProperty('--px', `${px}px`);
@@ -506,13 +507,13 @@
     g.className = 'setg';
     g.dataset.set = key;
     g.hidden = key !== current;
-    g.innerHTML = `<img class="base" src="assets/d/sets/${key}-base.webp" alt="Новогодний набор ${key}" draggable="false">`;
+    g.innerHTML = `<img class="base" data-src="assets/d/sets/${key}-base.webp" alt="Новогодний набор ${key}" draggable="false">`;
     ITEMS[key] = list.map(([id, l, t, w, h], i) => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'it';
       b.style.cssText = `left:${l}%;top:${t}%;width:${w}%;height:${h}%`;
-      b.innerHTML = `<img src="assets/d/sets/${key}-${id}.webp" alt="" draggable="false">`;
+      b.innerHTML = `<img data-src="assets/d/sets/${key}-${id}.webp" alt="" draggable="false">`;
       b.setAttribute('aria-label', `Подробнее: ${DETAILS[id].title.replace(/<br>/g, ' ')}`);
       b.addEventListener('click', e => { if (e.detail === 0) openItem(key, i); }); // клавиатура
       g.appendChild(b);
@@ -1354,6 +1355,47 @@
   };
 
   const fmt = v => Math.round(v * 1000) / 1000;
+  /* ===== Картинки нужного размера и по мере приближения =====
+     У крупных картинок есть половинная копия (.h.webp, tools/make-half.py). Её берём, только если её пикселей хватает
+     на экране с учётом масштаба кадра и плотности пикселей; скрытые картинки (другие наборы, окна) — всегда полные */
+  const HALF = window.DRINKNIT_HALF || {};
+  const pickSrc = (img, src) => {
+    const [path, q] = src.split('?');
+    const ws = HALF[path];
+    if (!ws) return src;
+    const need = img.offsetWidth * s * (devicePixelRatio || 1);
+    if (!need || need > ws[0]) return src;
+    const quarter = ws[1] && need <= ws[1];
+    img.dataset.half = quarter ? ws[1] : ws[0];
+    img.dataset.full = src;
+    return path.replace(/\.webp$/, quarter ? '.q.webp' : '.h.webp') + (q ? '?' + q : '');
+  };
+  // включить картинки внутри root: блок на миг показывается для замера (он ещё за экраном), потом прячется обратно
+  const releaseIn = root => {
+    if (!root) return;
+    const imgs = $$('img[data-src]', root);
+    if (!imgs.length) return;
+    const sec = root.closest ? root.closest('section, footer') : null;
+    const hid = sec && sec.style.display === 'none';
+    if (hid) sec.style.display = '';
+    const srcs = imgs.map(im => pickSrc(im, im.dataset.src));
+    if (hid) sec.style.display = 'none';
+    imgs.forEach((im, i) => { im.removeAttribute('data-src'); im.src = srcs[i]; });
+  };
+  // окно стало больше — половинные копии, которых уже не хватает, меняем на полные
+  function upgradeImgs() {
+    $$('img[data-half]').forEach(im => {
+      if (im.offsetWidth * s * (devicePixelRatio || 1) > +im.dataset.half) { im.src = im.dataset.full; im.removeAttribute('data-half'); }
+    });
+  }
+  // после открытия подарка остальной сайт догружается в фоне по блокам сверху вниз
+  let restT = 0;
+  const releaseRest = () => {
+    const next = $$('section, footer').find(n => n.querySelector('img[data-src]'));
+    if (!next) { releaseIn(document.body); return; }
+    releaseIn(next);
+    restT = setTimeout(releaseRest, 350);
+  };
   const preDecode = el => $$('img', el).forEach(i => { if (i.decode) i.decode().catch(() => {}); });
   // запись в стиль только если значение изменилось: без лишних пересчётов страницы
   const put = (n, prop, v) => {
@@ -1478,7 +1520,7 @@
     // остальные сцены
     SCENES.forEach(sc => {
       const e = clamp(P - (sc.a - 1)), l = clamp(P - sc.b);
-      if (!sc.pre && P > sc.a - 2.2) { sc.pre = true; preDecode(sc.el); }
+      if (!sc.pre && P > sc.a - 2.2) { sc.pre = true; releaseIn(sc.el); if (sc.id === 'faq') releaseIn(footer); preDecode(sc.el); }
       const visible = e > 0 && (['cover', 'split', 'clip', 'video'].includes(sc.leave) ? l < 1 : l < .6);
       // невидимые сцены убираются из отрисовки целиком
       put(sc.el, 'display', visible ? '' : 'none');
@@ -1691,7 +1733,7 @@
     // открытая коробка на первом экране — отдельная картинка: набор на экране наборов едет со своим блоком
     heroBox = document.createElement('div');
     heroBox.className = 'hero-box';
-    heroBox.innerHTML = '<div class="prod-inner"><img src="assets/d/sets/L-base.webp" alt="" draggable="false"></div>';
+    heroBox.innerHTML = '<div class="prod-inner"><img data-src="assets/d/sets/L-base.webp" alt="" draggable="false"></div>';
     $('#hero .fr').insertBefore(heroBox, $('#hero .hero-fade'));
     // набор — внутри блока наборов: едет вместе с ним, окно предмета открывается поверх
     $('#sets .fr').appendChild(product);
@@ -1743,7 +1785,7 @@
       put(o.el, 'transform', `translateY(${fmt(tY)}px)`);
       put(o.el, 'display', vis ? '' : 'none');
       // картинки блока распаковываются заранее, за полтора экрана: при появлении прокрутка не дёргается
-      if (!o.pre && tY + o.r0 < scrBot + FH * 1.5) { o.pre = true; preDecode(o.el); }
+      if (!o.pre && tY + o.r0 < scrBot + FH * 1.5) { o.pre = true; releaseIn(o.el); if (o.id === 'faq') releaseIn(footer); preDecode(o.el); }
       if (FLOW_GOALS[o.id] && tY + o.r0 < FH / 2) track(FLOW_GOALS[o.id], null, true);
     });
     if (st.stage === 4) track('video_done', null, true);
@@ -1840,6 +1882,7 @@
     html.classList.remove('is-locked');
     twinkleOn = true;
     setTimeout(() => body.classList.remove('intro'), 50);
+    clearTimeout(restT); restT = setTimeout(releaseRest, 2500);
   };
   const start = () => {
     body.classList.add('intro');
@@ -1851,8 +1894,8 @@
     // страница показывается только после первой раскладки, иначе на миг видны все блоки друг на друге
     requestAnimationFrame(() => requestAnimationFrame(() => {
       html.classList.add('flow-ready');
-      // картинки остальных блоков начинают грузиться сразу после показа первого экрана
-      if (window.__drinknitImgs) window.__drinknitImgs();
+      // картинки первого экрана, набора и блока наборов — сразу после показа; остальные — по мере приближения
+      ['#header', '#hero', '#product', '#sets', '#idle-hint', '#jn'].forEach(sel => releaseIn($(sel)));
     }));
     if (reduce) { finish(); return; }
     html.classList.add('is-locked');
