@@ -1074,6 +1074,8 @@
   // стопор держит экран 0,3 с и отпускает только после паузы 0,1 с в прокрутке (микростопер):
   // инерция тачпада и телефона не перелистывает сразу вторую карточку
   const HOLD_MIN = 300, HOLD_MAX = 300, HOLD_GAP = 180, HOLD_QUIET = 100;
+  // десктоп, карточки блока 3: следующую карточку можно листать уже через 30 мс паузы в прокрутке
+  const CARD_QUIET = FLOW ? HOLD_QUIET : 30, CARD_MIN = FLOW ? HOLD_MIN : 30;
   const cardStop = k => k >= 3 && k <= 5;   // остановки карточек блока 3 (десктоп)
   // остановки карточек в пикселях прокрутки: сравнение с допуском 1–2 px, как на телефоне
   // (в долях экрана полпикселя расхождения на экранах с дробной высотой давали лишний переворот и рывки назад)
@@ -1114,14 +1116,14 @@
     const now = performance.now();
     // паузу считаем по времени самих событий: если браузер подтормозил и отдал их пачкой, это всё ещё одно движение
     const ts = e.timeStamp || now;
-    if (ts - lastWheelTs > HOLD_QUIET) gestId++;
+    if (ts - lastWheelTs > CARD_QUIET) gestId++;
     lastWheelTs = ts;
     lastWheel = now;
     auto = false;                // посетитель крутит колесо — доезжание и переход по меню отменяются
     const cardHold = FLOW || cardStop(holdStop);
     const holding = now < holdUntil || (cardHold && holdGest === gestId);
     const extend = () => {
-      holdUntil = cardHold ? Math.max(holdUntil, now + HOLD_QUIET)
+      holdUntil = cardHold ? Math.max(holdUntil, now + CARD_QUIET)
         : Math.min(holdStart + HOLD_MAX, Math.max(holdUntil, now + HOLD_GAP));
     };
     if (e.ctrlKey) return;
@@ -1165,7 +1167,7 @@
     if (!auto && !touching && !html.classList.contains('is-locked') && modal.hidden) {
       if (now < holdUntil) {
         // во время стопора держим экран на месте (клавиши, полоса прокрутки)
-        if (Math.abs(scrollY - holdY) > VH() * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; if (cardStop(holdStop)) holdUntil = Math.max(holdUntil, now + HOLD_QUIET); }
+        if (Math.abs(scrollY - holdY) > VH() * .006) { scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY; if (cardStop(holdStop)) holdUntil = Math.max(holdUntil, now + CARD_QUIET); }
       } else {
         // первый экран, который скролл проскочил за это событие
         // допуск 0,01 экрана: позиция прокрутки округляется до пикселей, и экран может оказаться чуть дальше целого —
@@ -1180,7 +1182,7 @@
           // карточка: стопор ровно на её остановке
           holdStop = 3 + cs.indexOf(crossC);
           holdStart = now; holdGest = gestId; wheelTo = null;
-          holdUntil = now + HOLD_MIN;
+          holdUntil = now + CARD_MIN;
           holdY = crossC;
           arriveCard(cs.indexOf(crossC));
           wheelTo = null;
