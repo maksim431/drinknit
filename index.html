@@ -56,8 +56,6 @@
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-  <!-- узор снега (11 КБ) — сразу: на телефоне слой снега самый большой на первом экране -->
-  <link rel="preload" as="image" href="assets/d/snow-glow.webp" fetchpriority="high">
   <!-- подарок первого экрана — главный элемент экрана: качается первым и нужного размера -->
   <link rel="preload" as="image" href="assets/box-closed.webp" imagesrcset="assets/box-closed.h.webp 1024w, assets/box-closed.webp 2048w" imagesizes="(max-aspect-ratio: 1/1) 127vw, 70vw" fetchpriority="high">
   <meta property="og:description" content="Свяжу, упакую и подпишу открытку вашим текстом. До Нового года успею сделать только 10.">
@@ -76,11 +74,11 @@
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; if (rel === 'stylesheet') l.setAttribute('blocking', 'render'); document.head.appendChild(l); };
       // скрипты страницы — сразу и с высоким приоритетом, раньше картинок: на медленной сети страница не ждёт, пока догрузятся фото
       ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'imgsizes.js', 'desktop.js'].forEach(function (f) {
-        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105o'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
+        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105q'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
       });
-      add('stylesheet', 'desktop.css?v=20261105o');
+      add('stylesheet', 'desktop.css?v=20261105q');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261105o');
+      if (m) add('stylesheet', 'portrait.css?v=20261105q');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -461,13 +459,22 @@
       // содержимое из админки → тексты на странице → данные → сценарий страницы.
       // Если какой-то файл не загрузился, остальные всё равно выполняются — страница не зависает
       var load = function (src) { var s = document.createElement('script'); s.src = src; s.async = false; s.setAttribute('fetchpriority', 'high'); document.body.appendChild(s); };
-      load('content.js?t=' + Date.now());
-      load('texts.js?v=20261105o');
-      load('boot.js?v=20261105o');
-      load('analytics.js?v=20261105o');
-      load('data.js?v=20261105o');
-      load('imgsizes.js?v=20261105o');
-      load('desktop.js?v=20261105o');
+      // сначала браузер рисует подарок первого экрана, потом выполняются скрипты (скачиваются они уже сейчас — preload в head):
+      // так главный элемент экрана появляется, не дожидаясь работы скриптов (LCP в PageSpeed)
+      var run = function () {
+        if (run.done) return; run.done = true;
+        load('content.js?t=' + Date.now());
+        load('texts.js?v=20261105q');
+        load('boot.js?v=20261105q');
+        load('analytics.js?v=20261105q');
+        load('data.js?v=20261105q');
+        load('imgsizes.js?v=20261105q');
+        load('desktop.js?v=20261105q');
+      };
+      var afterPaint = function () { requestAnimationFrame(function () { setTimeout(run, 0); }); };
+      var gift = document.querySelector('.closed img');
+      if (gift && !gift.complete) { gift.addEventListener('load', afterPaint); gift.addEventListener('error', afterPaint); setTimeout(run, 1500); }
+      else afterPaint();
       // последняя страховка: если сценарий так и не запустился за 30 с, показываем страницу как есть
       setTimeout(function () { document.documentElement.classList.add('flow-ready'); later(); }, 30000);
     })();

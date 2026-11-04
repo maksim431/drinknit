@@ -965,9 +965,10 @@
   KICK.forEach(ev => addEventListener(ev, kick, true));
   // пробуем включить сразу при загрузке: браузер разрешит, если посетитель уже бывал на сайте
   // или разрешил звук для него; иначе музыка начнётся с первого клика или нажатия клавиши
-  if (soundOn && setupAudio()) {
-    actx.resume().then(() => { if (actx.state === 'running') unkick(); }).catch(() => {});
-  }
+  // (через 3 с после показа первого экрана — чтобы музыка (1,3 МБ) не качалась вместе со страницей)
+  const tryAutoplay = () => {
+    if (soundOn && setupAudio()) actx.resume().then(() => { if (actx.state === 'running') unkick(); }).catch(() => {});
+  };
   sounds.forEach(btn => btn.addEventListener('click', () => {
     soundOn = !soundOn;
     syncSound();
@@ -1910,6 +1911,7 @@
   };
   const start = () => {
     if (window.__drinknitStep) __drinknitStep('старт');
+    setTimeout(tryAutoplay, 3000);
     const fail = document.getElementById('boot-fail');
     if (fail) fail.remove();   // сценарий всё-таки запустился (медленное устройство) — убираем сообщение о сбое
     body.classList.add('intro');

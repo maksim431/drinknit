@@ -101,12 +101,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .snow-all i {
   /* слой выше экрана на высоту узора; смещение — через transform, не через top: смена масштаба не сдвигает макет (CLS) */
   position: absolute; left: 0; right: 0; top: 0; height: calc(100% + var(--th)); transform: translateY(calc(-1 * var(--th)));
-  background: url(assets/d/snow-glow.webp) 0 0 / calc(1920px * var(--sz)) var(--th) repeat;
+  /* узор снега — белый с прозрачностью, поэтому рисуется маской по белому фону: выглядит так же, но не считается
+     «главным элементом» экрана в PageSpeed (LCP) — им остаётся подарок, который грузится первым */
+  background: #fff;
+  -webkit-mask: url(assets/d/snow-glow.webp) 0 0 / calc(1920px * var(--sz)) var(--th) repeat;
+  mask: url(assets/d/snow-glow.webp) 0 0 / calc(1920px * var(--sz)) var(--th) repeat;
   animation: snowfall var(--dur) linear infinite;
   will-change: transform;
 }
 .snow-all .far { --sz: var(--s, 1); --th: calc(1064px * var(--s, 1)); --dur: 60s; opacity: .9; }
-.snow-all .near { --sz: calc(1.8 * var(--s, 1)); --th: calc(1915px * var(--s, 1)); --dur: 42s; background-position: 37% 0; }
+.snow-all .near { --sz: calc(1.8 * var(--s, 1)); --th: calc(1915px * var(--s, 1)); --dur: 42s; -webkit-mask-position: 37% 0; mask-position: 37% 0; }
 @keyframes snowfall { from { transform: translateY(calc(-1 * var(--th))); } to { transform: translateY(0); } }
 
 /* Шапка */
