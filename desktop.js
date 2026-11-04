@@ -1078,20 +1078,6 @@
   // остановки карточек в пикселях прокрутки: сравнение с допуском 1–2 px, как на телефоне
   // (в долях экрана полпикселя расхождения на экранах с дробной высотой давали лишний переворот и рывки назад)
   const cardYs = () => [3, 4, 5].map(k => Math.round(toY(k)));
-  // блокировка прокрутки на время стопора карточки: инерция тачпада не может сдвинуть страницу,
-  // поэтому нет ни рывков (страница не едет и не возвращается), ни лишнего переворота после жеста
-  let wheelLockT = 0;
-  const unlockWheel = () => {
-    const left = holdUntil - performance.now();
-    if (left > 0) { wheelLockT = setTimeout(unlockWheel, left + 10); return; }
-    html.classList.remove('wheel-lock');
-  };
-  const lockWheel = () => {
-    if (FLOW) return;
-    html.classList.add('wheel-lock');
-    clearTimeout(wheelLockT);
-    wheelLockT = setTimeout(unlockWheel, HOLD_MIN + 10);
-  };
   let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY, lastDir = 1;
   let lastWheel = 0, lastWheelTs = -1e9, holdGest = -1;   // holdGest — движение, в котором сработал стопор
   // палец на экране: пока посетитель тянет страницу, ни стопор, ни доезжание её не двигают —
@@ -1133,12 +1119,39 @@
     lastWheel = now;
     auto = false;                // посетитель крутит колесо — доезжание и переход по меню отменяются
     const cardHold = FLOW || cardStop(holdStop);
-    if (!e.ctrlKey && (now < holdUntil || (cardHold && holdGest === gestId))) {
-      e.preventDefault();
-      holdUntil = FLOW || cardStop(holdStop) ? Math.max(holdUntil, now + HOLD_QUIET)
+    const holding = now < holdUntil || (cardHold && holdGest === gestId);
+    const extend = () => {
+      holdUntil = cardHold ? Math.max(holdUntil, now + HOLD_QUIET)
         : Math.min(holdStart + HOLD_MAX, Math.max(holdUntil, now + HOLD_GAP));
+    };
+    if (e.ctrlKey) return;
+    // десктоп: прокрутку колесом и тачпадом ведёт сам сайт — каждое событие отменяется и превращается в прокрутку.
+    // На стопоре страница просто не двигается: без запрета прокрутки (overflow), из-за которого браузер «привязывал»
+    // жест к непрокручиваемой странице и прокрутка оживала только после движения мыши
+    if (!FLOW && !html.classList.contains('is-locked') && modal.hidden) {
+      e.preventDefault();
+      if (holding) { extend(); wheelTo = null; return; }
+      wheelScroll(e.deltaY * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? innerHeight : 1));
+      return;
     }
+    if (holding) { e.preventDefault(); extend(); }
   }, { passive: false });
+  // прокрутка от колеса: мелкие шаги тачпада — сразу, крупные шаги колеса мыши — плавно, как у браузера
+  let wheelTo = null, wheelRaf = 0;
+  const wheelAnim = () => {
+    wheelRaf = 0;
+    if (wheelTo === null) return;
+    const y = scrollY, d = wheelTo - y;
+    if (Math.abs(d) < 1.5) { scrollTo(0, wheelTo); wheelTo = null; return; }
+    scrollTo(0, y + d * .3);
+    wheelRaf = requestAnimationFrame(wheelAnim);
+  };
+  const wheelScroll = dy => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    if (Math.abs(dy) < 50 && wheelTo === null) { scrollTo(0, clamp(scrollY + dy, 0, max)); return; }
+    wheelTo = clamp((wheelTo === null ? scrollY : wheelTo) + dy, 0, max);
+    if (!wheelRaf) wheelRaf = requestAnimationFrame(wheelAnim);
+  };
   // у высокого блока (участок спуска) два края: верх — toY(k), низ — после спуска. Сверху страница встаёт на верх,
   // снизу — на низ; доезжание выбирает ближайший край
   const holdPx = k => { const g = SEGS.find(g => !g.span && g.p === k); return g ? g.len * VH() : 0; };
@@ -1166,16 +1179,16 @@
         if (crossC !== undefined && Math.abs(y - yPrev) < VH() * .5) {
           // карточка: стопор ровно на её остановке
           holdStop = 3 + cs.indexOf(crossC);
-          holdStart = now; holdGest = gestId;
+          holdStart = now; holdGest = gestId; wheelTo = null;
           holdUntil = now + HOLD_MIN;
           holdY = crossC;
           arriveCard(cs.indexOf(crossC));
-          lockWheel();
+          wheelTo = null;
           scrollTo({ top: holdY, behavior: 'instant' });
           lastY = holdY;
         } else if (crossed && k >= 0 && k <= LAST && !(k >= STOPS.time && k <= 5) && Math.abs(scrollY - yPrev) < VH() * .5) {
           holdStop = k;
-          holdStart = now; holdGest = gestId;
+          holdStart = now; holdGest = gestId; wheelTo = null;
           holdUntil = now + HOLD_MIN;
           holdY = edgeY(k, P < P0);         // прокрутка вверх встаёт на нижний край высокого блока
           scrollTo({ top: holdY, behavior: 'instant' });

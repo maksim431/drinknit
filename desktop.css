@@ -660,6 +660,3 @@ body:not(.is-open):not(.is-done) .hero-box .prod-inner { opacity: 0; transform: 
 /* стикер на стыке подпрыгивает только на первом экране */
 .is-done .jn.still .jn-b { animation: none; }
 
-/* стопор карточек блока 3: на время остановки страница не прокручивается (место под полосу прокрутки сохраняется) */
-html:not(.is-p) { scrollbar-gutter: stable; }
-html.wheel-lock { overflow: hidden; }
