@@ -19,9 +19,9 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104h');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104i');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104h');
+      if (m) add('stylesheet', 'portrait.css?v=20261104i');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -248,7 +248,7 @@
     <div class="b6-topshade" aria-hidden="true"></div>
     <h2 class="h2 b6-title rv" style="--d:.2s">Чтобы набор успел<br>к празднику,<br>напишите до 25.12</h2>
     <div class="b6-shade" aria-hidden="true"></div>
-    <div class="rv" style="--d:.4s"><img class="b6-bubble" src="assets/d/b5-bubble.svg" alt="" data-d="10"><img class="b6-bubble-m" src="assets/d/m-terms-bubble.svg" alt="">
+    <div class="rv" style="--d:.4s"><img class="b6-bubble" src="assets/d/b5-bubble.svg?v=2" alt="" data-d="10"><img class="b6-bubble-m" src="assets/d/m-terms-bubble.svg" alt="">
     <ol class="b6-steps" data-d="10">
       <li>Напишите мне, какой набор хотите и какой текст написать на открытке.</li>
       <li>Я ставлю ваш набор в очередь. Вы вносите 100% предоплату за набор переводом на карту.</li>
@@ -256,7 +256,6 @@
       <li>Получаете набор: самовывоз Нижний Новгород (район ТЦ Фантастика), Яндекс Доставка по городу или отправка по России (СДЭК / Яндекс / Озон / Почта). Доставку оплачиваете отдельно по тарифу службы.</li>
     </ol></div>
     <div class="stickers" data-set="terms"></div>
-    <a class="btn btn-red b6-btn rv" style="--d:.6s" href="#" data-msg="pick" data-d="10">Забронировать набор</a>
   </div></section>
 
   <!-- 7. Обо мне -->
@@ -384,12 +383,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104h', function () {
+        load('texts.js?v=20261104i', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104h');
-          load('data.js?v=20261104h', function () { load('desktop.js?v=20261104h'); });
+          load('analytics.js?v=20261104i');
+          load('data.js?v=20261104i', function () { load('desktop.js?v=20261104i'); });
         });
       });
     })();

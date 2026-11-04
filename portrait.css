@@ -162,7 +162,7 @@ html.is-p .b6-topshade { display: block; position: absolute; left: -47px; top: 0
 html.is-p .b6-title { left: 16.6px; top: 126.4px; width: 300px; }
 html.is-p .b6-bubble { display: none; }
 html.is-p .b6-bubble-m { display: block; position: absolute; left: 10px; top: 655px; width: 370px; height: 391px; max-width: none; z-index: 13; }
-html.is-p .b6-steps { left: 26px; top: 686px; width: 339px; padding-left: 17.98px; gap: 9.68px; font-size: 12.45px; line-height: 16.19px; }
+html.is-p .b6-steps { left: 26px; top: 718px; width: 339px; padding-left: 17.98px; gap: 9.68px; font-size: 12.45px; line-height: 16.19px; }
 html.is-p .b6-btn { left: 28px; top: 935px; width: 333px; }
 
 /* 7. Обо мне */
