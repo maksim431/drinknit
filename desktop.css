@@ -634,7 +634,7 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 
 /* Стикер на стыке первого экрана и наборов: подсказка, что страница листается */
 .jn { position: absolute; left: 1254px; top: 0; width: 290px; height: 313.79px; z-index: 6; pointer-events: none;
-  display: flex; align-items: center; justify-content: center; --hop: -19.2px; }
+  display: flex; align-items: center; justify-content: center; --hop: -25px; }
 .jn-b { opacity: 0; scale: .6; transition: opacity .5s ease .3s, scale .7s cubic-bezier(.34, 1.56, .64, 1) .3s; }
 .is-done .jn-b { opacity: 1; scale: 1; animation: jnHop 1.8s ease-in-out 1.2s infinite; }
 .jn .stk-r { width: 220.82px; height: 257.98px; transform: rotate(18.09deg); }

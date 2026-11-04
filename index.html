@@ -19,9 +19,9 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104m');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104n');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104m');
+      if (m) add('stylesheet', 'portrait.css?v=20261104n');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -385,12 +385,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104m', function () {
+        load('texts.js?v=20261104n', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104m');
-          load('data.js?v=20261104m', function () { load('desktop.js?v=20261104m'); });
+          load('analytics.js?v=20261104n');
+          load('data.js?v=20261104n', function () { load('desktop.js?v=20261104n'); });
         });
       });
     })();

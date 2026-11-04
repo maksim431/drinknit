@@ -236,6 +236,6 @@ html.is-p .tt.tt-on { clip-path: inset(-30% -5% -30% -5%); }
 /* до первой раскладки свободного скролла страница скрыта (виден только фон) */
 
 /* стикер на стыке первого экрана и наборов (мобильный макет) */
-html.is-p .jn { left: 187.51px; width: 151.06px; height: 163.46px; --hop: -10.8px; }
+html.is-p .jn { left: 187.51px; width: 151.06px; height: 163.46px; --hop: -14px; }
 html.is-p .jn .stk-r { width: 115.03px; height: 134.39px; filter: drop-shadow(0 4.9px 2.45px rgba(0, 0, 0, .55)); }
 html.flow-lock .jn { opacity: 0 !important; transition: opacity .2s; }
