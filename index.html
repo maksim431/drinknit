@@ -19,9 +19,9 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104g');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104h');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104g');
+      if (m) add('stylesheet', 'portrait.css?v=20261104h');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -366,9 +366,8 @@
 <!-- выбор мессенджера: открывается кнопками «Написать мне», «Хочу набор», «Забронировать набор», «Задать вопрос» -->
 <div class="pick" id="pick" role="dialog" aria-modal="true" aria-labelledby="pick-title" hidden>
   <div class="pick-card">
-    <button class="pick-close" type="button" aria-label="Закрыть">×</button>
+    <button class="pick-close" type="button" aria-label="Закрыть"><img src="assets/d/ic-close.svg" alt=""></button>
     <p class="pick-title" id="pick-title">Где вам удобнее написать?</p>
-    <p class="pick-sub">Откроется диалог со мной. В Telegram текст сообщения уже будет набран, для ВКонтакте и MAX он скопируется — останется вставить</p>
     <div class="pick-btns">
       <a class="btn btn-red" href="#" data-msg="telegram" data-pick>Telegram</a>
       <a class="btn btn-red" href="#" data-msg="vk" data-pick>ВКонтакте</a>
@@ -385,12 +384,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104g', function () {
+        load('texts.js?v=20261104h', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104g');
-          load('data.js?v=20261104g', function () { load('desktop.js?v=20261104g'); });
+          load('analytics.js?v=20261104h');
+          load('data.js?v=20261104h', function () { load('desktop.js?v=20261104h'); });
         });
       });
     })();
