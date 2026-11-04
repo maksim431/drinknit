@@ -1051,11 +1051,25 @@
   const HOLD_MIN = 300, HOLD_MAX = 300, HOLD_GAP = 180, HOLD_QUIET = 100;
   const cardStop = k => k >= 3 && k <= 5;   // остановки карточек блока 3 (десктоп)
   let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY, lastDir = 1;
-  let lastWheel = 0;
+  let lastWheel = 0, lastWheelTs = -1e9, holdGest = -1;   // holdGest — движение, в котором сработал стопор
   // палец на экране: пока посетитель тянет страницу, ни стопор, ни доезжание её не двигают —
   // иначе на телефоне страница уезжала из-под пальца (особенно внутри видео-перехода)
   let touching = false;
-  let gestId = 0, cardCur = 0, cardGest = -1;   // телефон: за одно движение карточка меняется не больше чем на одну
+  // карточки блока 3 (все версии): за одно движение карточка меняется не больше чем на одну.
+  // Движение — касание, серия колеса/тачпада без паузы 0,1 с, нажатие клавиши или кнопки мыши (полоса прокрутки)
+  let gestId = 0, cardCur = 0, cardGest = -1;
+  addEventListener('keydown', () => { gestId++; });
+  addEventListener('pointerdown', () => { gestId++; }, { passive: true });
+  const nudgeCard = dir => {
+    if (cardGest === gestId || !dir) return;
+    const nc = Math.max(0, Math.min(2, cardCur + dir));
+    if (nc !== cardCur) { cardCur = nc; cardGest = gestId; flipTo(cardCur); }
+  };
+  const stepCard = (rawCard, far) => {
+    if (far || reduce) cardCur = rawCard;
+    else if (rawCard !== cardCur && cardGest !== gestId) { cardCur += Math.sign(rawCard - cardCur); cardGest = gestId; }
+    flipTo(cardCur);
+  };
   let holdTouch = false;   // стопор пойман во время текущего касания — держит карточку, пока палец на экране
   addEventListener('touchstart', () => { touching = true; auto = false; clearTimeout(settleT); holdUntil = 0; holdTouch = false; gestId++; }, { passive: true });
   const touchEnd = e => { if (!e.touches || !e.touches.length) { touching = false; lastY = scrollY; if (holdTouch) holdUntil = Math.max(holdUntil, performance.now() + HOLD_QUIET); } };
@@ -1063,10 +1077,14 @@
   addEventListener('touchcancel', touchEnd, { passive: true });
   addEventListener('wheel', e => {
     const now = performance.now();
-    if (now - lastWheel > 200) gestId++;
+    // паузу считаем по времени самих событий: если браузер подтормозил и отдал их пачкой, это всё ещё одно движение
+    const ts = e.timeStamp || now;
+    if (ts - lastWheelTs > HOLD_QUIET) gestId++;
+    lastWheelTs = ts;
     lastWheel = now;
     auto = false;                // посетитель крутит колесо — доезжание и переход по меню отменяются
-    if (now < holdUntil && !e.ctrlKey) {
+    const cardHold = FLOW || cardStop(holdStop);
+    if (!e.ctrlKey && (now < holdUntil || (cardHold && holdGest === gestId))) {
       e.preventDefault();
       holdUntil = FLOW || cardStop(holdStop) ? Math.max(holdUntil, now + HOLD_QUIET)
         : Math.min(holdStart + HOLD_MAX, Math.max(holdUntil, now + HOLD_GAP));
@@ -1096,7 +1114,7 @@
         // большой скачок за одно событие — это полоса прокрутки или End/Home: стопор не мешает
         if (crossed && k >= 0 && k <= LAST && Math.abs(scrollY - yPrev) < VH() * .5) {
           holdStop = k;
-          holdStart = now;
+          holdStart = now; holdGest = gestId;
           holdUntil = now + HOLD_MIN;
           holdY = edgeY(k, P < P0);         // прокрутка вверх встаёт на нижний край высокого блока
           scrollTo({ top: holdY, behavior: 'instant' });
@@ -1114,9 +1132,11 @@
       // доезжаем до ближайшего экрана в любую сторону, в том числе назад к тому, с которого уходят
       const P = toP(scrollY), target = Math.round(P), d = Math.abs(P - target);
       // карточки блока 3: одно движение — одна карточка, доезжаем до следующей в сторону прокрутки
-      if (P > 3 && P < 5 && d > .003) {
+      if (P > 3 && P < 5 && Math.abs(P - (3 + cardCur)) > .003) nudgeCard(Math.sign(P - (3 + cardCur)));
+      const tc = 3 + cardCur, freeOut = (P >= 5 && cardCur === 2) || (P <= 3 && cardCur === 0);
+      if (P > 2.5 && P < 5.5 && !freeOut && Math.abs(P - tc) > .003) {
         auto = true;
-        scrollTo({ top: toY(lastDir > 0 ? Math.ceil(P) : Math.floor(P)), behavior: reduce ? 'auto' : 'smooth' });
+        scrollTo({ top: toY(tc), behavior: reduce ? 'auto' : 'smooth' });
         return;
       }
       // зона прилипания: у блока с наборами 30 %, у карточек блока 3 — на 30 % больше обычной (20,8 %), у остальных 16 %
@@ -1485,7 +1505,7 @@
     if (L.bookPan) put(bookFr, 'transform', `translateY(${fmt(CUT - L.bookPan * (holdF[10] || 0))}px)`);
 
     // 3 → 4 → 5: блок стоит, карточка переворачивается по вертикали, угол — от скролла
-    flipTo(P < 3.5 ? 0 : P < 4.5 ? 1 : 2);
+    stepCard(P < 3.5 ? 0 : P < 4.5 ? 1 : 2, P < 2.5 || P > 5.5);
 
     // 6 ↔ 7 ↔ 8: жёсткий параллакс — объекты таймера стоят, рамка наезжает снизу и уезжает вверх
     left.style.setProperty('--ct', `${fmt(clamp(7 - P) * 100)}%`);
@@ -1588,7 +1608,7 @@
       } else {
         const cross = y > y0 ? stops.find(v => v > y0 + 1 && v <= y + 1) : [...stops].reverse().find(v => v < y0 - 1 && v >= y - 1);
         if (cross !== undefined && Math.abs(y - y0) < VH() * .6) {
-          holdStart = now; holdUntil = now + HOLD_MIN; holdY = cross; holdTouch = touching;
+          holdStart = now; holdUntil = now + HOLD_MIN; holdY = cross; holdTouch = touching; holdGest = gestId;
           scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY;
         }
       }
@@ -1600,6 +1620,7 @@
       if (touching) { settleT = setTimeout(settle, 200); return; }
       if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
       const yy = scrollY;
+      if (yy > stops[0] && yy < stops[2] && Math.abs(yy - stops[cardCur]) > 2) nudgeCard(Math.sign(yy - stops[cardCur]));
       const tc = stops[cardCur], nearC = yy > stops[0] - VH() * .5 && yy < stops[2] + VH() * .5;
       const freeOut = (yy >= stops[2] && cardCur === 2) || (yy <= stops[0] && cardCur === 0);
       if (nearC && !freeOut && Math.abs(yy - tc) > 2) {
@@ -1714,9 +1735,7 @@
     const rawCard = st.stage === 0 ? 0 : st.stage === 1 ? (st.u < .5 ? 0 : st.u < 1.5 ? 1 : 2) : 2;
     // далеко от карточек (переход по меню, быстрый пролёт) — карточка по положению; рядом — по одной за движение
     const farCards = st.stage === 0 ? f < FL.vC - FH * .5 : st.stage >= 2 && f > FL.vC + FL.CL + FH * .5;
-    if (farCards || reduce) cardCur = rawCard;
-    else if (rawCard !== cardCur && cardGest !== gestId) { cardCur += Math.sign(rawCard - cardCur); cardGest = gestId; }
-    flipTo(cardCur);
+    stepCard(rawCard, farCards);
     if (view > FL.vC - FH) loadFrames();
     // видео-переход: кадры и затемнение стоят на экране, элементы блока 3 гаснут, блок 4 проявляется в конце
     const vOut = clamp(vt / .16);
