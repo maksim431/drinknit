@@ -1,0 +1,34 @@
+# Публикация сайта на GitHub Pages через GitHub Actions.
+# Запускается на каждый коммит в main (в том числе на правки из админки) и вручную (Actions → Deploy site → Run workflow).
+# В Settings → Pages → Build and deployment → Source должно стоять «GitHub Actions».
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# новая публикация отменяет предыдущую, если та ещё идёт
+concurrency:
+  group: site-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
