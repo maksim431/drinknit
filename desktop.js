@@ -1055,13 +1055,15 @@
   // палец на экране: пока посетитель тянет страницу, ни стопор, ни доезжание её не двигают —
   // иначе на телефоне страница уезжала из-под пальца (особенно внутри видео-перехода)
   let touching = false;
+  let gestId = 0, cardCur = 0, cardGest = -1;   // телефон: за одно движение карточка меняется не больше чем на одну
   let holdTouch = false;   // стопор пойман во время текущего касания — держит карточку, пока палец на экране
-  addEventListener('touchstart', () => { touching = true; auto = false; clearTimeout(settleT); holdUntil = 0; holdTouch = false; }, { passive: true });
+  addEventListener('touchstart', () => { touching = true; auto = false; clearTimeout(settleT); holdUntil = 0; holdTouch = false; gestId++; }, { passive: true });
   const touchEnd = e => { if (!e.touches || !e.touches.length) { touching = false; lastY = scrollY; if (holdTouch) holdUntil = Math.max(holdUntil, performance.now() + HOLD_QUIET); } };
   addEventListener('touchend', touchEnd, { passive: true });
   addEventListener('touchcancel', touchEnd, { passive: true });
   addEventListener('wheel', e => {
     const now = performance.now();
+    if (now - lastWheel > 200) gestId++;
     lastWheel = now;
     auto = false;                // посетитель крутит колесо — доезжание и переход по меню отменяются
     if (now < holdUntil && !e.ctrlKey) {
@@ -1598,8 +1600,10 @@
       if (touching) { settleT = setTimeout(settle, 200); return; }
       if (performance.now() - lastWheel < 260) { settleT = setTimeout(settle, 120); return; }
       const yy = scrollY;
-      if (yy > stops[0] + 2 && yy < stops[2] - 2 && !stops.some(v => Math.abs(v - yy) <= 2)) {
-        const t = lastDir > 0 ? stops.find(v => v > yy) : [...stops].reverse().find(v => v < yy);
+      const tc = stops[cardCur], nearC = yy > stops[0] - VH() * .5 && yy < stops[2] + VH() * .5;
+      const freeOut = (yy >= stops[2] && cardCur === 2) || (yy <= stops[0] && cardCur === 0);
+      if (nearC && !freeOut && Math.abs(yy - tc) > 2) {
+        const t = tc;
         auto = true;
         scrollTo({ top: t, behavior: reduce ? 'auto' : 'smooth' });
       }
@@ -1707,7 +1711,12 @@
     const stick = `translateY(${fmt(Math.max(0, CUT - (time.top - (st.stage === 3 ? FL.vA : view))))}px)`;
     b3sticky.forEach(n => put(n, 'transform', stick));
     titleReveal();
-    flipTo(st.stage === 0 ? 0 : st.stage === 1 ? (st.u < .5 ? 0 : st.u < 1.5 ? 1 : 2) : 2);
+    const rawCard = st.stage === 0 ? 0 : st.stage === 1 ? (st.u < .5 ? 0 : st.u < 1.5 ? 1 : 2) : 2;
+    // далеко от карточек (переход по меню, быстрый пролёт) — карточка по положению; рядом — по одной за движение
+    const farCards = st.stage === 0 ? f < FL.vC - FH * .5 : st.stage >= 2 && f > FL.vC + FL.CL + FH * .5;
+    if (farCards || reduce) cardCur = rawCard;
+    else if (rawCard !== cardCur && cardGest !== gestId) { cardCur += Math.sign(rawCard - cardCur); cardGest = gestId; }
+    flipTo(cardCur);
     if (view > FL.vC - FH) loadFrames();
     // видео-переход: кадры и затемнение стоят на экране, элементы блока 3 гаснут, блок 4 проявляется в конце
     const vOut = clamp(vt / .16);
