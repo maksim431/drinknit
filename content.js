@@ -17,7 +17,7 @@ window.DRINKNIT_CONTENT = {
       "max": "",
       "vkGroup": ""
     },
-    "metrikaId": ""
+    "metrikaId": "29294558315068421"
   },
   "sets": {
     "S": {
