@@ -631,3 +631,18 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 
 /* Safari: фильтр тени и 3D-контекст вместе ломают переворот карточки — оставляем плоскую карточку с перспективой у родителя */
 .stamp { transform-style: flat; -webkit-transform-style: flat; will-change: transform; }
+
+/* Стикер на стыке первого экрана и наборов: подсказка, что страница листается */
+.jn { position: absolute; left: 1254px; top: 0; width: 290px; height: 313.79px; z-index: 6; pointer-events: none;
+  display: flex; align-items: center; justify-content: center; --hop: -16px; }
+.jn-b { opacity: 0; scale: .6; transition: opacity .5s ease .3s, scale .7s cubic-bezier(.34, 1.56, .64, 1) .3s; }
+.is-done .jn-b { opacity: 1; scale: 1; animation: jnHop 1.8s ease-in-out 1.2s infinite; }
+.jn .stk-r { width: 220.82px; height: 257.98px; transform: rotate(18.09deg); }
+.jn .stk-r > i > img { left: 0; top: 0; width: 100%; height: 100%; }
+@keyframes jnHop {
+  0%, 46%, 100% { translate: 0 0; }
+  16% { translate: 0 var(--hop); }
+  30% { translate: 0 0; }
+  38% { translate: 0 calc(var(--hop) * .3); }
+}
+@media (prefers-reduced-motion: reduce) { .is-done .jn-b { animation: none; } }

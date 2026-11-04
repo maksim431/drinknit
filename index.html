@@ -19,9 +19,9 @@
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104k');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261104l');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261104k');
+      if (m) add('stylesheet', 'portrait.css?v=20261104l');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -168,6 +168,8 @@
   </div></section>
 
   <!-- Продукт: один слой на два экрана. Едет со скроллом из первого экрана во второй -->
+  <!-- стикер на стыке первого экрана и наборов: снизу первого экрана видна его часть, он подпрыгивает — подсказка, что страница листается -->
+  <div class="jn" id="jn" aria-hidden="true"><div class="jn-b"><div class="stk-r"><i><img src="assets/d/st-goatsong.webp" alt=""></i></div></div></div>
   <div id="product" aria-label="Набор: нажмите на предмет, чтобы узнать подробнее">
     <div class="prod-inner"></div>
   </div>
@@ -383,12 +385,12 @@
       var load = function (src, next) { var s = document.createElement('script'); s.src = src; if (next) s.onload = next; document.body.appendChild(s); };
       // содержимое из админки (content.js) → тексты на странице → данные → сценарий страницы
       load('content.js?t=' + Date.now(), function () {
-        load('texts.js?v=20261104k', function () {
+        load('texts.js?v=20261104l', function () {
           var C = window.DRINKNIT_CONTENT || {};
           window.DrinknitTexts.apply(document.body, C.texts);
           window.DrinknitTexts.applyMeta(C.meta);
-          load('analytics.js?v=20261104k');
-          load('data.js?v=20261104k', function () { load('desktop.js?v=20261104k'); });
+          load('analytics.js?v=20261104l');
+          load('data.js?v=20261104l', function () { load('desktop.js?v=20261104l'); });
         });
       });
     })();
