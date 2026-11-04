@@ -1112,7 +1112,7 @@
         const k = P > P0 ? Math.floor(P0 + EPS) + 1 : Math.ceil(P0 - EPS) - 1;
         const crossed = P > P0 ? P >= k - EPS : P <= k + EPS;   // дошёл до экрана или проскочил его
         // большой скачок за одно событие — это полоса прокрутки или End/Home: стопор не мешает
-        if (crossed && k >= 0 && k <= LAST && Math.abs(scrollY - yPrev) < VH() * .5) {
+        if (crossed && k >= 0 && k <= LAST && k !== STOPS.time && Math.abs(scrollY - yPrev) < VH() * .5) {
           holdStop = k;
           holdStart = now; holdGest = gestId;
           holdUntil = now + HOLD_MIN;
@@ -1141,6 +1141,8 @@
       }
       // зона прилипания: у блока с наборами 30 %, у карточек блока 3 — на 30 % больше обычной (20,8 %), у остальных 16 %
       // внутри видео-перехода (P 5…6) зона узкая: видео прокручивается свободно и не отскакивает к началу
+      // блок 3 (от заголовка до последней карточки) — без прилипания, как на телефоне: держат только остановки карточек
+      if (P >= STOPS.time && P <= 5) return;
       const inVideo = P > V_START && P < V_START + 1;
       const zone = inVideo ? .06 : target === STOPS.sets ? .3 : target >= 3 && target <= 5 ? .208 : .16;
       const y0 = edgeY(target, false), y1 = edgeY(target, true);
