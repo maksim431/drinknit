@@ -19,24 +19,26 @@
       var m = isM();
       window.__drinknitMode = m ? 'm' : 'd';
       document.documentElement.classList.add(m ? 'is-p' : 'is-d');
-      var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; document.head.appendChild(l); };
+      // стили страницы блокируют первую отрисовку (blocking=render): без них раскладка «прыгала» (сдвиг макета в PageSpeed)
+      var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; if (rel === 'stylesheet') l.setAttribute('blocking', 'render'); document.head.appendChild(l); };
       // скрипты страницы — сразу и с высоким приоритетом, раньше картинок: на медленной сети страница не ждёт, пока догрузятся фото
       ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'desktop.js'].forEach(function (f) {
-        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105c'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
+        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105h'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
       });
-      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261105c');
+      add('preload', 'assets/box-closed.webp', 'image'); add('stylesheet', 'desktop.css?v=20261105h');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261105c');
+      if (m) add('stylesheet', 'portrait.css?v=20261105h');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
   </script>
   <style>html { background: #002510; }
-    /* до первой раскладки страница скрыта: неразложенные блоки (вопросы поверх всего) не видны никогда.
-       Если загрузка идёт дольше секунды — на зелёном фоне крутится индикатор */
-    html:not(.flow-ready) body { opacity: 0; }
+    /* до первой раскладки страницу закрывает зелёная заливка: неразложенные блоки (вопросы поверх всего) не видны никогда.
+       Сама страница под заливкой видима (не opacity: 0) — так браузер и PageSpeed засчитывают отрисовку первого экрана (LCP).
+       Если загрузка идёт дольше секунды — на заливке крутится индикатор */
+    html:not(.flow-ready)::before { content: ''; position: fixed; inset: 0; z-index: 2147483646; background: #002510; }
     html:not(.flow-ready)::after {
-      content: ''; position: fixed; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
+      content: ''; position: fixed; z-index: 2147483647; left: 50%; top: 50%; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
       border: 3px solid rgba(255, 237, 200, .2); border-top-color: #ffedc8; opacity: 0;
       animation: bootSpin .9s linear infinite, bootIn .3s ease 1s forwards;
     }
@@ -406,11 +408,11 @@
       // Если какой-то файл не загрузился, остальные всё равно выполняются — страница не зависает
       var load = function (src) { var s = document.createElement('script'); s.src = src; s.async = false; s.setAttribute('fetchpriority', 'high'); document.body.appendChild(s); };
       load('content.js?t=' + Date.now());
-      load('texts.js?v=20261105c');
-      load('boot.js?v=20261105c');
-      load('analytics.js?v=20261105c');
-      load('data.js?v=20261105c');
-      load('desktop.js?v=20261105c');
+      load('texts.js?v=20261105h');
+      load('boot.js?v=20261105h');
+      load('analytics.js?v=20261105h');
+      load('data.js?v=20261105h');
+      load('desktop.js?v=20261105h');
       // последняя страховка: если сценарий так и не запустился за 30 с, показываем страницу как есть
       setTimeout(function () { document.documentElement.classList.add('flow-ready'); later(); }, 30000);
     })();

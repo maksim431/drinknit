@@ -99,14 +99,15 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* Снег: всегда на экране, поверх всех сцен, два слоя */
 .snow-all { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; overflow: clip; }
 .snow-all i {
-  position: absolute; left: 0; right: 0; bottom: 0; top: calc(-1 * var(--th));
+  /* слой выше экрана на высоту узора; смещение — через transform, не через top: смена масштаба не сдвигает макет (CLS) */
+  position: absolute; left: 0; right: 0; top: 0; height: calc(100% + var(--th)); transform: translateY(calc(-1 * var(--th)));
   background: url(assets/d/snow-glow.webp) 0 0 / calc(1920px * var(--sz)) var(--th) repeat;
   animation: snowfall var(--dur) linear infinite;
   will-change: transform;
 }
 .snow-all .far { --sz: var(--s, 1); --th: calc(1064px * var(--s, 1)); --dur: 60s; opacity: .9; }
 .snow-all .near { --sz: calc(1.8 * var(--s, 1)); --th: calc(1915px * var(--s, 1)); --dur: 42s; background-position: 37% 0; }
-@keyframes snowfall { to { transform: translateY(var(--th)); } }
+@keyframes snowfall { from { transform: translateY(calc(-1 * var(--th))); } to { transform: translateY(0); } }
 
 /* Шапка */
 #header { position: absolute; left: 0; top: 0; z-index: 100; width: 1920px; pointer-events: none; }
@@ -519,13 +520,14 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
   100% { transform: translateY(-60px) scale(1.18); filter: brightness(3.5) blur(14px); opacity: 0; }
 }
 /* открытая коробка вылетает из закрытой */
-.intro #product .prod-inner { opacity: 0; transform: translateY(70px) scale(.78); filter: brightness(1.9) saturate(.6); }
+body:not(.is-open):not(.is-done) #product .prod-inner { opacity: 0; transform: translateY(70px) scale(.78); filter: brightness(1.9) saturate(.6); }
 .intro.is-open #product .prod-inner {
   opacity: 1; transform: none; filter: none;
   transition: opacity .35s ease, transform 1.25s cubic-bezier(.34, 1.45, .5, 1), filter 1.4s ease;
 }
 /* лучи, эллипс и интерфейс появляются после вспышки */
-.intro:not(.is-frame) .hero-ray, .intro:not(.is-frame) .hero-ellipse { opacity: 0 !important; }
+/* лучи и эллипс скрыты с самой первой отрисовки и до открытия подарка (иначе PageSpeed считал их «главным элементом» экрана) */
+body:not(.is-frame):not(.is-done) .hero-ray, body:not(.is-frame):not(.is-done) .hero-ellipse { opacity: 0 !important; }
 .intro.is-frame .hero-ray, .intro.is-frame .hero-ellipse { opacity: 1; transition: opacity 1.2s ease; }
 .ui { opacity: 0; transform: translateY(26px); filter: blur(8px); }
 .is-ui .ui {
@@ -603,7 +605,7 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 @media (prefers-reduced-motion: reduce) { .idle-hint .ch { animation: none; } .idle-hint .ch2 { opacity: 1; } }
 /* только для телефона */
 .hero-box, .b3-topshade, .b6-bg-m, .b6-topshade, .b3-l01m { display: none; }
-.intro .hero-box .prod-inner { opacity: 0; transform: translateY(70px) scale(.78); filter: brightness(1.9) saturate(.6); }
+body:not(.is-open):not(.is-done) .hero-box .prod-inner { opacity: 0; transform: translateY(70px) scale(.78); filter: brightness(1.9) saturate(.6); }
 .intro.is-open .hero-box .prod-inner {
   opacity: 1; transform: none; filter: none;
   transition: opacity .35s ease, transform 1.25s cubic-bezier(.34, 1.45, .5, 1), filter 1.4s ease;
