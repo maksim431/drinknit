@@ -1050,6 +1050,23 @@
   // инерция тачпада и телефона не перелистывает сразу вторую карточку
   const HOLD_MIN = 300, HOLD_MAX = 300, HOLD_GAP = 180, HOLD_QUIET = 100;
   const cardStop = k => k >= 3 && k <= 5;   // остановки карточек блока 3 (десктоп)
+  // остановки карточек в пикселях прокрутки: сравнение с допуском 1–2 px, как на телефоне
+  // (в долях экрана полпикселя расхождения на экранах с дробной высотой давали лишний переворот и рывки назад)
+  const cardYs = () => [3, 4, 5].map(k => Math.round(toY(k)));
+  // блокировка прокрутки на время стопора карточки: инерция тачпада не может сдвинуть страницу,
+  // поэтому нет ни рывков (страница не едет и не возвращается), ни лишнего переворота после жеста
+  let wheelLockT = 0;
+  const unlockWheel = () => {
+    const left = holdUntil - performance.now();
+    if (left > 0) { wheelLockT = setTimeout(unlockWheel, left + 10); return; }
+    html.classList.remove('wheel-lock');
+  };
+  const lockWheel = () => {
+    if (FLOW) return;
+    html.classList.add('wheel-lock');
+    clearTimeout(wheelLockT);
+    wheelLockT = setTimeout(unlockWheel, HOLD_MIN + 10);
+  };
   let settleT = 0, holdUntil = 0, holdStart = 0, holdStop = 0, lastY = scrollY, lastDir = 1;
   let lastWheel = 0, lastWheelTs = -1e9, holdGest = -1;   // holdGest — движение, в котором сработал стопор
   // палец на экране: пока посетитель тянет страницу, ни стопор, ни доезжание её не двигают —
@@ -1064,6 +1081,13 @@
     if (cardGest === gestId || !dir) return;
     const nc = Math.max(0, Math.min(2, cardCur + dir));
     if (nc !== cardCur) { cardCur = nc; cardGest = gestId; flipTo(cardCur); }
+  };
+  // стопор поймал остановку карточки idx: если это движение ещё не листало — карточка встаёт на эту остановку
+  // (не дальше одной), если уже листало или это та же карточка — движение больше ничего не переворачивает
+  const arriveCard = idx => {
+    if (cardGest !== gestId && idx !== cardCur) cardCur += Math.sign(idx - cardCur);
+    cardGest = gestId;
+    flipTo(cardCur);
   };
   const stepCard = (rawCard, far) => {
     if (far || reduce) cardCur = rawCard;
@@ -1108,11 +1132,23 @@
         // первый экран, который скролл проскочил за это событие
         // допуск 0,01 экрана: позиция прокрутки округляется до пикселей, и экран может оказаться чуть дальше целого —
         // без допуска стопор снова ловил тот же экран и не отпускал прокрутку
+        const cs = cardYs(), y = scrollY;
+        const crossC = y > yPrev ? cs.find(v => v > yPrev + 1 && v <= y + 1) : [...cs].reverse().find(v => v < yPrev - 1 && v >= y - 1);
         const EPS = .01;
         const k = P > P0 ? Math.floor(P0 + EPS) + 1 : Math.ceil(P0 - EPS) - 1;
         const crossed = P > P0 ? P >= k - EPS : P <= k + EPS;   // дошёл до экрана или проскочил его
         // большой скачок за одно событие — это полоса прокрутки или End/Home: стопор не мешает
-        if (crossed && k >= 0 && k <= LAST && k !== STOPS.time && Math.abs(scrollY - yPrev) < VH() * .5) {
+        if (crossC !== undefined && Math.abs(y - yPrev) < VH() * .5) {
+          // карточка: стопор ровно на её остановке
+          holdStop = 3 + cs.indexOf(crossC);
+          holdStart = now; holdGest = gestId;
+          holdUntil = now + HOLD_MIN;
+          holdY = crossC;
+          arriveCard(cs.indexOf(crossC));
+          lockWheel();
+          scrollTo({ top: holdY, behavior: 'instant' });
+          lastY = holdY;
+        } else if (crossed && k >= 0 && k <= LAST && !(k >= STOPS.time && k <= 5) && Math.abs(scrollY - yPrev) < VH() * .5) {
           holdStop = k;
           holdStart = now; holdGest = gestId;
           holdUntil = now + HOLD_MIN;
@@ -1132,11 +1168,14 @@
       // доезжаем до ближайшего экрана в любую сторону, в том числе назад к тому, с которого уходят
       const P = toP(scrollY), target = Math.round(P), d = Math.abs(P - target);
       // карточки блока 3: одно движение — одна карточка, доезжаем до следующей в сторону прокрутки
-      if (P > 3 && P < 5 && Math.abs(P - (3 + cardCur)) > .003) nudgeCard(Math.sign(P - (3 + cardCur)));
-      const tc = 3 + cardCur, freeOut = (P >= 5 && cardCur === 2) || (P <= 3 && cardCur === 0);
-      if (P > 2.5 && P < 5.5 && !freeOut && Math.abs(P - tc) > .003) {
+      // карточки — та же логика, что на телефоне, в пикселях
+      const cs = cardYs(), yy = scrollY;
+      if (yy > cs[0] && yy < cs[2] && Math.abs(yy - cs[cardCur]) > 2) nudgeCard(Math.sign(yy - cs[cardCur]));
+      const tc = cs[cardCur], nearC = yy > cs[0] - VH() * .5 && yy < cs[2] + VH() * .5;
+      const freeOut = (yy >= cs[2] && cardCur === 2) || (yy <= cs[0] && cardCur === 0);
+      if (nearC && !freeOut && Math.abs(yy - tc) > 2) {
         auto = true;
-        scrollTo({ top: toY(tc), behavior: reduce ? 'auto' : 'smooth' });
+        scrollTo({ top: tc, behavior: reduce ? 'auto' : 'smooth' });
         return;
       }
       // зона прилипания: у блока с наборами 30 %, у карточек блока 3 — на 30 % больше обычной (20,8 %), у остальных 16 %
@@ -1610,7 +1649,7 @@
       } else {
         const cross = y > y0 ? stops.find(v => v > y0 + 1 && v <= y + 1) : [...stops].reverse().find(v => v < y0 - 1 && v >= y - 1);
         if (cross !== undefined && Math.abs(y - y0) < VH() * .6) {
-          holdStart = now; holdUntil = now + HOLD_MIN; holdY = cross; holdTouch = touching; holdGest = gestId;
+          holdStart = now; holdUntil = now + HOLD_MIN; holdY = cross; holdTouch = touching; holdGest = gestId; arriveCard(stops.indexOf(cross));
           scrollTo({ top: holdY, behavior: 'instant' }); lastY = holdY;
         }
       }

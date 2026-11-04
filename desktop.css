@@ -653,3 +653,7 @@ body:not(.is-ui) .hero-content { pointer-events: none; }   /* пока пода�
 
 /* стикер на стыке подпрыгивает только на первом экране */
 .is-done .jn.still .jn-b { animation: none; }
+
+/* стопор карточек блока 3: на время остановки страница не прокручивается (место под полосу прокрутки сохраняется) */
+html:not(.is-p) { scrollbar-gutter: stable; }
+html.wheel-lock { overflow: hidden; }
