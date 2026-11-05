@@ -74,11 +74,11 @@
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; if (rel === 'stylesheet') l.setAttribute('blocking', 'render'); document.head.appendChild(l); };
       // скрипты страницы — сразу и с высоким приоритетом, раньше картинок: на медленной сети страница не ждёт, пока догрузятся фото
       ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'imgsizes.js', 'desktop.js'].forEach(function (f) {
-        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105s'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
+        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105t'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
       });
-      add('stylesheet', 'desktop.css?v=20261105s');
+      add('stylesheet', 'desktop.css?v=20261105t');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261105s');
+      if (m) add('stylesheet', 'portrait.css?v=20261105t');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -101,8 +101,8 @@
   <template id="tpl-desktop">
 
 
-<!-- подсказка «листайте дальше»: появляется, если посетитель не прокручивает страницу больше 4 секунд -->
-<div class="idle-hint" id="idle-hint" aria-hidden="true"><svg viewBox="0 -1 42 44" width="42" height="42"><path class="ch ch1" d="M10.88 .38a1.31 1.31 0 0 1 1.86 0l7.82 7.83 7.82-7.83a1.31 1.31 0 0 1 1.86 1.86l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.86z"/><path class="ch ch2" d="M10.88 15.42a1.31 1.31 0 0 1 1.86 0l7.82 7.82 7.82-7.82a1.31 1.31 0 0 1 1.86 1.85l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.85z"/><path class="ch ch3" d="M10.88 31.38a1.31 1.31 0 0 1 1.86 0l7.82 7.83 7.82-7.83a1.31 1.31 0 0 1 1.86 1.86l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.86z"/></svg></div>
+<!-- подсказка «листайте вниз»: полоса внизу экрана, появляется, если посетитель не прокручивает страницу больше 2 секунд -->
+<div class="idle-hint" id="idle-hint" aria-hidden="true"><svg class="ih-ch" viewBox="0 -1 42 44"><path class="ch ch1" d="M10.88 .38a1.31 1.31 0 0 1 1.86 0l7.82 7.83 7.82-7.83a1.31 1.31 0 0 1 1.86 1.86l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.86z"/><path class="ch ch2" d="M10.88 15.42a1.31 1.31 0 0 1 1.86 0l7.82 7.82 7.82-7.82a1.31 1.31 0 0 1 1.86 1.85l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.85z"/><path class="ch ch3" d="M10.88 31.38a1.31 1.31 0 0 1 1.86 0l7.82 7.83 7.82-7.83a1.31 1.31 0 0 1 1.86 1.86l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.86z"/></svg><span class="ih-text">Листайте вниз</span><svg class="ih-ch" viewBox="0 -1 42 44"><path class="ch ch1" d="M10.88 .38a1.31 1.31 0 0 1 1.86 0l7.82 7.83 7.82-7.83a1.31 1.31 0 0 1 1.86 1.86l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.86z"/><path class="ch ch2" d="M10.88 15.42a1.31 1.31 0 0 1 1.86 0l7.82 7.82 7.82-7.82a1.31 1.31 0 0 1 1.86 1.85l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.85z"/><path class="ch ch3" d="M10.88 31.38a1.31 1.31 0 0 1 1.86 0l7.82 7.83 7.82-7.83a1.31 1.31 0 0 1 1.86 1.86l-8.75 8.75a1.31 1.31 0 0 1-1.86 0l-8.75-8.75a1.31 1.31 0 0 1 0-1.86z"/></svg></div>
 <div class="vp" id="vp">
 <div id="stage">
 
@@ -207,9 +207,9 @@
       </div>
     </div>
     <div class="hint b2-el" style="--d:.45">
-      <img class="hint-bubble" src="assets/d/bubble.svg" alt="">
-      <div class="hint-goat"><div class="stk-r" style="width:286.17px;height:332.861px;transform:rotate(-165.17deg) scaleY(-1)"><i><img src="assets/d/stk/st-goatbox-1.webp" alt="" style="left:0%;top:-1.023%;width:101.051%;height:102.034%"></i></div></div>
-      <p class="hint-text">Кликните на предмет,<br>чтобы узнать подробнее</p>
+      <img class="hint-bubble" src="assets/d/hint-cloud.svg" alt="">
+      <img class="hint-bubble-m" src="assets/d/m-hint-cloud.svg" alt="">
+      <p class="hint-text">Кликните на предмет в наборе, чтобы посмотреть подробнее</p>
     </div>
     <div class="dim bgl" id="dim"></div>
     <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
@@ -232,8 +232,6 @@
   </div></section>
 
   <!-- Продукт: один слой на два экрана. Едет со скроллом из первого экрана во второй -->
-  <!-- стикер на стыке первого экрана и наборов: снизу первого экрана видна его часть, он подпрыгивает — подсказка, что страница листается -->
-  <div class="jn" id="jn" aria-hidden="true"><div class="jn-b"><div class="stk-r"><i><img src="assets/d/st-goatsong.webp" alt=""></i></div></div></div>
   <div id="product" aria-label="Набор: нажмите на предмет, чтобы узнать подробнее">
     <div class="prod-inner"></div>
   </div>
@@ -464,12 +462,12 @@
       var run = function () {
         if (run.done) return; run.done = true;
         load('content.js?t=' + Date.now());
-        load('texts.js?v=20261105s');
-        load('boot.js?v=20261105s');
-        load('analytics.js?v=20261105s');
-        load('data.js?v=20261105s');
-        load('imgsizes.js?v=20261105s');
-        load('desktop.js?v=20261105s');
+        load('texts.js?v=20261105t');
+        load('boot.js?v=20261105t');
+        load('analytics.js?v=20261105t');
+        load('data.js?v=20261105t');
+        load('imgsizes.js?v=20261105t');
+        load('desktop.js?v=20261105t');
       };
       var afterPaint = function () { requestAnimationFrame(function () { setTimeout(run, 0); }); };
       var gift = document.querySelector('.closed img');

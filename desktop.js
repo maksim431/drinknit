@@ -1451,9 +1451,6 @@
   };
   const show = (n, on) => put(n, 'display', on ? '' : 'none');
   const heroContent = $('.hero-content');
-  const jn = $('#jn');
-  // стикер на стыке подпрыгивает только на первом экране: как только начали листать — замирает
-  const jnStill = on => { if (on !== jn.classList.contains('still')) jn.classList.toggle('still', on); };
   const heroSec = $('#hero');
 
   let lastH = -1, lastP = -1, heroBurst = false, mouseMoving = true;
@@ -1530,10 +1527,6 @@
     if (focusClone) focusClone.style.transform = product.style.transform;
     const fade = clamp(1 - p * 2.4);
     heroFadeEls.forEach(el => put(el, 'opacity', String(fmt(fade))));
-    put(jn, 'transform', `translateY(${fmt(FH - CUT - 99 - (FH - 2 * CUT) * easeIO(p))}px)`);
-    put(jn, 'opacity', String(fmt(1 - clamp((lS - .05) * 3))));
-    show(jn, P < 1.6);
-    jnStill(P > .01);
     show(heroContent.parentNode.querySelector('.hero-ray'), fade > 0);
     put(heroContent, 'transform', `translateY(${fmt(-40 * (1 - fade))}px)`);
     put(heroContent, 'pointerEvents', fade > .5 ? '' : 'none');
@@ -1837,9 +1830,6 @@
     if (focusClone) focusClone.style.transform = product.style.transform;
     // набор «включается», когда коробка на экране; фон наборов отстаёт от блока (параллакс)
     const relS = CUT - tS;
-    put(jn, 'transform', `translateY(${fmt(tS - 50.59)}px)`);
-    jnStill(view > 5);
-    show(jn, tS - 51 < FH + EXTF + 20 && tS + 120 > 0);
     const onSets = relS > -320 && relS < 640;
     put(b2bg, 'transform', `translateY(${fmt(clamp(relS * .6, 0, 210))}px)`);
     if (onSets !== product.classList.contains('b2-on')) {
@@ -1939,7 +1929,7 @@
     requestAnimationFrame(() => requestAnimationFrame(() => {
       html.classList.add('flow-ready');
       // картинки первого экрана, набора и блока наборов — сразу после показа; остальные — по мере приближения
-      ['#header', '#hero', '#product', '#sets', '#idle-hint', '#jn'].forEach(sel => releaseIn($(sel)));
+      ['#header', '#hero', '#product', '#sets', '#idle-hint'].forEach(sel => releaseIn($(sel)));
     }));
     if (reduce) { finish(); return; }
     html.classList.add('is-locked');
