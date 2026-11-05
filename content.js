@@ -18,7 +18,7 @@ window.DRINKNIT_CONTENT = {
       "vkGroup": "https://vk.ru/drinknit",
       "avito": "https://www.avito.ru/user/b565417f38ad9a6312344935d20afac4/profile?src=sharing"
     },
-    "metrikaId": "29294558315068421",
+    "metrikaId": "114096674",
     "greeting": "Здравствуйте, я по поводу новогоднего набора"
   },
   "sets": {
