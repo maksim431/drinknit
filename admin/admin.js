@@ -412,7 +412,7 @@
         <div class="f-tok"></div>
         <details class="howto"><summary>Как подключить Метрику</summary>
           <ol class="steps">
-            <li>Создайте счётчик на <a href="https://metrika.yandex.ru/add" target="_blank" rel="noopener">metrika.yandex.ru</a>: адрес сайта <code>maksim431.github.io</code>, включите Вебвизор. Номер счётчика вставьте выше и нажмите «Опубликовать» — сайт начнёт отправлять данные.</li>
+            <li>Создайте счётчик на <a href="https://metrika.yandex.ru/add" target="_blank" rel="noopener">metrika.yandex.ru</a>: адрес сайта <code>drinknit.ru</code>, включите Вебвизор. Номер счётчика вставьте выше и нажмите «Опубликовать» — сайт начнёт отправлять данные.</li>
             <li>Создайте приложение на <a href="https://oauth.yandex.ru/client/new" target="_blank" rel="noopener">oauth.yandex.ru</a>: платформа «Веб-сервисы», Redirect URI <code>${esc(REDIRECT)}</code>, доступ «Яндекс Метрика → Получение статистики, чтение параметров своих и доверенных счётчиков».</li>
             <li>Скопируйте ClientID приложения в поле ниже и нажмите «Войти через Яндекс». Либо получите токен вручную и вставьте его в поле «OAuth-токен».</li>
             <li>Создайте цели из списка «Цели» ниже (раздел «Цели» в настройках счётчика → «JavaScript-событие»).</li>
