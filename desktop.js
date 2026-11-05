@@ -270,8 +270,9 @@
     vp.style.setProperty('--cut', `${cut}px`);
     buildSegs();
     if (typeof sizeFooterRef === 'function') sizeFooterRef();
+    if (typeof fitHeroRef === 'function') requestAnimationFrame(fitHeroRef);   // подстройка сдвинула первый экран — проверяем зазор до подсказки
   }
-  let sizeFooterRef = null;
+  let sizeFooterRef = null, fitHeroRef = null;
   // высота экрана для раскладки и прокрутки. На телефоне адресная строка браузера прячется и появляется при прокрутке,
   // и innerHeight меняется на лету — раскладка и соответствие «прокрутка ↔ экран» от этого прыгали.
   // Поэтому берём наименьшую высоту при текущей ширине; лишняя полоса снизу просто заполняется фоном (--ext)
@@ -1470,18 +1471,33 @@
   const idle = $('#idle-hint');
   let idleT = 0;
   const idleOff = () => { idle.classList.remove('on'); body.classList.remove('idle'); };
+  let idleNever = false;   // посетитель дошёл до подвала — подсказка больше не нужна
+  // 2) первый экран: главный текст и кнопки не должны уходить под полосу подсказки (зазор как в макете).
+  // На экранах короче макета они немного поднимаются; на обычных — стоят на месте
+  const fitHeroToIdle = () => {
+    const hc = $('.hero-content');
+    hc.style.marginTop = '';   // translate занят подстройкой под короткий экран (applyCut) — поднимаем отступом
+    const r = hc.getBoundingClientRect(), cur = new DOMMatrixReadOnly(getComputedStyle(hc).transform).m42 * s;
+    const gap = 15 * s;   // в макете от кнопок до полосы 15 px
+    const lift = Math.max(0, r.bottom - cur - (innerHeight - idle.offsetHeight - gap));
+    if (lift > .5) hc.style.marginTop = `${-(lift / s).toFixed(1)}px`;
+  };
+  addEventListener('resize', () => requestAnimationFrame(fitHeroToIdle));
+  fitHeroRef = fitHeroToIdle;
   // 4 с считаются от последней прокрутки или от момента, когда страница стала доступной (после интро, закрытия окна)
   let idleFrom = performance.now();
   const idleArm = () => {
     clearTimeout(idleT);
     idleT = setTimeout(function check() {
       const atEnd = scrollY + VH() >= document.documentElement.scrollHeight - 4;
+      if (!idleNever && footer.getBoundingClientRect().top < innerHeight - 40) idleNever = true;
+      if (idleNever) { idleOff(); return; }
       if (!body.classList.contains('is-done') || html.classList.contains('is-locked') || !modal.hidden || atEnd || document.hidden) { idleOff(); idleFrom = performance.now(); idleT = setTimeout(check, 400); return; }
       if (scrollY > 4 && performance.now() - idleFrom < 2000) { idleT = setTimeout(check, 300); return; }
       idle.classList.add('on'); body.classList.add('idle');
     }, 300);
   };
-  const idleReset = () => { idleOff(); idleFrom = performance.now(); idleArm(); };
+  const idleReset = () => { idleOff(); if (idleNever) return; idleFrom = performance.now(); idleArm(); };
   addEventListener('scroll', idleReset, { passive: true });
   addEventListener('wheel', idleReset, { passive: true });
   addEventListener('touchmove', idleReset, { passive: true });
@@ -1909,6 +1925,7 @@
     body.classList.remove('is-waiting');
     dustUntil = 0;
     body.classList.add('is-charging', 'is-open', 'is-frame', 'is-ui', 'is-done');
+    fitHeroToIdle();
     html.classList.remove('is-locked');
     twinkleOn = true;
     setTimeout(() => body.classList.remove('intro'), 50);
@@ -1916,6 +1933,7 @@
   };
   const start = () => {
     if (window.__drinknitStep) __drinknitStep('старт');
+    requestAnimationFrame(fitHeroToIdle);
     setTimeout(tryAutoplay, 3000);
     const fail = document.getElementById('boot-fail');
     if (fail) fail.remove();   // сценарий всё-таки запустился (медленное устройство) — убираем сообщение о сбое
@@ -1945,7 +1963,7 @@
     dustUntil = performance.now() + 1500;
     at(1700, () => { body.classList.add('is-open'); openBurst(); });
     at(2300, () => body.classList.add('is-frame'));
-    at(2800, () => body.classList.add('is-ui'));
+    at(2800, () => { fitHeroToIdle(); body.classList.add('is-ui'); });   // зазор до подсказки — до появления текста и кнопок
     at(4500, finish);
   };
   $('#gift').addEventListener('click', openGift);

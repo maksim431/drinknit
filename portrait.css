@@ -214,9 +214,9 @@ html.is-p .hero-box .prod-inner img { position: absolute; inset: 0; width: 100%;
 /* стикеры у верхнего края «Сроков» и финального блока заходят на блок выше */
 html.is-p #terms, html.is-p #book { overflow: visible; clip-path: inset(-80px 0 0 0); }
 /* подсказка «листайте дальше» на телефоне: 9 px от низа */
-html.is-p .idle-hint { height: calc(58px + env(safe-area-inset-bottom, 0px)); padding-top: 10px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
-html.is-p .idle-hint .ih-ch { width: 38px; height: 38px; filter: drop-shadow(0 0 2.3px rgba(255, 237, 200, .9)); }
-html.is-p .idle-hint .ih-text { font-size: 16px; }
+html.is-p .idle-hint { height: calc(58px * var(--s, 1) + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html.is-p .idle-hint .ih-ch { width: calc(38px * var(--s, 1)); height: calc(38px * var(--s, 1)); filter: drop-shadow(0 0 2.3px rgba(255, 237, 200, .9)); }
+html.is-p .idle-hint .ih-text { font-size: calc(16px * var(--s, 1)); }
 /* подвал: телефона и почты в мобильном макете нет */
 html.is-p .ft-phone, html.is-p .ft-mail { display: none; }
 

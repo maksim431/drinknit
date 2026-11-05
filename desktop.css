@@ -179,7 +179,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: linear-gradient(180deg, rgba(1, 38, 17, 0) 0%, #012611 55.288%);
 }
 .hero-content {
-  position: absolute; left: 674px; top: 647px; width: 580px; height: 378px; z-index: 10;
+  position: absolute; left: 674px; top: 627px; width: 580px; height: 354px; z-index: 10;   /* макет: до полосы «листайте вниз» 15 px */
   display: flex; flex-direction: column; align-items: center; justify-content: space-between;
 }
 .chip {
@@ -596,14 +596,14 @@ body:not(.is-frame):not(.is-done) .hero-ray, body:not(.is-frame):not(.is-done) .
 /* подсказка «листайте вниз» (макет «Если нет скролла более 2 секунд»): полоса во всю ширину внизу экрана,
    шевроны загораются по очереди сверху вниз, текст подпрыгивает */
 .idle-hint {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; height: 84px; pointer-events: none;
-  display: flex; align-items: center; justify-content: center; gap: 22px; padding-top: 20px; padding-bottom: 20px;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; height: calc(84px * var(--s, 1)); pointer-events: none;
+  display: flex; align-items: center; justify-content: center; gap: calc(22px * var(--s, 1));
   background: linear-gradient(180deg, rgba(1, 38, 17, 0) 0%, #012611 100%);
   opacity: 0; visibility: hidden; transform: translateY(12px);
   transition: opacity .35s ease, transform .45s cubic-bezier(.16, 1, .3, 1), visibility 0s linear .45s;
 }
-.idle-hint .ih-ch { display: block; flex: none; width: 44px; height: 44px; overflow: visible; filter: drop-shadow(0 0 2.6px rgba(255, 237, 200, .9)); }
-.idle-hint .ih-text { font: 600 18px/1 Manrope, sans-serif; color: #ffedc8; text-transform: uppercase; white-space: nowrap; animation: ihHop 1.2s ease-in-out infinite; }
+.idle-hint .ih-ch { display: block; flex: none; width: calc(44px * var(--s, 1)); height: calc(44px * var(--s, 1)); overflow: visible; filter: drop-shadow(0 0 2.6px rgba(255, 237, 200, .9)); }
+.idle-hint .ih-text { font: 600 max(13px, calc(18px * var(--s, 1)))/1 Manrope, sans-serif; color: #ffedc8; text-transform: uppercase; white-space: nowrap; animation: ihHop 1.2s ease-in-out infinite; }
 .idle-hint .ch { fill: #ffedc8; opacity: .3; animation: chev 1.2s ease-in-out infinite; }
 .idle-hint .ch2 { animation-delay: .2s; }
 .idle-hint .ch3 { animation-delay: .4s; }

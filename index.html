@@ -74,11 +74,11 @@
       var add = function (rel, href, as) { var l = document.createElement('link'); l.rel = rel; l.href = href; if (as) l.as = as; if (rel === 'stylesheet') l.setAttribute('blocking', 'render'); document.head.appendChild(l); };
       // скрипты страницы — сразу и с высоким приоритетом, раньше картинок: на медленной сети страница не ждёт, пока догрузятся фото
       ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'imgsizes.js', 'desktop.js'].forEach(function (f) {
-        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105t'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
+        var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + '?v=20261105v'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
       });
-      add('stylesheet', 'desktop.css?v=20261105t');
+      add('stylesheet', 'desktop.css?v=20261105v');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
-      if (m) add('stylesheet', 'portrait.css?v=20261105t');
+      if (m) add('stylesheet', 'portrait.css?v=20261105v');
       var t;
       addEventListener('resize', function () { clearTimeout(t); t = setTimeout(function () { if (isM() !== m) location.reload(); }, 250); });
     })();
@@ -462,12 +462,12 @@
       var run = function () {
         if (run.done) return; run.done = true;
         load('content.js?t=' + Date.now());
-        load('texts.js?v=20261105t');
-        load('boot.js?v=20261105t');
-        load('analytics.js?v=20261105t');
-        load('data.js?v=20261105t');
-        load('imgsizes.js?v=20261105t');
-        load('desktop.js?v=20261105t');
+        load('texts.js?v=20261105v');
+        load('boot.js?v=20261105v');
+        load('analytics.js?v=20261105v');
+        load('data.js?v=20261105v');
+        load('imgsizes.js?v=20261105v');
+        load('desktop.js?v=20261105v');
       };
       var afterPaint = function () { requestAnimationFrame(function () { setTimeout(run, 0); }); };
       var gift = document.querySelector('.closed img');
