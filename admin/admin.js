@@ -397,7 +397,8 @@
   });
 
   /* ===== Подключения ===== */
-  const REDIRECT = `${location.origin}${location.pathname}`;
+  // Redirect URI приложения — стандартная страница Яндекса: она показывает токен, его копируют в поле «OAuth-токен»
+  const REDIRECT = 'https://oauth.yandex.ru/verification_code';
   const renderSettings = () => {
     const body = $('#settings-body');
     const c = content.config, base = JSON.parse(saved).config;
@@ -413,8 +414,9 @@
         <details class="howto"><summary>Как подключить Метрику</summary>
           <ol class="steps">
             <li>Создайте счётчик на <a href="https://metrika.yandex.ru/add" target="_blank" rel="noopener">metrika.yandex.ru</a>: адрес сайта <code>drinknit.ru</code>, включите Вебвизор. Номер счётчика вставьте выше и нажмите «Опубликовать» — сайт начнёт отправлять данные.</li>
-            <li>Создайте приложение на <a href="https://oauth.yandex.ru/client/new" target="_blank" rel="noopener">oauth.yandex.ru</a>: платформа «Веб-сервисы», Redirect URI <code>${esc(REDIRECT)}</code>, доступ «Яндекс Метрика → Получение статистики, чтение параметров своих и доверенных счётчиков».</li>
-            <li>Скопируйте ClientID приложения в поле ниже и нажмите «Войти через Яндекс». Либо получите токен вручную и вставьте его в поле «OAuth-токен».</li>
+            <li>Создайте приложение на <a href="https://oauth.yandex.ru/client/new" target="_blank" rel="noopener">oauth.yandex.ru/client/new</a> → «Для доступа к API или отладки». Доступ: «Яндекс Метрика → Получение статистики, чтение параметров своих и доверенных счётчиков». Redirect URI оставьте как есть (<code>${esc(REDIRECT.replace('https://', ''))}</code>), менять его не нужно.</li>
+            <li>Скопируйте ClientID приложения в поле ниже и нажмите «Получить токен» — откроется Яндекс, разрешите доступ и скопируйте показанный токен.</li>
+            <li>Вставьте токен в поле «OAuth-токен» и нажмите «Сохранить токен».</li>
             <li>Создайте цели из списка «Цели» ниже (раздел «Цели» в настройках счётчика → «JavaScript-событие»).</li>
           </ol>
         </details>
@@ -442,11 +444,13 @@
     tb.onclick = () => { const v = tok._inp.value.trim(); if (!v) return; store.set(LS.ym, v); toast('Токен сохранён'); renderSettings(); loadStats(); };
     tok.appendChild(tb); $('.f-tok', body).appendChild(tok);
     const cl = field({ label: 'ClientID приложения Яндекса', value: store.get(LS.ymClient), multiline: false, onInput: v => store.set(LS.ymClient, v.trim()) });
-    const lb = document.createElement('button'); lb.type = 'button'; lb.className = 'btn btn-primary btn-sm'; lb.textContent = 'Войти через Яндекс';
+    const lb = document.createElement('button'); lb.type = 'button'; lb.className = 'btn btn-primary btn-sm'; lb.textContent = 'Получить токен';
     lb.onclick = () => {
       const id = store.get(LS.ymClient);
       if (!id) { toast('Сначала вставьте ClientID'); return; }
-      location.href = `https://oauth.yandex.ru/authorize?response_type=token&client_id=${encodeURIComponent(id)}&redirect_uri=${encodeURIComponent(REDIRECT)}`;
+      window.open(`https://oauth.yandex.ru/authorize?response_type=token&client_id=${encodeURIComponent(id)}&redirect_uri=${encodeURIComponent(REDIRECT)}`, '_blank', 'noopener');
+      toast('Скопируйте токен со страницы Яндекса и вставьте в поле «OAuth-токен»');
+      tok._inp.focus();
     };
     cl.appendChild(lb); $('.f-client', body).appendChild(cl);
     const off = $('#ym-off', body);
