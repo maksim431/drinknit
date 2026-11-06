@@ -1,0 +1,29 @@
+# Drinknit — drinknit.ru
+# Поисковики и ИИ-роботы могут читать весь сайт, кроме админки и служебных скриптов.
+# Именованная группа заменяет общую, поэтому запреты повторены и в ней.
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /tools/
+
+User-agent: Yandex
+User-agent: YandexBot
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: YandexAdditional
+Allow: /
+Disallow: /admin/
+Disallow: /tools/
+
+Sitemap: https://drinknit.ru/sitemap.xml
