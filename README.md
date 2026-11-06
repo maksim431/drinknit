@@ -43,5 +43,7 @@
 
 Рядом: `robots.txt` (закрыты `/admin/` и `/tools/`), `sitemap.xml`, `llms.txt`.
 
-Статический текст, JSON-LD, `llms.txt`, `sitemap.xml` и мета-теги собирает `tools/build-seo.mjs` из `content.js`.
+Отдельные страницы под вопросы покупателей (обычный HTML, без анимации): `/kakoy-nabor-vybrat/`, `/podarok-uchitelyu/`, `/dostavka-i-oplata/`, `/o-masterskoy/`. Стили — `assets/pages.css`. Ссылки на них стоят в подвале главной и в `llms.txt`, адреса — в `sitemap.xml`.
+
+Статический текст, JSON-LD, эти четыре страницы, `llms.txt`, `sitemap.xml` и мета-теги собирают `tools/build-seo.mjs` и `tools/seo-pages.mjs` из `content.js` (цены, составы, сроки, ссылки, вопросы). Руками файлы `*/index.html` этих страниц не правьте: изменения пропадут при следующем запуске.
 **После правок текстов, цен или вопросов в админке запустите `node tools/build-seo.mjs` и закоммитьте результат** — иначе роботы увидят старые цены и тексты.

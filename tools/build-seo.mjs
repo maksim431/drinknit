@@ -18,6 +18,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildPages } from './seo-pages.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://drinknit.ru';
@@ -42,6 +43,14 @@ const override = (keyStart, fallback) => {
 
 const total = C.config.total;
 const links = C.config.links || {};
+// счётчик Метрики на обычных страницах (тот же код, что в index.html) и список разделов
+const YM = 114103928;
+const NAV = [
+  ['/kakoy-nabor-vybrat/', 'Какой набор выбрать'],
+  ['/podarok-uchitelyu/', 'Подарок учителю'],
+  ['/dostavka-i-oplata/', 'Доставка и оплата'],
+  ['/o-masterskoy/', 'О мастере'],
+];
 const deadline = new Date(C.config.deadline);
 const deadlineText = deadline.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Moscow' }).replace(/\s*г\.$/, '');
 const deadlineDate = new Date(deadline.getTime() + 3 * 3600 * 1000).toISOString().slice(0, 10);
@@ -166,6 +175,10 @@ ${C.faq.map(([q, a]) => `      <h3>${esc(plain(q))}</h3>\n      <p>${esc(plain(a
       <ul>
         ${[contact(links.telegram, 'Telegram'), contact(links.vk, 'ВКонтакте'), contact(links.max, 'MAX'), contact(links.vkGroup, 'Группа ВКонтакте'), contact(links.avito, 'Авито')].filter(Boolean).join('\n        ')}
       </ul>
+      <p>Подробнее:</p>
+      <ul>
+        ${NAV.map(([href, label]) => `<li><a href="${href}">${esc(label)}</a></li>`).join('\n        ')}
+      </ul>
       <p>Цены указаны в рублях. Изделия ручной работы, внешний вид может немного отличаться от фото. Доставка оплачивается отдельно по тарифу службы.</p>
     </footer>
   </main>`;
@@ -218,22 +231,34 @@ ${STEPS.map((s, i) => `${i + 1}. ${s}`).join('\n')}
 
 ${C.faq.map(([q, a]) => `- ${plain(q)} ${plain(a)}`).join('\n')}
 
+## Страницы сайта
+
+${NAV.map(([href, label]) => `- [${label}](${SITE}${href})`).join('\n')}
+
 ## Ссылки
 
 - [Сайт: наборы, сроки, вопросы](${SITE}/)
 ${links.telegram ? `- [Написать в Telegram](${links.telegram})\n` : ''}${links.vk ? `- [Написать во ВКонтакте](${links.vk})\n` : ''}${links.vkGroup ? `- [Группа ВКонтакте](${links.vkGroup})\n` : ''}${links.avito ? `- [Профиль на Авито](${links.avito})\n` : ''}`;
 write('llms.txt', llms);
 
+/* ---------- обычные страницы под запросы покупателей ---------- */
+const pages = buildPages({ C, SITE, links, orgId, deadlineText, today, total, SETS, COMP, LABEL, STEPS, ABOUT, ABOUT_TITLE, kidsText, NAV, YM, esc, plain, dot, fmt });
+pages.forEach(p => {
+  fs.mkdirSync(path.join(root, p.slug), { recursive: true });
+  write(`${p.slug}/index.html`, p.html);
+});
+
 /* ---------- sitemap.xml ---------- */
+const urlEntry = (loc, prio, freq) => `  <url>
+    <loc>${loc}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>${freq}</changefreq>
+    <priority>${prio}</priority>
+  </url>`;
 write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${SITE}/</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+${[urlEntry(`${SITE}/`, '1.0', 'weekly'), ...pages.map(p => urlEntry(`${SITE}/${p.slug}/`, '0.8', 'monthly'))].join('\n')}
 </urlset>
 `);
 
-console.log('Готово: index.html (JSON-LD, статический текст, meta), llms.txt, sitemap.xml');
+console.log(`Готово: index.html (JSON-LD, статический текст, meta), llms.txt, sitemap.xml, страницы: ${pages.map(p => '/' + p.slug + '/').join(' ')}`);

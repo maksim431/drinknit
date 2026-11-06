@@ -1,0 +1,67 @@
+/* Стили обычных (не анимированных) страниц сайта: подбор набора, подарок учителю, доставка и оплата, о мастере.
+   Страницы собирает tools/build-seo.mjs. Цвета и шрифты те же, что на главной */
+:root { --cream: #ffedc8; --green: #002510; --panel: rgba(255, 237, 200, .06); --line: rgba(255, 237, 200, .16); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { background: var(--green); }
+body { background: var(--green); color: var(--cream); font: 400 17px/1.6 Manrope, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+img { display: block; max-width: 100%; height: auto; }
+a:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
+
+.wrap { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+/* шапка */
+.site-head { border-bottom: 1px solid var(--line); }
+.site-head .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding-top: 16px; padding-bottom: 16px; }
+.logo img { width: 110px; height: auto; }
+.nav { display: flex; flex-wrap: wrap; gap: 6px 22px; font-weight: 600; font-size: 15px; }
+.nav a { text-decoration: none; opacity: .85; }
+.nav a:hover, .nav a[aria-current] { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+
+main { padding: 28px 0 56px; }
+.crumbs { font-size: 14px; opacity: .7; margin-bottom: 18px; }
+.crumbs a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* заголовки и текст */
+h1, h2, h3 { font-family: Comfortaa, system-ui, sans-serif; font-weight: 700; line-height: 1.25; }
+h1 { font-size: clamp(28px, 5vw, 42px); margin-bottom: 18px; }
+h2 { font-size: clamp(22px, 3.4vw, 28px); margin: 40px 0 14px; }
+h3 { font-size: 19px; margin: 24px 0 8px; }
+p { margin: 0 0 14px; }
+ul, ol { margin: 0 0 14px; padding-left: 1.3em; }
+li { margin: 0 0 8px; }
+.lead { font-size: 19px; line-height: 1.55; padding: 18px 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; margin-bottom: 8px; }
+.note { font-size: 15px; opacity: .75; }
+
+/* таблицы */
+.tbl { overflow-x: auto; margin: 0 0 16px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 16px; }
+th, td { padding: 12px 14px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background: var(--panel); font-weight: 700; }
+
+/* карточки и фото */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 16px 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.card img { width: 100%; height: auto; }
+.card .pad { padding: 14px 16px 16px; }
+.card h3 { margin-top: 0; }
+.card p:last-child { margin-bottom: 0; }
+.photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 16px 0; }
+.photos img { width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 14px; }
+.about-photo { margin: 0 0 20px; }
+.about-photo img { border-radius: 18px; width: 100%; }
+.ideas li { padding: 12px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; list-style: none; }
+.ideas { padding-left: 0; }
+
+/* призыв написать */
+.cta { margin: 44px 0 0; padding: 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 22px; }
+.cta h2 { margin-top: 0; }
+.btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; padding: 14px 28px; border-radius: 100px; font: 700 16px/1 Manrope, system-ui, sans-serif; color: var(--cream); text-decoration: none; background: linear-gradient(180deg, #fb8895 0%, #9d031b 100%); border: 2px solid #952430; transition: filter .25s ease, transform .25s ease; }
+.btn:hover { filter: brightness(1.08); transform: translateY(-2px); }
+.btn-ghost { background: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .27); }
+
+/* подвал */
+.site-foot { border-top: 1px solid var(--line); padding: 28px 0 40px; font-size: 14px; }
+.site-foot nav { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-bottom: 14px; font-weight: 600; opacity: .9; }
+.site-foot p { opacity: .65; margin-bottom: 6px; }

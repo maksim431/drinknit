@@ -585,6 +585,8 @@ body:not(.is-frame):not(.is-done) .hero-ray, body:not(.is-frame):not(.is-done) .
 .ft-brand img { width: 160px; height: auto; }
 .ft-tag { font: 400 14px/1 Manrope, sans-serif; margin-top: -2px; }
 .ft-small { font: 400 13px/1.5 Manrope, sans-serif; opacity: .6; }
+.ft-bottom .ft-pages { display: flex; flex-wrap: wrap; gap: 6px 22px; opacity: .85; font-weight: 600; }
+.ft-pages a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
 .ft-bottom { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255, 237, 200, .12); display: flex; flex-direction: column; gap: 10px; }
 .footer a:focus-visible { outline: 2px solid var(--cream); outline-offset: 3px; }
 
