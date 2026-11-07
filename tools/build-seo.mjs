@@ -44,7 +44,7 @@ const override = (keyStart, fallback) => {
 const total = C.config.total;
 const links = C.config.links || {};
 // счётчик Метрики на обычных страницах (тот же код, что в index.html) и список разделов
-const YM = 114103928;
+const YM = Number(C.config?.metrikaId) || 0;
 const NAV = [
   ['/kakoy-nabor-vybrat/', 'Какой набор выбрать'],
   ['/podarok-uchitelyu/', 'Подарок учителю'],

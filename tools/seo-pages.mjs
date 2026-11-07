@@ -78,21 +78,11 @@ export function buildPages(ctx) {
   <script type="application/ld+json">
 ${JSON.stringify(ld, null, 2).replace(/<\/script/gi, '<\\/script').replace(/^/gm, '  ')}
   </script>
-  <!-- Yandex.Metrika counter -->
-  <script type="text/javascript">
-      (function(m,e,t,r,i,k,a){
-          m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-          m[i].l=1*new Date();
-          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=${YM}', 'ym');
-
-      ym(${YM}, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-  </script>
-  <!-- /Yandex.Metrika counter -->
+  <link rel="stylesheet" href="/assets/cookies.css">
+  <script defer src="/assets/cookies.js"></script>
+  <script defer src="/analytics.js?v=20261107cookies" data-metrika-id="${YM}"></script>
 </head>
 <body>
-  <noscript><div><img src="https://mc.yandex.ru/watch/${YM}" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
   <header class="site-head">
     <div class="wrap">
       <a class="logo" href="/"><img src="/assets/d/logo.svg" width="198" height="112" alt="Drinknit — вещи ручной работы"></a>
@@ -115,6 +105,7 @@ ${cta}
       <nav aria-label="Разделы"><a href="/">Главная</a>${NAV.map(([href, label]) => `<a href="${href}">${esc(label)}</a>`).join('')}</nav>
       <p>Drinknit — новогодние наборы с вязаными игрушками ручной работы. Нижний Новгород, доставка по России.</p>
       <p>Цены указаны в рублях. Изделия ручной работы, внешний вид может немного отличаться от фото. Доставка оплачивается отдельно по тарифу службы.</p>
+      <p><a href="/privacy/">Политика конфиденциальности</a></p>
       <p>© ${today.slice(0, 4)} Drinknit</p>
     </div>
   </footer>

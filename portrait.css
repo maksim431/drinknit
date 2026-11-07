@@ -193,14 +193,18 @@ html.is-p .faq-more p { font-size: 12.5px; line-height: 17.5px; max-width: 200px
 
 /* Подвал */
 html.is-p .footer { background: #002510; top: calc(844px + var(--py, 0px) + var(--ext, 0px)); width: calc(390px + 2 * var(--px, 0px)); padding: 38.73px calc(19.37px + var(--px, 0px)) 30.43px; border-top-width: .69px; }
-html.is-p .ft-in { grid-template-columns: 1fr 1fr; gap: 27.67px 19.37px; }
+html.is-p .ft-in { grid-template-columns: 1fr 1fr; gap: 32px; }
 html.is-p .ft-brand { grid-column: 1 / -1; gap: 8.3px; }
 html.is-p .ft-col { gap: 8.3px; font-size: 14.53px; line-height: 21.06px; }
 html.is-p .ft-h { font-size: 15.22px; line-height: 19.78px; letter-spacing: .484px; margin-bottom: 4.15px; }
-html.is-p .ft-brand img { width: 138.33px; }
+html.is-p .ft-brand .ft-logo-wide { display: none; }
+html.is-p .ft-brand .ft-logo-narrow { display: block; margin-left: 1.84px; margin-bottom: 1.15px; }
+html.is-p .ft-credit { grid-column: 1 / -1; margin-top: 16px; }
+html.is-p .ft-legal { flex-direction: column-reverse; gap: 20px; font-size: 14.53px; }
+html.is-p .ft-bottom .ft-pages { display: none; }
 html.is-p .ft-tag { font-size: 12.45px; }
 html.is-p .ft-small { font-size: 12px; line-height: 16.6px; }
-html.is-p .ft-bottom { margin-top: 24.9px; padding-top: 16.6px; gap: 6.92px; }
+html.is-p .ft-bottom { margin-top: 20px; padding-top: 0; border: 0; gap: 20px; }
 html.is-p #book .stickers { z-index: 16; }   /* стикеры поверх карточек наборов */
 
 
@@ -218,7 +222,6 @@ html.is-p .idle-hint { height: calc(58px * var(--s, 1) + env(safe-area-inset-bot
 html.is-p .idle-hint .ih-ch { width: calc(38px * var(--s, 1)); height: calc(38px * var(--s, 1)); filter: drop-shadow(0 0 2.3px rgba(255, 237, 200, .9)); }
 html.is-p .idle-hint .ih-text { font-size: calc(16px * var(--s, 1)); }
 /* подвал: телефона и почты в мобильном макете нет */
-html.is-p .ft-phone, html.is-p .ft-mail { display: none; }
 
 /* свободный скролл: таймер на одном уровне с остальными блоками, иначе он закрывал стикер на краю «Сроков» */
 html.is-p #left { z-index: 30; }

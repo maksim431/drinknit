@@ -27,34 +27,32 @@
   ];
 
   const C = window.DRINKNIT_CONTENT || {};
-  const id = Number(C.config && C.config.metrikaId) || 0;
+  const pageId = document.currentScript?.dataset.metrikaId;
+  const id = Number(pageId ?? C.config?.metrikaId) || 0;
   const sent = {};
 
-  if (id && !/[?&]noym\b/.test(location.search)) {
-    // стандартный код счётчика Метрики
-    (function (m, e, t, r, i, k, a) {
-      m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments); };
-      m[i].l = 1 * new Date();
-      // сам скрипт Метрики грузится после показа первого экрана: на медленной сети он не отнимает канал у страницы.
-      // До этого вызовы ym копятся в очереди и отправляются, когда скрипт загрузится
-      const add = () => { k = e.createElement(t); a = e.getElementsByTagName(t)[0]; k.async = 1; k.src = r; a.parentNode.insertBefore(k, a); };
-      // скрипт Метрики — через 3,5 с после показа первого экрана, в свободное время браузера:
-      // не мешает загрузке страницы (PageSpeed). Посещения короче этого времени в статистику не попадают
-      const html = e.documentElement;
-      const later = () => setTimeout(() => (window.requestIdleCallback ? requestIdleCallback(add, { timeout: 2000 }) : add()), 3500);
-      if (html.classList.contains('flow-ready')) later();
-      else {
-        const mo = new MutationObserver(() => { if (html.classList.contains('flow-ready')) { mo.disconnect(); later(); } });
-        mo.observe(html, { attributes: true, attributeFilter: ['class'] });
-      }
-    })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+  let started = false;
+  function start() {
+    if (started || !id || /[?&]noym\b/.test(location.search)) return;
+    started = true;
+
+    window.ym = function () { (window.ym.a ||= []).push(arguments); };
+    window.ym.l = Date.now();
+    const tag = document.createElement('script');
+    tag.async = true;
+    tag.src = 'https://mc.yandex.ru/metrika/tag.js';
+    document.head.appendChild(tag);
     window.ym(id, 'init', { clickmap: true, trackLinks: true, accurateTrackBounce: true, webvisor: true });
   }
 
+  if (window.DrinknitCookies?.accepted()) start();
+  window.addEventListener('drinknit:analytics-accepted', start);
+
   // событие → цель Метрики. once — только один раз за визит (дошёл до блока, досмотрел видео)
   const track = (goal, params, once) => {
+    if (!started) return;
     if (once) { if (sent[goal]) return; sent[goal] = 1; }
-    if (id && window.ym) window.ym(id, 'reachGoal', goal, params || undefined);
+    window.ym(id, 'reachGoal', goal, params || undefined);
   };
 
   window.DrinknitAnalytics = { GOALS, track };
