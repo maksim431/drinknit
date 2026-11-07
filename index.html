@@ -92,7 +92,7 @@
       ['texts.js', 'boot.js', 'analytics.js', 'data.js', 'imgsizes.js', 'desktop.js'].forEach(function (f) {
         var l = document.createElement('link'); l.rel = 'preload'; l.as = 'script'; l.href = f + (f === 'analytics.js' ? '?v=20261107cookies' : '?v=20261105v'); l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l);
       });
-      add('stylesheet', 'desktop.css?v=20261107footer');
+      add('stylesheet', 'desktop.css?v=20261107footer2');
       // телефон и вертикальный планшет: те же блоки и анимации в вертикальном кадре
       if (m) add('stylesheet', 'portrait.css?v=20261107cookies');
       var t;
