@@ -139,7 +139,10 @@ window.DRINKNIT_CONTENT = {
       "title": "Крем для рук",
       "text": "Приятный зимний уход в дополнение к игрушкам.<br>Объём 30 мл.",
       "note": "",
-      "photos": []
+      "photos": [
+        "assets/items/cream-mw820ji60.webp",
+        "assets/items/cream-mw820lb11.webp"
+      ]
     },
     "card": {
       "title": "Открытка<br>с вашим текстом",
