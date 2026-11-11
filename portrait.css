@@ -58,10 +58,10 @@ html.is-p .chip img { width: 16.6px; height: 16.6px; }
 html.is-p .h1 { width: 384.57px; font-size: 22px; line-height: 31.75px; letter-spacing: .747px; }
 html.is-p .row-btns { flex-direction: column; width: 359px; gap: 4px; }
 html.is-p .row-btns .btn { width: 100%; height: 48px; font-size: 14px; }
-/* подсказка «Нажми на подарок» (в мобильном макете не нарисована) */
-html.is-p .gift-hint-bubble { left: 8px; top: 660px; width: 236px; height: 137px; }
-html.is-p .gift-hint-text { left: 118px; top: 702px; font-size: 14px; }
-html.is-p .gift-hint-goat { left: 210px; top: 630px; scale: .55; transform-origin: 0 0; }
+/* Подсказка над подарком с учётом обрезки кадра на коротких экранах. */
+html.is-p .gift-hint-bubble { left: 8px; top: 62px; width: 236px; height: 137px; }
+html.is-p .gift-hint-text { left: 118px; top: 104px; font-size: 14px; }
+html.is-p .gift-hint-goat { left: 210px; top: 32px; scale: .55; transform-origin: 0 0; }
 html.is-p .skip { right: 16px; bottom: 16px; }
 
 /* 2. Наборы */
@@ -88,7 +88,7 @@ html.is-p .hint-text { left: 18px; top: 21px; width: 226px; font-size: 12px; }
 html.is-p .setg[data-set="S"] { transform: translate(.03%, -5.815%) scale(.8179); }
 html.is-p .setg[data-set="M"] { transform: translate(.01%, .124%) scale(.9673); }
 /* окно предмета */
-html.is-p .modal { left: 10px; top: calc(var(--cut, 0px) + 92px); width: 370px; height: calc(740px - 2 * var(--cut, 0px)); flex-direction: column-reverse; padding: 16px; gap: 14px; border-radius: 28px; }
+html.is-p .modal { left: 10px; top: 104px; width: 370px; height: calc(740px - 2 * var(--cut, 0px)); flex-direction: column-reverse; padding: 16px; gap: 14px; border-radius: 28px; }
 html.is-p .modal-photo { width: 100%; height: auto; flex: 1 1 0; min-height: 0; border-radius: 18px; }
 html.is-p .modal-img img { width: 100%; height: 100%; }
 html.is-p .modal-info { flex: none; justify-content: flex-start; gap: 12px; }   /* текст сразу под названием, фото забирает остальную высоту */
