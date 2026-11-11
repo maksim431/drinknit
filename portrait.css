@@ -88,7 +88,7 @@ html.is-p .hint-text { left: 18px; top: 21px; width: 226px; font-size: 12px; }
 html.is-p .setg[data-set="S"] { transform: translate(.03%, -5.815%) scale(.8179); }
 html.is-p .setg[data-set="M"] { transform: translate(.01%, .124%) scale(.9673); }
 /* окно предмета */
-html.is-p .modal { left: 10px; top: 104px; width: 370px; height: calc(740px - 2 * var(--cut, 0px)); flex-direction: column-reverse; padding: 16px; gap: 14px; border-radius: 28px; }
+html.is-p .modal { left: 10px; top: calc(var(--cut, 0px) + 92px); width: 370px; height: calc(740px - 2 * var(--cut, 0px)); flex-direction: column-reverse; padding: 16px; gap: 14px; border-radius: 28px; }
 html.is-p .modal-photo { width: 100%; height: auto; flex: 1 1 0; min-height: 0; border-radius: 18px; }
 html.is-p .modal-img img { width: 100%; height: 100%; }
 html.is-p .modal-info { flex: none; justify-content: flex-start; gap: 12px; }   /* текст сразу под названием, фото забирает остальную высоту */
